@@ -5,9 +5,9 @@ import 'package:gymbook/core/constants/app_assets.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
+import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/auth/presentation/screens/widgets/bouncing_social_button.dart';
 import 'package:gymbook/features/auth/presentation/screens/widgets/divider_widget.dart';
 
 class LoginWidget extends StatefulWidget {

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/constants/app_assets.dart';
-
-import 'package:gymbook/features/home/presentation/screens/widgets/attendance_history_card.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/attendance_history_card.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/rating_card.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/subscriptions_details_info_card.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/subscriptions_info_card.dart';
 import 'package:gymbook/features/home/presentation/screens/widgets/image_gym_details.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/rating_card.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/subscriptions_details_info_card.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/subscriptions_info_card.dart';
 
 class SubscriptionsDetailsScreenBody extends StatelessWidget {
   const SubscriptionsDetailsScreenBody({super.key});

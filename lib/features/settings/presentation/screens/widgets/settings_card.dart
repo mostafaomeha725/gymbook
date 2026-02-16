@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/settings_item.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/switch_open_gym.dart';
+import 'package:gymbook/core/widgets/switch_open_gym.dart';
+import 'package:gymbook/features/settings/presentation/screens/widgets/settings_item.dart';
 
 class SettingsCard extends StatefulWidget {
   const SettingsCard({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/auth/presentation/screens/widgets/bouncing_social_button.dart';
 
 class GymInfoCard extends StatelessWidget {
   final String gymName;
@@ -136,7 +136,6 @@ class GymInfoCard extends StatelessWidget {
           /// Buttons
           Row(
             children: [
-              /// Directions
               Expanded(
                 child: BouncingSocialButton(
                   text: 'Directions',

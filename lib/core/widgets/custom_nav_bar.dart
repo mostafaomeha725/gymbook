@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gymbook/core/widgets/custom_bottom_navbar.dart';
+import 'package:gymbook/core/widgets/customer_nav_data.dart';
 import 'package:gymbook/core/widgets/navigation_state.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/widgets/admin_nav_data.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/customer_nav_data.dart';
 
 class CustomNavBar extends StatefulWidget {
   final bool isAdmin;
 
-  const CustomNavBar({super.key, this.isAdmin = true});
+  const CustomNavBar({super.key, this.isAdmin = false});
 
   // ignore: library_private_types_in_public_api
   static _CustomNavBarState? of(BuildContext context) =>

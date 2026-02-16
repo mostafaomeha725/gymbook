@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/app_image.dart';
+import 'package:gymbook/core/widgets/switch_open_gym.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/widgets/tag_bage.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/switch_open_gym.dart';
 
 class BranchHeaderSection extends StatefulWidget {
   const BranchHeaderSection({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/auth/presentation/screens/widgets/bouncing_social_button.dart';
 
 class SubscriptionsInfoCard extends StatelessWidget {
   const SubscriptionsInfoCard({super.key});

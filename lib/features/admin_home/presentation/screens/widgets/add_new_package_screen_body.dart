@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 
 import 'package:gymbook/features/admin_home/presentation/screens/widgets/add_new_package_text_field_body.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/appbar_subscription_widget.dart';
 
 class AddNewPackageScreenBody extends StatelessWidget {
   const AddNewPackageScreenBody({super.key});

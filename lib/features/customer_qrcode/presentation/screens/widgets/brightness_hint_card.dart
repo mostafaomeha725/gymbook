@@ -18,7 +18,6 @@ class BrightnessHintCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Icon
           Padding(
             padding: EdgeInsets.only(top: 4.h),
             child: Icon(Icons.light_mode, color: Colors.amber, size: 26.sp),

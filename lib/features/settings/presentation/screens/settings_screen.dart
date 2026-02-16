@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/settings_screen_body.dart';
+import 'package:gymbook/features/settings/presentation/screens/widgets/settings_screen_body.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});

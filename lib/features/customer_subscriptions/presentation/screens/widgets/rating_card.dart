@@ -35,7 +35,6 @@ class _RatingCardState extends State<RatingCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Title
           AppText(
             "Rate Your Experience",
             style: font18w700.copyWith(color: const Color(0xff2E3A46)),
@@ -43,7 +42,6 @@ class _RatingCardState extends State<RatingCard> {
 
           SizedBox(height: 20.h),
 
-          /// Stars
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {

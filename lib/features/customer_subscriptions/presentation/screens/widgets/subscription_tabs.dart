@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/subscriptions_screen_body.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/subscriptions_screen_body.dart';
 
 class SubscriptionTabs extends StatelessWidget {
   final SubscriptionTab selectedTab;

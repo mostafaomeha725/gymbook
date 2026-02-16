@@ -42,7 +42,6 @@ class SettingsItem extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           child: Row(
             children: [
-              /// Icon Container
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
@@ -58,7 +57,6 @@ class SettingsItem extends StatelessWidget {
 
               16.horizontalSpace,
 
-              /// Texts
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +78,6 @@ class SettingsItem extends StatelessWidget {
                 ),
               ),
 
-              /// Trailing
               if (trailingWidget != null) trailingWidget,
             ],
           ),

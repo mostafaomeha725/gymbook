@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/widgets/branch_buttom.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/widgets/manage_package_status.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/widgets/package_card.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/features/home/presentation/screens/widgets/gym_pagination_widget.dart';
 
 class ManagePackageScreenBody extends StatefulWidget {

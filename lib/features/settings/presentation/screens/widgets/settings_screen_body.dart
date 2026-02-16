@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/appbar_subscription_widget.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/profile_card.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/settings_card.dart';
+import 'package:gymbook/features/settings/presentation/screens/widgets/profile_card.dart';
+import 'package:gymbook/features/settings/presentation/screens/widgets/settings_card.dart';
 
 class SettingsScreenBody extends StatelessWidget {
   const SettingsScreenBody({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/auth/presentation/screens/widgets/bouncing_social_button.dart';
 
 class SubscriptionsDetailsInfoCard extends StatelessWidget {
   const SubscriptionsDetailsInfoCard({super.key});
@@ -19,6 +19,7 @@ class SubscriptionsDetailsInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.08),
             blurRadius: 20.r,
             offset: const Offset(0, 10),
@@ -28,7 +29,6 @@ class SubscriptionsDetailsInfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Title
           AppText(
             "Subscription Details",
             style: font18w700.copyWith(color: const Color(0xff2E3A46)),
@@ -36,22 +36,18 @@ class SubscriptionsDetailsInfoCard extends StatelessWidget {
 
           SizedBox(height: 24.h),
 
-          /// Plan
           _buildRow("Plan", "Monthly Plan"),
 
           SizedBox(height: 18.h),
 
-          /// Price
           _buildRow("Price", "500 EGP"),
 
           SizedBox(height: 18.h),
 
-          /// Start Date
           _buildRow("Start Date", "February 8, 2026"),
 
           SizedBox(height: 18.h),
 
-          /// Expire Date
           _buildRow("Expires On", "March 8, 2026"),
 
           SizedBox(height: 24.h),
@@ -60,7 +56,6 @@ class SubscriptionsDetailsInfoCard extends StatelessWidget {
 
           SizedBox(height: 20.h),
 
-          /// Sessions Used
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -77,7 +72,6 @@ class SubscriptionsDetailsInfoCard extends StatelessWidget {
 
           SizedBox(height: 12.h),
 
-          /// Progress
           ClipRRect(
             borderRadius: BorderRadius.circular(8.r),
             child: LinearProgressIndicator(
@@ -90,7 +84,6 @@ class SubscriptionsDetailsInfoCard extends StatelessWidget {
 
           SizedBox(height: 28.h),
 
-          /// Freeze Button
           BouncingSocialButton(
             text: 'Freeze Subscription',
             borderColor: const Color(0xffF54900),

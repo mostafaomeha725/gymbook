@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/constants/app_assets.dart';
+import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_snack_bar.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/appbar_subscription_widget.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/editable_profile_image.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/editable_text_field.dart';
+import 'package:gymbook/features/settings/presentation/screens/widgets/editable_profile_image.dart';
+import 'package:gymbook/features/settings/presentation/screens/widgets/editable_text_field.dart';
 
 class EditProfileScreenBody extends StatefulWidget {
   const EditProfileScreenBody({super.key});
@@ -19,19 +19,16 @@ class _EditProfileScreenBodyState extends State<EditProfileScreenBody> {
   bool _isNameEditable = false;
   bool _isEmailEditable = false;
   bool _isPhoneEditable = false;
-  // bool _isLocationEditable = false;
 
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _phoneFocus = FocusNode();
-  // final FocusNode _locationFocus = FocusNode();
 
   @override
   void dispose() {
     _nameFocus.dispose();
     _emailFocus.dispose();
     _phoneFocus.dispose();
-    // _locationFocus.dispose();
     super.dispose();
   }
 
@@ -112,7 +109,6 @@ class _EditProfileScreenBodyState extends State<EditProfileScreenBody> {
                 _isNameEditable = false;
                 _isEmailEditable = false;
                 _isPhoneEditable = false;
-                // _isLocationEditable = false;
               });
               CustomSnackBar.showSuccess(
                 context,

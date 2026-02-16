@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/constants/app_assets.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_asset.dart';
+import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/auth/presentation/screens/widgets/bouncing_social_button.dart';
 
 class QrcodeScanner extends StatelessWidget {
   const QrcodeScanner({super.key});
@@ -28,7 +28,6 @@ class QrcodeScanner extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          /// QR Stack
           Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,
@@ -76,7 +75,6 @@ class QrcodeScanner extends StatelessWidget {
 
           SizedBox(height: 40.h),
 
-          /// Expire Text
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -98,9 +96,7 @@ class QrcodeScanner extends StatelessWidget {
               text: 'Refresh Code',
               borderColor: const Color(0XFF0EA5E9),
               icon: Icons.refresh,
-              onTap: () {
-                // Directions action
-              },
+              onTap: () {},
               textSize: 14.sp,
               textColor: const Color(0XFF0EA5E9),
             ),

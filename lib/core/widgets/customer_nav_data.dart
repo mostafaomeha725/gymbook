@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gymbook/features/customer_qrcode/presentation/screens/entry_qrcode_gym_screen.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/subscriptions_screen.dart';
 import 'package:gymbook/features/home/presentation/screens/customer_home_screen.dart';
-import 'package:gymbook/features/home/presentation/screens/entry_qrcode_gym_screen.dart';
-import 'package:gymbook/features/home/presentation/screens/settings_screen.dart';
-import 'package:gymbook/features/home/presentation/screens/subscriptions_screen.dart';
+import 'package:gymbook/features/settings/presentation/screens/settings_screen.dart';
 
 class CustomerNavData {
   static final List<Map<String, dynamic>> items = [

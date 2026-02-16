@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/auth/presentation/screens/widgets/bouncing_social_button.dart';
 
 class ProfileCard extends StatelessWidget {
   const ProfileCard({super.key});
@@ -49,7 +49,6 @@ class ProfileCard extends StatelessWidget {
 
               SizedBox(width: 16.w),
 
-              /// Name + Phone
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -66,7 +65,6 @@ class ProfileCard extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          /// Edit Button
           BouncingSocialButton(
             text: 'Edit Profile',
 

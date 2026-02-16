@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/my_subscription_card.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/subscriptions_screen_body.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/my_subscription_card.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/subscriptions_screen_body.dart';
 
 class SubscriptionListView extends StatelessWidget {
   final SubscriptionTab selectedTab;

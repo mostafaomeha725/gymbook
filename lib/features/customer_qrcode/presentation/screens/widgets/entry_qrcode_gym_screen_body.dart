@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:gymbook/features/auth/presentation/screens/widgets/gymbook_card.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/brightness_hint_card.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/qrcode_scanner.dart';
+import 'package:gymbook/features/customer_qrcode/presentation/screens/widgets/brightness_hint_card.dart';
+import 'package:gymbook/features/customer_qrcode/presentation/screens/widgets/qrcode_scanner.dart';
 
 class EntryQrcodeGymScreenBody extends StatelessWidget {
   const EntryQrcodeGymScreenBody({super.key});

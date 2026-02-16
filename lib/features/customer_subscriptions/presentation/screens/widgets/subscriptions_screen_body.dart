@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/appbar_subscription_widget.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/subscription_list_view.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/subscription_tabs.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/subscription_list_view.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/screens/widgets/subscription_tabs.dart';
 
 enum SubscriptionTab { active, expired }
 
@@ -95,7 +95,6 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
 
           SizedBox(height: 16.h),
 
-          /// Tabs
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: SubscriptionTabs(
