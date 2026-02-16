@@ -11,28 +11,35 @@ class AdminHomeScreenBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Column(
-            children: [
-              const AppbarAdminHomeWidget(
-                userName: 'My Branches',
-                location: 'Manage all your gym locations',
-              ),
-              SizedBox(height: 16.h),
-              AppText(
-                'All Branches (${branchesList.length})',
-                style: font20w700,
-                textPadding: EdgeInsets.symmetric(horizontal: 16.w),
-              ),
-              SizedBox(height: 16.h),
-            ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Column(
+              children: [
+                const AppbarAdminHomeWidget(
+                  userName: 'My Branches',
+                  location: 'Manage all your gym locations',
+                ),
+                SizedBox(height: 16.h),
+
+                AppText(
+                  'All Branches (${branchesList.length})',
+                  style: font20w700,
+                  textPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                ),
+
+                SizedBox(height: 16.h),
+              ],
+            ),
           ),
-        ),
-        const Expanded(child: BranchesListView()),
-      ],
+
+          const BranchesListView(),
+
+          SizedBox(height: 152.h),
+        ],
+      ),
     );
   }
 }

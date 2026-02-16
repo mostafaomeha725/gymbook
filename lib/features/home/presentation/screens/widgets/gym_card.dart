@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/admin_home/presentation/screens/widgets/get_type_color.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/widgets/tag_bage.dart';
 
 class GymCard extends StatelessWidget {
   final String gymName;
@@ -38,6 +38,7 @@ class GymCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
+              // ignore: deprecated_member_use
               color: Colors.black.withOpacity(0.05),
               blurRadius: 15,
               offset: const Offset(0, 5),
@@ -79,13 +80,7 @@ class GymCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildBadge(
-                        text: type,
-                        bgColor: GetTypeColor()
-                            .getTypeColor(type)
-                            .withOpacity(0.1),
-                        textColor: GetTypeColor().getTypeColor(type),
-                      ),
+                      TagBadge(tag: type),
                       Row(
                         children: [
                           Icon(
@@ -107,15 +102,7 @@ class GymCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildBadge(
-                        text: isOpen ? 'Open Now' : 'Closed',
-                        bgColor: isOpen
-                            ? const Color(0xFFDCFCE7)
-                            : const Color(0xFFFEE2E2),
-                        textColor: isOpen
-                            ? const Color(0xFF166534)
-                            : const Color(0xFF991B1B),
-                      ),
+                      TagBadge(tag: isOpen ? 'Open Now' : 'Closed'),
                       Row(
                         children: [
                           Icon(
@@ -138,27 +125,6 @@ class GymCard extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBadge({
-    required String text,
-    required Color bgColor,
-    required Color textColor,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: AppText(
-        text,
-        style: font12w500.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );

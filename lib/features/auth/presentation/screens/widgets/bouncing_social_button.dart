@@ -16,6 +16,9 @@ class BouncingSocialButton extends StatelessWidget {
     this.textColor,
     this.textSize,
     this.color,
+    this.gradient,
+    this.leading,
+    this.height,
   });
 
   final String text;
@@ -23,53 +26,59 @@ class BouncingSocialButton extends StatelessWidget {
 
   final String? assetName;
   final IconData? icon;
+  final Widget? leading;
 
   final Color? borderColor;
   final Color? textColor;
   final double? textSize;
   final Color? color;
+  final Gradient? gradient;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     return BounceIt(
       onPressed: onTap,
       child: Container(
-        height: 48.h,
+        height: height ?? 48.h,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: color,
+          color: gradient == null ? color : null,
+          gradient: gradient,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(color: borderColor ?? const Color(0xFFDADADA)),
         ),
         child: Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              /// 👈 child مخصص
+              if (leading != null) ...[
+                leading!,
+                SizedBox(width: 16.w),
+              ]
               /// SVG
-              if (assetName != null)
+              else if (assetName != null) ...[
                 AppSVG(
                   assetName: assetName!,
                   width: 20.w,
                   height: 20.h,
                   fit: BoxFit.contain,
-                )
-              /// Icon
-              else if (icon != null)
-                Icon(
-                  icon,
-                  size: 20.sp,
-                  color: textColor ?? const Color(0xff0EA5E9),
                 ),
-
-              SizedBox(width: 12.w),
+                SizedBox(width: 10.w),
+              ]
+              /// Icon
+              else if (icon != null) ...[
+                Icon(icon, size: 20.sp, color: textColor ?? Colors.white),
+                SizedBox(width: 10.w),
+              ],
 
               AppText(
                 text,
                 maxLines: 1,
                 alignment: AlignmentDirectional.center,
                 style: font16w600.copyWith(
-                  color: textColor ?? const Color(0xff0EA5E9),
+                  color: textColor ?? Colors.white,
                   fontSize: textSize ?? 16.sp,
                 ),
               ),

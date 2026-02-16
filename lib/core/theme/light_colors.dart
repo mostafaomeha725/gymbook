@@ -17,4 +17,10 @@ class AppLightColors {
   static const Color formfiledErrorColor = Color(0xFFFB4E4E);
 
   static const Color buttonColor = Color(0xFF0EA5E9);
+
+  static const LinearGradient buttonGradient = LinearGradient(
+    colors: [Color(0xFF0EA5E9), Color(0xFF0284C7)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 }

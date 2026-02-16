@@ -5,6 +5,8 @@ import 'package:gymbook/features/admin_home/presentation/screens/add_branch_four
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_one_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_three_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_two_screen.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/add_new_package_screen.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/manage_package_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/gym_register_details_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/join_us_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/login_screen.dart';
@@ -29,7 +31,7 @@ final CustomGoRouterObserver customGoRouterObserver = CustomGoRouterObserver();
 
 GoRouter createRouter() {
   return GoRouter(
-    initialLocation: Routes.mainNavigationScreen,
+    initialLocation: Routes.addNewPackageScreen,
     navigatorKey: navigatorKey,
     debugLogDiagnostics: true,
     observers: [
@@ -120,6 +122,14 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.addBranchFourScreen,
         builder: (context, state) => const AddBranchFourScreen(),
+      ),
+      GoRoute(
+        path: Routes.addNewPackageScreen,
+        builder: (context, state) => const AddNewPackageScreen(),
+      ),
+      GoRoute(
+        path: Routes.managePackageScreen,
+        builder: (context, state) => const ManagePackageScreen(),
       ),
     ],
   );

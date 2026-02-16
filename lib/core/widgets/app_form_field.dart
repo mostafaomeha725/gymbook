@@ -99,7 +99,7 @@ class _AppFormFieldState extends State<AppFormField> {
         hintStyle: font14w500.copyWith(
           color: Theme.of(context).brightness == Brightness.dark
               ? AppDarkColors.offwhite
-              : const Color(0xff717182),
+              : Colors.grey,
         ),
         filled: true,
         fillColor: widget.fillColor ?? Colors.white,

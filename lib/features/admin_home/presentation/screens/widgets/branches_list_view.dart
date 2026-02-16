@@ -11,21 +11,27 @@ class BranchesListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: EdgeInsets.only(bottom: 124.h, left: 12.w, right: 12.w),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
       itemCount: branches.length,
       itemBuilder: (context, index) {
         final branch = branches[index];
-        return BranchCard(
-          imageUrl: branch.imageUrl,
-          branchName: branch.branchName,
-          location: branch.location,
-          tags: branch.tags,
-          subscriptions: branch.subscriptions,
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${branch.branchName} tapped!')),
-            );
-          },
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: BranchCard(
+            imageUrl: branch.imageUrl,
+            branchName: branch.branchName,
+            location: branch.location,
+            tags: branch.tags,
+            subscriptions: branch.subscriptions,
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${branch.branchName} tapped!')),
+              );
+            },
+          ),
         );
       },
     );

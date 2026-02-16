@@ -17,4 +17,6 @@ class Routes {
   static const addBranchTwoScreen = '/add-branch-two-screen';
   static const addBranchThreeScreen = '/add-branch-three-screen';
   static const addBranchFourScreen = '/add-branch-four-screen';
+  static const managePackageScreen = '/manage-package-screen';
+  static const addNewPackageScreen = '/add-new-package-screen';
 }

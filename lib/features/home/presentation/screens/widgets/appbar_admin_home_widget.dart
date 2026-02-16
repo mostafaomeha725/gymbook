@@ -97,10 +97,11 @@ class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
               ),
             ),
             SizedBox(height: 16.h),
-            BouncingSocialButton(
+            const BouncingSocialButton(
               text: 'Add New Branch',
               icon: Icons.add,
               color: Colors.white,
+              textColor: Color(0xff0EA5E9),
             ),
 
             SizedBox(height: 24.h),
