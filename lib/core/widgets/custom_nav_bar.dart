@@ -7,7 +7,7 @@ import 'package:gymbook/features/admin_home/presentation/screens/widgets/admin_n
 class CustomNavBar extends StatefulWidget {
   final bool isAdmin;
 
-  const CustomNavBar({super.key, this.isAdmin = false});
+  const CustomNavBar({super.key, this.isAdmin = true});
 
   // ignore: library_private_types_in_public_api
   static _CustomNavBarState? of(BuildContext context) =>

@@ -31,8 +31,8 @@ class StatusCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 16,
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 16.r,
             offset: const Offset(0, 8),
           ),
         ],
@@ -49,12 +49,11 @@ class StatusCard extends StatelessWidget {
 
           SizedBox(height: 12.h),
 
-          /// الرقم
           FittedBox(
             fit: BoxFit.scaleDown,
             child: AppText(
               title,
-              style: font24w700.copyWith(
+              style: font18w700.copyWith(
                 color: gradient != null
                     ? Colors.white
                     : const Color(0xff2C3E50),
@@ -64,14 +63,13 @@ class StatusCard extends StatelessWidget {
 
           SizedBox(height: 4.h),
 
-          /// النص
           FittedBox(
             fit: BoxFit.scaleDown,
             child: AppText(
               subtitle,
               style: font14w500.copyWith(
                 color: gradient != null
-                    ? Colors.white.withOpacity(.9)
+                    ? Colors.white.withValues(alpha: 0.9)
                     : Colors.grey,
               ),
             ),

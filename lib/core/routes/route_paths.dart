@@ -19,4 +19,9 @@ class Routes {
   static const addBranchFourScreen = '/add-branch-four-screen';
   static const managePackageScreen = '/manage-package-screen';
   static const addNewPackageScreen = '/add-new-package-screen';
+  static const adminManageSubscriptionsScreen =
+      '/admin-manage-subscriptions-screen';
+  static const adminSubscriptionDetailsScreen =
+      '/admin-subscription-details-screen';
+  static const adminAddSubscriptionScreen = '/admin-add-subscription-screen';
 }

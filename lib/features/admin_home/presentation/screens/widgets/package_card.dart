@@ -37,8 +37,7 @@ class PackageCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18.r),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(.08),
+            color: Colors.black.withAlpha(15),
             blurRadius: 14.r,
             offset: const Offset(0, 6),
           ),
@@ -49,10 +48,7 @@ class PackageCard extends StatelessWidget {
         child: IntrinsicHeight(
           child: Row(
             children: [
-              Container(
-                width: 4.w,
-                decoration: BoxDecoration(color: sideColor),
-              ),
+              Container(width: 4.w, color: sideColor),
 
               SizedBox(width: 12.w),
 
@@ -74,16 +70,15 @@ class PackageCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isActive
                                   ? const Color(0x200EA5E9)
-                                  // أزرق فاتح
-                                  : const Color(0xffF3F4F6), // رمادي فاتح
+                                  : const Color(0xffF3F4F6),
                               borderRadius: BorderRadius.circular(14.r),
                             ),
                             child: Icon(
                               Icons.inventory_2_outlined,
                               size: 26.sp,
                               color: isActive
-                                  ? const Color(0xFF0EA5E9) // أزرق
-                                  : const Color(0xff9CA3AF), // رمادي
+                                  ? const Color(0xFF0EA5E9)
+                                  : const Color(0xff9CA3AF),
                             ),
                           ),
 
@@ -93,10 +88,10 @@ class PackageCard extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                AppText(title, style: font18w700, maxLines: 2),
+                                AppText(title, style: font18w700),
                                 SizedBox(height: 4.h),
                                 AppText(
-                                  "$months Months  •  $freezes Freezes",
+                                  "$months Months • $freezes Freezes",
                                   style: font14w400.copyWith(
                                     color: const Color(0xff4A5565),
                                   ),
@@ -145,49 +140,44 @@ class PackageCard extends StatelessWidget {
 
                       SizedBox(height: 12.h),
 
-                      Padding(
-                        padding: EdgeInsets.only(left: 60.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                AppText(
-                                  price,
-                                  style: font24w700.copyWith(
-                                    color: const Color(0xFF0EA5E9),
-                                  ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              AppText(
+                                price,
+                                style: font24w700.copyWith(
+                                  color: const Color(0xFF0EA5E9),
                                 ),
-                                SizedBox(width: 6.w),
-                                AppText(
-                                  "EGP",
-                                  style: font14w400.copyWith(
-                                    color: const Color(0xff6A7282),
-                                  ),
+                              ),
+                              SizedBox(width: 6.w),
+                              AppText(
+                                "EGP",
+                                style: font14w400.copyWith(
+                                  color: const Color(0xff6A7282),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
 
-                            Row(
-                              children: [
-                                AppText(
-                                  isActive ? "Active" : "Inactive",
-                                  style: font14w500.copyWith(
-                                    color: Colors.grey,
-                                  ),
+                          Row(
+                            children: [
+                              AppText(
+                                isActive ? "Active" : "Inactive",
+                                style: font14w500.copyWith(color: Colors.grey),
+                              ),
+                              SizedBox(width: 6.w),
+                              Transform.scale(
+                                scale: 0.9,
+                                child: OpenGymSwitch(
+                                  value: isActive,
+                                  onChanged: onToggle ?? (_) {},
                                 ),
-                                SizedBox(width: 6.w),
-                                Transform.scale(
-                                  scale: 0.9.h,
-                                  child: OpenGymSwitch(
-                                    value: isActive,
-                                    onChanged: onToggle!,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),

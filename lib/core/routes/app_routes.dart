@@ -6,6 +6,9 @@ import 'package:gymbook/features/admin_home/presentation/screens/add_branch_one_
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_three_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_two_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_new_package_screen.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/admin_add_subscription_screen.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/admin_manage_subscriptions_screen.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/admin_subscription_details_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/manage_package_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/gym_register_details_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/join_us_screen.dart';
@@ -89,13 +92,13 @@ GoRouter createRouter() {
         pageBuilder: (context, state) {
           final args = state.extra as FullImageViewerArgs;
           return CustomTransitionPage(
-            opaque: false, // لضمان رؤية الخلفية
-            barrierColor: Colors.black.withOpacity(0.5), // درجة التعتيم
+            opaque: false,
+            barrierColor: Colors.black.withOpacity(0.5),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);
                 },
-            child: FullImageViewerScreen(args: args), // مرر الـ args هنا
+            child: FullImageViewerScreen(args: args),
           );
         },
       ),
@@ -130,6 +133,18 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.managePackageScreen,
         builder: (context, state) => const ManagePackageScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminManageSubscriptionsScreen,
+        builder: (context, state) => const AdminManageSubscriptionsScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminSubscriptionDetailsScreen,
+        builder: (context, state) => const AdminSubscriptionDetailsScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminAddSubscriptionScreen,
+        builder: (context, state) => const AdminAddSubscriptionScreen(),
       ),
     ],
   );

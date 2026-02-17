@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
+import 'package:gymbook/core/widgets/custom_search.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/core/widgets/app_form_field.dart';
 
 class AppbarAdminHomeWidget extends StatefulWidget {
   final String userName;
@@ -76,25 +76,10 @@ class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
 
             SizedBox(height: 24.h),
 
-            AppFormField(
+            CustomSearch(
               controller: searchController,
-              hintText: 'Search branches...',
-              fillColor: Colors.white,
-              radius: 16.r,
-              borderColor: Colors.transparent,
-              prefixIcon: Padding(
-                padding: EdgeInsets.only(left: 8.w),
-                child: Icon(
-                  Icons.search,
-                  color: const Color(0xFF94A3B8),
-                  size: 24.sp,
-                ),
-              ),
-              maxLines: 1,
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 15.h,
-                horizontal: 10.w,
-              ),
+              hintText: "Search branches...",
+              onChanged: (text) {},
             ),
             SizedBox(height: 16.h),
             const BouncingSocialButton(

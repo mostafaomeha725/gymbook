@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 
@@ -34,7 +35,13 @@ class AppbarSubscriptionWidget extends StatelessWidget {
             Row(
               children: [
                 GestureDetector(
-                  onTap: onBack,
+                  onTap: () {
+                    if (onBack != null) {
+                      onBack!();
+                    } else {
+                      GoRouter.of(context).pop();
+                    }
+                  },
                   child: const Icon(Icons.arrow_back, color: Colors.white),
                 ),
                 SizedBox(width: 16.w),

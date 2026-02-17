@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/custom_search.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/features/home/presentation/screens/widgets/notification_icon.dart';
@@ -87,25 +88,9 @@ class _AppbarHomeWidgetState extends State<AppbarHomeWidget> {
 
             SizedBox(height: 24.h),
 
-            AppFormField(
+            CustomSearch(
               controller: searchController,
-              hintText: 'Find gyms near you...',
-              fillColor: Colors.white,
-              radius: 16.r,
-              borderColor: Colors.transparent,
-              prefixIcon: Padding(
-                padding: EdgeInsets.only(left: 8.w),
-                child: Icon(
-                  Icons.search,
-                  color: const Color(0xFF94A3B8),
-                  size: 24.sp,
-                ),
-              ),
-              maxLines: 1,
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 15.h,
-                horizontal: 10.w,
-              ),
+              hintText: "Find gyms near you...",
             ),
 
             SizedBox(height: 24.h),

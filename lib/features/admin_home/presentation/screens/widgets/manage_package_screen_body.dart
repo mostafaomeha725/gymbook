@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
@@ -19,6 +21,30 @@ class ManagePackageScreenBody extends StatefulWidget {
 class _ManagePackageScreenBodyState extends State<ManagePackageScreenBody> {
   int _currentSelectedPage = 1;
 
+  List<Map<String, dynamic>> packages = [
+    {
+      "title": "Premium Semi-Annual",
+      "months": 6,
+      "freezes": 3,
+      "price": "2500",
+      "isActive": true,
+    },
+    {
+      "title": "Elite Annual",
+      "months": 12,
+      "freezes": 4,
+      "price": "4500",
+      "isActive": false,
+    },
+    {
+      "title": "Starter Monthly",
+      "months": 1,
+      "freezes": 1,
+      "price": "500",
+      "isActive": true,
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -33,7 +59,13 @@ class _ManagePackageScreenBodyState extends State<ManagePackageScreenBody> {
           const ManagePackageStatus(),
           SizedBox(height: 24.h),
 
-          BranchButtom(text: 'Add New Package', icon: Icons.add, onTap: () {}),
+          BranchButtom(
+            text: 'Add New Package',
+            icon: Icons.add,
+            onTap: () {
+              GoRouter.of(context).push(Routes.addNewPackageScreen);
+            },
+          ),
 
           SizedBox(height: 48.h),
 
@@ -45,43 +77,30 @@ class _ManagePackageScreenBodyState extends State<ManagePackageScreenBody> {
 
           SizedBox(height: 16.h),
 
-          PackageCard(
-            title: "Premium Semi-Annual",
-            months: 6,
-            freezes: 3,
-            price: "2500",
-            isActive: true,
-            sideColor: Colors.green,
-            onToggle: (v) {},
-          ),
+          ...List.generate(packages.length, (index) {
+            final pkg = packages[index];
 
-          PackageCard(
-            title: "Elite Annual",
-            months: 12,
-            freezes: 4,
-            price: "4500",
-            isActive: false,
-            sideColor: Colors.red,
-            onToggle: (v) {},
-          ),
-          PackageCard(
-            title: "Elite Annual",
-            months: 12,
-            freezes: 4,
-            price: "4500",
-            isActive: false,
-            sideColor: Colors.red,
-            onToggle: (v) {},
-          ),
-          PackageCard(
-            title: "Elite Annual",
-            months: 12,
-            freezes: 4,
-            price: "4500",
-            isActive: false,
-            sideColor: Colors.red,
-            onToggle: (v) {},
-          ),
+            return PackageCard(
+              onEdit: () {
+                GoRouter.of(context).push(Routes.addNewPackageScreen);
+              },
+              title: pkg["title"],
+              months: pkg["months"],
+              freezes: pkg["freezes"],
+              price: pkg["price"],
+              isActive: pkg["isActive"],
+
+              sideColor: pkg["isActive"] ? Colors.green : Colors.red,
+
+              onToggle: (value) {
+                setState(() {
+                  pkg["isActive"] = value;
+                });
+              },
+            );
+          }),
+
+          SizedBox(height: 20.h),
 
           SizedBox(height: 20.h),
 
