@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/auth/presentation/screens/widgets/join_us_screen_body.dart';
+import 'package:gymbook/features/auth/presentation/widgets/join_us_screen_body.dart';
 
 class JoinUsScreen extends StatelessWidget {
   const JoinUsScreen({super.key});

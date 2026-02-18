@@ -20,8 +20,9 @@ import 'package:gymbook/core/widgets/custom_nav_bar.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/screens/subscriptions_details_screen.dart';
 import 'package:gymbook/features/home/presentation/screens/full_image_viewer_screen.dart';
 import 'package:gymbook/features/home/presentation/screens/gym_details_screen.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/full_image_viewer_args.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/gym_details_screen_body.dart';
+import 'package:gymbook/features/home/presentation/widgets/full_image_viewer_args.dart';
+import 'package:gymbook/features/home/presentation/widgets/gym_details_screen_body.dart';
+
 import 'package:gymbook/features/settings/presentation/screens/edit_profile_screen.dart';
 
 import '/core/env.dart';

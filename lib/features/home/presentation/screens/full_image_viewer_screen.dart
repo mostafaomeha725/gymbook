@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/full_image_viewer_args.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/full_image_viewer_screen_body.dart';
+import 'package:gymbook/features/home/presentation/widgets/full_image_viewer_args.dart';
+import 'package:gymbook/features/home/presentation/widgets/full_image_viewer_screen_body.dart';
 
 class FullImageViewerScreen extends StatelessWidget {
-  final FullImageViewerArgs args; // استقبال الموديل اللي فيه الصور
+  final FullImageViewerArgs args;
 
   const FullImageViewerScreen({super.key, required this.args});
 

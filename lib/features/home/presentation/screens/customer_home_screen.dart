@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/home/presentation/screens/widgets/customer_home_screen_body.dart';
+import 'package:gymbook/features/home/presentation/widgets/customer_home_screen_body.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
   const CustomerHomeScreen({super.key});

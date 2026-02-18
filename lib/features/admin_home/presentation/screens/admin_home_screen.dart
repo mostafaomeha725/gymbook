@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/admin_home/presentation/screens/widgets/admin_home_screen_body.dart';
+import 'package:gymbook/features/admin_home/presentation/widgets/admin_home_screen_body.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
