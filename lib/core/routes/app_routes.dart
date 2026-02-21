@@ -35,7 +35,7 @@ final CustomGoRouterObserver customGoRouterObserver = CustomGoRouterObserver();
 
 GoRouter createRouter() {
   return GoRouter(
-    initialLocation: Routes.mainNavigationScreen,
+    initialLocation: Routes.loginScreen,
     navigatorKey: navigatorKey,
     debugLogDiagnostics: true,
     observers: [

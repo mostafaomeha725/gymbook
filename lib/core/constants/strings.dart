@@ -1,6 +1,5 @@
 class AppStrings {
-  static const String baseUrl =
-      'https://optima-software-solutions.com/divido/api/';
+  static const String baseUrl = 'http://localhost:44000/api/';
   static const String perPage = '10';
   static const String googlePlayUrl = '';
   static const String appStoreUrl = '';

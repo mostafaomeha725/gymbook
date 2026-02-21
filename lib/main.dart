@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/routes/app_routes.dart';
 import 'package:gymbook/core/theme/light_colors.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ServiceLocator().init();
+  configureEasyLoading();
+
   runApp(const GymbookApp());
 }
 
@@ -30,6 +36,7 @@ class GymbookApp extends StatelessWidget {
             useMaterial3: true,
           ),
           routerConfig: router,
+          builder: EasyLoading.init(),
         );
       },
     );
