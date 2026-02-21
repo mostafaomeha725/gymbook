@@ -3,7 +3,6 @@ import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/auth/data/model/register_response.dart';
-import 'package:meta/meta.dart';
 
 part 'register_state.dart';
 
@@ -13,22 +12,27 @@ class RegisterCubit extends Cubit<RegisterState> {
   final NetworkService networkService;
 
   Future<void> register({
-    required String fullName,
+    required String firstName,
+    required String lastName,
     required String email,
-    required String countryCode,
-    required String phoneNumber,
     required String password,
+    required String confirmPassword,
+    required String address,
+    required String phoneNumber,
   }) async {
+    emit(RegisterLoading());
     showLoading();
 
     final response = await networkService.postData(
       endPoint: EndPoints.register,
       data: {
-        'full_name': fullName,
+        'firstName': firstName,
+        'lastName': lastName,
         'email': email,
-        'country_code': '+$countryCode',
-        'phone_number': phoneNumber,
         'password': password,
+        'confirmPassword': confirmPassword,
+        'address': address,
+        'phoneNumber': phoneNumber,
       },
     );
 
@@ -39,16 +43,9 @@ class RegisterCubit extends Cubit<RegisterState> {
         showError(failure.message);
         emit(RegisterFailure(failure.message));
       },
-      (response) {
-        final registerResponse = RegisterResponse.fromJson(response);
-        if (registerResponse.success) {
-          emit(
-            RegisterSuccess(registerResponse.message, phoneNumber, countryCode),
-          );
-        } else {
-          showError(registerResponse.message);
-          emit(RegisterFailure(registerResponse.message));
-        }
+      (data) {
+        final registerResponse = RegisterResponse.fromJson(data);
+        emit(RegisterSuccess(registerResponse));
       },
     );
   }

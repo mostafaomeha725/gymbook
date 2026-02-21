@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
@@ -39,7 +40,12 @@ class ServiceLocator {
   /// AUTH FEATURE
   /// =============================
   void _initAuth() {
-    sl.registerFactory(() => LoginCubit(sl()));
+    if (!sl.isRegistered<LoginCubit>()) {
+      sl.registerFactory(() => LoginCubit(sl()));
+    }
+    if (!sl.isRegistered<RegisterCubit>()) {
+      sl.registerFactory(() => RegisterCubit(sl()));
+    }
   }
 
   // /// =============================

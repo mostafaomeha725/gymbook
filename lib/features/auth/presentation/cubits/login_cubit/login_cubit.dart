@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
+import 'package:gymbook/core/services/google_sign_in_service.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/auth/data/model/login_response.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
@@ -13,6 +14,8 @@ class LoginCubit extends Cubit<LoginState> {
 
   final NetworkService networkService;
 
+  // ─── Email / Password Login ────────────────────────────────────────────────
+
   Future<void> login(String email, String password) async {
     emit(LoginLoading());
     showLoading();
@@ -22,7 +25,7 @@ class LoginCubit extends Cubit<LoginState> {
       data: {'email': email, 'password': password},
     );
 
-    showLoading();
+    hideLoading();
 
     response.fold(
       (failure) {
@@ -31,13 +34,45 @@ class LoginCubit extends Cubit<LoginState> {
       },
       (data) async {
         final loginResponse = LoginResponse.fromJson(data);
-        await saveUserToken(loginResponse.accessToken);
+        await _saveSession(loginResponse);
         emit(LoginSuccess(loginResponse));
       },
     );
   }
 
-  Future<void> saveUserToken(String token) async {
-    await sl<PreferencesStorage>().saveUserToken(token);
+  // ─── Google Login ──────────────────────────────────────────────────────────
+
+  Future<void> loginWithGoogle() async {
+    final idToken = await GoogleSignInService.getIdToken();
+
+    if (idToken == null) return; // user cancelled
+
+    emit(LoginLoading());
+    showLoading();
+
+    final response = await networkService.postData(
+      endPoint: EndPoints.googleLogin,
+      data: {'idToken': idToken},
+    );
+
+    hideLoading();
+
+    response.fold(
+      (failure) {
+        showError(failure.message);
+        emit(LoginFailure(failure.message));
+      },
+      (data) async {
+        final loginResponse = LoginResponse.fromJson(data);
+        await _saveSession(loginResponse);
+        emit(LoginSuccess(loginResponse));
+      },
+    );
+  }
+
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+
+  Future<void> _saveSession(LoginResponse response) async {
+    await sl<PreferencesStorage>().saveUserToken(response.accessToken);
   }
 }

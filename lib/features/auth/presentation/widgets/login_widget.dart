@@ -166,7 +166,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               BouncingSocialButton(
                 text: "Continue with Google",
                 assetName: Assets.google,
-                onTap: () {},
+                onTap: () => context.read<LoginCubit>().loginWithGoogle(),
                 textColor: Colors.black,
               ),
             ],

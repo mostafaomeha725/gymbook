@@ -81,9 +81,8 @@ class JoinAsMemberCard extends StatelessWidget {
           TextJoinMember(color: color, text: text[0]),
           TextJoinMember(color: color, text: text[1]),
           TextJoinMember(color: color, text: text[2]),
-          TextJoinMember(color: color, text: text[3]),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 16.h),
 
           AppButton(
             text: textbutton,

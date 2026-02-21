@@ -2,9 +2,11 @@ class EndPoints {
   static const String apiSecret = 'kJ5kHX2vCfiy0zc2mWulKgZy0TFo6pTF';
 
   /// Auth endpoints
-  static const String register = 'auth/register';
+  static const String register = 'Users';
 
   static const String login = 'Authentication/login';
+
+  static const String googleLogin = 'Authentication/google-login';
 
   static const String sendOtp = 'send-otp';
 
