@@ -48,6 +48,19 @@ class PreferencesStorage {
     await _preferences.remove(PreferencesKeys.userToken.name);
   }
 
+  /// ================= USER ROLE =================
+  Future<void> saveUserRole(bool isAdmin) async {
+    await _preferences.setBool(PreferencesKeys.userIsAdmin.name, isAdmin);
+  }
+
+  bool isUserAdmin() {
+    return _preferences.getBool(PreferencesKeys.userIsAdmin.name) ?? false;
+  }
+
+  Future<void> deleteUserRole() async {
+    await _preferences.remove(PreferencesKeys.userIsAdmin.name);
+  }
+
   /// ================= LANGUAGE =================
   String getCurrentLanguage() {
     return _preferences.getString(PreferencesKeys.currentLanguage.name) ?? "en";

@@ -1,11 +1,1 @@
-enum PreferencesKeys {
-  currentLanguage,
-  currentCurrency,
-  fcmToken,
-  uuid,
-  name,
-  picture,
-  email,
-  phone,
-  userToken,
-}
+export 'package:gymbook/core/enums/app_enums.dart' show PreferencesKeys;

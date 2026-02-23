@@ -1,6 +1,8 @@
 import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/cache/preferences_storage.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_four_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_one_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_three_screen.dart';
@@ -14,8 +16,7 @@ import 'package:gymbook/features/auth/presentation/screens/gym_register_details_
 import 'package:gymbook/features/auth/presentation/screens/join_us_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/login_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
-import 'package:gymbook/features/auth/presentation/screens/register_bussiness_screen.dart';
-import 'package:gymbook/features/auth/presentation/screens/register_customer_screen.dart';
+import 'package:gymbook/features/auth/presentation/screens/register_screen.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/screens/subscriptions_details_screen.dart';
 import 'package:gymbook/features/home/presentation/screens/full_image_viewer_screen.dart';
@@ -33,11 +34,41 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 final CustomGoRouterObserver customGoRouterObserver = CustomGoRouterObserver();
 
+String _getInitialLocation() {
+  final storage = sl<PreferencesStorage>();
+  final token = storage.getUserToken();
+  return token != null && token.isNotEmpty
+      ? Routes.mainNavigationScreen
+      : Routes.loginScreen;
+}
+
 GoRouter createRouter() {
   return GoRouter(
-    initialLocation: Routes.loginScreen,
+    initialLocation: _getInitialLocation(),
     navigatorKey: navigatorKey,
     debugLogDiagnostics: true,
+    redirect: (context, state) {
+      final storage = sl<PreferencesStorage>();
+      final token = storage.getUserToken();
+      final isLoggedIn = token != null && token.isNotEmpty;
+
+      if (isLoggedIn &&
+          (state.matchedLocation == Routes.loginScreen ||
+              state.matchedLocation == Routes.registerScreen ||
+              state.matchedLocation == Routes.joinusScreen)) {
+        return Routes.mainNavigationScreen;
+      }
+
+      if (!isLoggedIn &&
+          state.matchedLocation != Routes.loginScreen &&
+          state.matchedLocation != Routes.registerScreen &&
+          state.matchedLocation != Routes.joinusScreen &&
+          state.matchedLocation != Routes.otpScreen) {
+        return Routes.loginScreen;
+      }
+
+      return null;
+    },
     observers: [
       if (isDevEnviroment()) ChuckerFlutter.navigatorObserver,
       // customGoRouterObserver,
@@ -52,12 +83,11 @@ GoRouter createRouter() {
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
-        path: Routes.registerCustomerScreen,
-        builder: (context, state) => const RegisterCustomerScreen(),
-      ),
-      GoRoute(
-        path: Routes.registerBussinessScreen,
-        builder: (context, state) => const RegisterBussinessScreen(),
+        path: Routes.registerScreen,
+        builder: (context, state) {
+          final type = state.extra as RegisterType;
+          return RegisterScreen(type: type);
+        },
       ),
 
       GoRoute(
@@ -78,7 +108,11 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: Routes.mainNavigationScreen,
-        builder: (context, state) => const CustomNavBar(),
+        builder: (context, state) {
+          final storage = sl<PreferencesStorage>();
+          final isAdmin = (state.extra as bool?) ?? storage.isUserAdmin();
+          return CustomNavBar(isAdmin: isAdmin);
+        },
       ),
       GoRoute(
         path: Routes.gymDetailsScreen,
@@ -117,11 +151,19 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: Routes.addBranchTwoScreen,
-        builder: (context, state) => const AddBranchTwoScreen(),
+        builder: (context, state) {
+          final branchId =
+              int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0;
+          return AddBranchTwoScreen(branchId: branchId);
+        },
       ),
       GoRoute(
         path: Routes.addBranchThreeScreen,
-        builder: (context, state) => const AddBranchThreeScreen(),
+        builder: (context, state) {
+          final branchId =
+              int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0;
+          return AddBranchThreeScreen(branchId: branchId);
+        },
       ),
       GoRoute(
         path: Routes.addBranchFourScreen,

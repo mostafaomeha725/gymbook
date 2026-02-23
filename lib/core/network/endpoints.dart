@@ -2,7 +2,8 @@ class EndPoints {
   static const String apiSecret = 'kJ5kHX2vCfiy0zc2mWulKgZy0TFo6pTF';
 
   /// Auth endpoints
-  static const String register = 'Users';
+  static const String registerUser = 'Authentication/register-user';
+  static const String registerOwner = 'Authentication/register-owner';
 
   static const String login = 'Authentication/login';
 
@@ -20,4 +21,10 @@ class EndPoints {
 
   /// Profile endpoints
   static const String profile = 'profile';
+
+  /// Owner endpoints
+  static const String createBranch = 'Owner/Branches';
+
+  static String updateBranchWorkingHours(int branchId) =>
+      'Owner/Branches/$branchId/working-hours';
 }

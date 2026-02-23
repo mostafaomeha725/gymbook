@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/day_working_card.dart';
 
-
 class BranchWorkingHours extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onHoursChanged;
 
@@ -30,6 +29,10 @@ class _BranchWorkingHoursState extends State<BranchWorkingHours> {
   void initState() {
     super.initState();
     _initializeControllers();
+    // Notify initial state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _notifyChanges();
+    });
   }
 
   void _initializeControllers() {
@@ -55,20 +58,40 @@ class _BranchWorkingHoursState extends State<BranchWorkingHours> {
   }
 
   void _notifyChanges() {
-    final hoursData = <String, dynamic>{};
+    final workingHours = <Map<String, dynamic>>[];
     for (int i = 0; i < workingDays.length; i++) {
-      hoursData[workingDays[i]['day']] = {
-        'isOpen': workingDays[i]['isOpen'],
-        'openTime': openTimeControllers[i].text,
-        'closeTime': closeTimeControllers[i].text,
-      };
+      final isOpen = workingDays[i]['isOpen'] as bool;
+
+      if (isOpen) {
+        final openTime = openTimeControllers[i].text.trim();
+        final closeTime = closeTimeControllers[i].text.trim();
+
+        workingHours.add({
+          'day': i,
+          'openTime': openTime.isNotEmpty ? openTime : null,
+          'closeTime': closeTime.isNotEmpty ? closeTime : null,
+          'isClosed': false,
+        });
+      } else {
+        workingHours.add({
+          'day': i,
+          'openTime': null,
+          'closeTime': null,
+          'isClosed': true,
+        });
+      }
     }
-    widget.onHoursChanged?.call(hoursData);
+
+    widget.onHoursChanged?.call({'workingHours': workingHours});
   }
 
   void _updateDayStatus(int index, bool isOpen) {
     setState(() {
       workingDays[index]['isOpen'] = isOpen;
+      if (!isOpen) {
+        openTimeControllers[index].clear();
+        closeTimeControllers[index].clear();
+      }
     });
     _notifyChanges();
   }

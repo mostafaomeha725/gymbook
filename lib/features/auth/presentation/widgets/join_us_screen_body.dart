@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
+import 'package:gymbook/features/auth/presentation/screens/register_screen.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/auth/presentation/widgets/gymbook_card.dart';
@@ -34,7 +35,9 @@ class JoinUsScreenBody extends StatelessWidget {
             textbutton: 'Join as Member',
             icon: Icons.person_outline,
             onpressed: () {
-              GoRouter.of(context).push(Routes.registerCustomerScreen);
+              GoRouter.of(
+                context,
+              ).push(Routes.registerScreen, extra: RegisterType.customer);
             },
           ),
           SizedBox(height: 22.h),
@@ -49,7 +52,9 @@ class JoinUsScreenBody extends StatelessWidget {
             text2: 'Grow your gym business',
             textbutton: 'Register Your Gym',
             onpressed: () {
-              GoRouter.of(context).push(Routes.registerBussinessScreen);
+              GoRouter.of(
+                context,
+              ).push(Routes.registerScreen, extra: RegisterType.business);
             },
             icon: Icons.fitness_center_outlined,
           ),

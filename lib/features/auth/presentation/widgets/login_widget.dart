@@ -41,7 +41,10 @@ class _LoginWidgetState extends State<LoginWidget> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           hideLoading();
-          GoRouter.of(context).pushReplacement(Routes.mainNavigationScreen);
+          GoRouter.of(context).pushReplacement(
+            Routes.mainNavigationScreen,
+            extra: state.loginResponse.user.isAdmin,
+          );
         }
       },
       child: Container(

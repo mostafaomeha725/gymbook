@@ -250,8 +250,14 @@ class NetworkService {
       return const Left("Format Exception");
     } on DioException catch (e) {
       if (e.type == DioExceptionType.badResponse) {
-        return Left(e.response!.data['message']);
-        // return Left(_l)(e.message);
+        final data = e.response?.data;
+        if (data is Map && data['message'] != null) {
+          return Left(data['message']);
+        } else if (data is Map && data['title'] != null) {
+          return Left(data['title']);
+        } else {
+          return Left(e.message ?? 'Bad response');
+        }
       } else if (e.type == DioExceptionType.connectionTimeout) {
         // safePrint('check your connection');
         return const Left("Check your connection");
@@ -285,8 +291,14 @@ class NetworkService {
       return const Left("Format Exception");
     } on DioException catch (e) {
       if (e.type == DioExceptionType.badResponse) {
-        return Left(e.response!.data['message']);
-        // return Left(_l)(e.message);
+        final data = e.response?.data;
+        if (data is Map && data['message'] != null) {
+          return Left(data['message']);
+        } else if (data is Map && data['title'] != null) {
+          return Left(data['title']);
+        } else {
+          return Left(e.message ?? 'Bad response');
+        }
       } else if (e.type == DioExceptionType.connectionTimeout) {
         // safePrint('check your connection');
         return const Left("Check your connection");
@@ -339,7 +351,16 @@ class NetworkService {
     if (e.type == DioExceptionType.badResponse) {
       final data = e.response?.data;
       if (data is Map<String, dynamic>) {
-        // Handle errors array format: { "errors": [{"description": "..."}] }
+        // Handle validation errors as Map: { "errors": { "Email": ["..."], "PhoneNumber": ["..."] } }
+        if (data['errors'] is Map) {
+          final errors = data['errors'] as Map;
+          for (final fieldErrors in errors.values) {
+            if (fieldErrors is List && fieldErrors.isNotEmpty) {
+              return Left(Failure(fieldErrors.first.toString()));
+            }
+          }
+        }
+        // Handle errors as List: { "errors": [{"description": "..."}] }
         if (data['errors'] is List && (data['errors'] as List).isNotEmpty) {
           final firstError = (data['errors'] as List).first;
           if (firstError is Map<String, dynamic>) {

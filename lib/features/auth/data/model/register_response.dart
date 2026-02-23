@@ -4,6 +4,7 @@ class RegisterResponse {
   final String firstName;
   final String lastName;
   final String fullName;
+  final int role;
 
   RegisterResponse({
     required this.id,
@@ -11,6 +12,7 @@ class RegisterResponse {
     required this.firstName,
     required this.lastName,
     required this.fullName,
+    required this.role,
   });
 
   factory RegisterResponse.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class RegisterResponse {
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
       fullName: json['fullName'] ?? '',
+      role: json['role'] ?? 0,
     );
   }
 
@@ -30,6 +33,7 @@ class RegisterResponse {
       'firstName': firstName,
       'lastName': lastName,
       'fullName': fullName,
+      'role': role,
     };
   }
 }

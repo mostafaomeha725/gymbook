@@ -1,4 +1,5 @@
-enum RequestState { init, loading, success, error }
+export 'package:gymbook/core/enums/app_enums.dart' show RequestState;
+import 'package:gymbook/core/enums/app_enums.dart' show RequestState;
 
 extension RequestStateX on RequestState {
   bool get isLoading => this == RequestState.loading;

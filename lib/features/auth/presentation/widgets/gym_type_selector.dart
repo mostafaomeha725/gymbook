@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/auth/presentation/widgets/gym_type_item.dart';
-
-enum GymType { menOnly, womenOnly, mixed }
+export 'package:gymbook/core/enums/app_enums.dart' show GymType;
+import 'package:gymbook/core/enums/app_enums.dart' show GymType;
 
 class GymTypeSelector extends StatefulWidget {
   final GymType? initialValue;

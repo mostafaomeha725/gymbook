@@ -35,7 +35,7 @@ class _AllTextFieldRegisterBussinessState
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.h),
+      padding: EdgeInsets.symmetric(horizontal: 52.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -98,9 +98,7 @@ class _AllTextFieldRegisterBussinessState
           AppButton(
             text: 'Continue',
             onPressed: () {
-              GoRouter.of(
-                context,
-              ).push(Routes.otpScreen, extra: OtpSource.business);
+              GoRouter.of(context).push(Routes.loginScreen);
             },
             textSize: 16.sp,
             gradient: const LinearGradient(

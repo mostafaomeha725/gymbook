@@ -17,21 +17,20 @@ class RegisterCubit extends Cubit<RegisterState> {
     required String email,
     required String password,
     required String confirmPassword,
-    required String address,
     required String phoneNumber,
+    bool isOwner = false,
   }) async {
     emit(RegisterLoading());
     showLoading();
 
     final response = await networkService.postData(
-      endPoint: EndPoints.register,
+      endPoint: isOwner ? EndPoints.registerOwner : EndPoints.registerUser,
       data: {
         'firstName': firstName,
         'lastName': lastName,
         'email': email,
         'password': password,
         'confirmPassword': confirmPassword,
-        'address': address,
         'phoneNumber': phoneNumber,
       },
     );

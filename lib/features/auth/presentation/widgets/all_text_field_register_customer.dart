@@ -8,11 +8,17 @@ import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/auth/presentation/screens/register_screen.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:gymbook/features/auth/presentation/widgets/password_condition_widget.dart';
 
 class AllTextFieldRegisterCustomer extends StatefulWidget {
-  const AllTextFieldRegisterCustomer({super.key});
+  final RegisterType type;
+
+  const AllTextFieldRegisterCustomer({
+    super.key,
+    this.type = RegisterType.customer,
+  });
 
   @override
   State<AllTextFieldRegisterCustomer> createState() =>
@@ -27,7 +33,6 @@ class _AllTextFieldRegisterCustomerState
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
@@ -47,7 +52,6 @@ class _AllTextFieldRegisterCustomerState
     lastNameController.dispose();
     emailController.dispose();
     phoneController.dispose();
-    addressController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -65,7 +69,7 @@ class _AllTextFieldRegisterCustomerState
         if (state is RegisterSuccess) {
           hideLoading();
           showSuccess('Account created successfully!');
-          GoRouter.of(context).go(Routes.otpScreen);
+          GoRouter.of(context).go(Routes.loginScreen);
         }
       },
       child: Padding(
@@ -160,24 +164,6 @@ class _AllTextFieldRegisterCustomerState
               SizedBox(height: 16.h),
 
               AppText(
-                'Address (Optional)',
-                style: font14w500.copyWith(color: const Color(0xff364153)),
-              ),
-              SizedBox(height: 8.h),
-              AppFormField(
-                controller: addressController,
-                hintText: 'Enter your address',
-                maxLines: 1,
-                prefixIcon: Padding(
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: Icon(Icons.location_on_outlined, size: 22.sp),
-                ),
-                radius: 22.r,
-              ),
-
-              SizedBox(height: 16.h),
-
-              AppText(
                 'Password',
                 style: font14w500.copyWith(color: const Color(0xff364153)),
               ),
@@ -260,8 +246,8 @@ class _AllTextFieldRegisterCustomerState
                       email: emailController.text.trim(),
                       password: passwordController.text,
                       confirmPassword: confirmPasswordController.text,
-                      address: addressController.text.trim(),
                       phoneNumber: phoneController.text.trim(),
+                      isOwner: widget.type == RegisterType.business,
                     );
                   }
                 },

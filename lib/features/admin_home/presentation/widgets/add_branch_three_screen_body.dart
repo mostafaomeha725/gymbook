@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
+import 'package:gymbook/core/widgets/custom_snack_bar.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_working_hours.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/working_hours_tip.dart';
 import 'package:gymbook/features/auth/presentation/widgets/appbar_auth_card.dart';
 
 class AddBranchThreeScreenBody extends StatefulWidget {
-  const AddBranchThreeScreenBody({super.key});
+  final int branchId;
+  const AddBranchThreeScreenBody({super.key, this.branchId = 0});
 
   @override
   State<AddBranchThreeScreenBody> createState() =>
@@ -17,6 +21,30 @@ class AddBranchThreeScreenBody extends StatefulWidget {
 
 class _AddBranchThreeScreenBodyState extends State<AddBranchThreeScreenBody> {
   Map<String, dynamic>? branchHours;
+  bool _isLoading = false;
+
+  Future<void> _submitWorkingHours() async {
+    setState(() => _isLoading = true);
+
+    final success = await context
+        .read<BranchWorkingHoursCubit>()
+        .submitBranchWorkingHours(
+          branchId: widget.branchId,
+          branchHours: branchHours,
+        );
+
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    if (success) {
+      CustomSnackBar.showSuccess(
+        context,
+        message: 'Working hours saved successfully',
+      );
+      GoRouter.of(context).push(Routes.addBranchFourScreen);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +74,7 @@ class _AddBranchThreeScreenBodyState extends State<AddBranchThreeScreenBody> {
             SizedBox(height: 16.h),
             AppButton(
               text: 'Next: Add Photos',
-              onPressed: () {
-                GoRouter.of(context).push(Routes.otpScreen);
-              },
+              onPressed: _isLoading ? null : _submitWorkingHours,
               textSize: 16.sp,
               contentPadding: EdgeInsets.symmetric(horizontal: 8.w),
               gradient: const LinearGradient(

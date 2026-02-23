@@ -1,3 +1,5 @@
+import 'package:gymbook/core/enums/app_enums.dart';
+
 class LoginResponse {
   final String accessToken;
   final RefreshToken refreshToken;
@@ -24,6 +26,24 @@ class LoginResponse {
       'user': user.toJson(),
     };
   }
+}
+
+AppUserRole parseAppUserRole(dynamic rawRole) {
+  if (rawRole is int) {
+    return rawRole == 1 ? AppUserRole.admin : AppUserRole.customer;
+  }
+
+  if (rawRole is String) {
+    final normalized = rawRole.trim().toLowerCase();
+    if (normalized == '1' || normalized == 'admin' || normalized == 'owner') {
+      return AppUserRole.admin;
+    }
+    if (normalized == '0' || normalized == 'customer') {
+      return AppUserRole.customer;
+    }
+  }
+
+  return AppUserRole.customer;
 }
 
 class RefreshToken {
@@ -56,6 +76,7 @@ class LoginUser {
   final String firstName;
   final String lastName;
   final String fullName;
+  final AppUserRole role;
 
   LoginUser({
     required this.id,
@@ -63,7 +84,10 @@ class LoginUser {
     required this.firstName,
     required this.lastName,
     required this.fullName,
+    required this.role,
   });
+
+  bool get isAdmin => role == AppUserRole.admin;
 
   factory LoginUser.fromJson(Map<String, dynamic> json) {
     return LoginUser(
@@ -72,6 +96,7 @@ class LoginUser {
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
       fullName: json['fullName'] ?? '',
+      role: parseAppUserRole(json['role']),
     );
   }
 
@@ -82,6 +107,7 @@ class LoginUser {
       'firstName': firstName,
       'lastName': lastName,
       'fullName': fullName,
+      'role': role == AppUserRole.admin ? 1 : 0,
     };
   }
 }

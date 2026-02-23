@@ -4,8 +4,8 @@ import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/widgets/subscription_list_view.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/widgets/subscription_tabs.dart';
-
-enum SubscriptionTab { active, expired }
+export 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab;
+import 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab;
 
 class SubscriptionsScreenBody extends StatefulWidget {
   const SubscriptionsScreenBody({super.key});

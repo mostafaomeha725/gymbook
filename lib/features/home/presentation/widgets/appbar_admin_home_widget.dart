@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_search.dart';
@@ -82,7 +84,10 @@ class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
               onChanged: (text) {},
             ),
             SizedBox(height: 16.h),
-            const BouncingSocialButton(
+            BouncingSocialButton(
+              onTap: () {
+                GoRouter.of(context).push(Routes.addBranchOneScreen);
+              },
               text: 'Add New Branch',
               icon: Icons.add,
               color: Colors.white,

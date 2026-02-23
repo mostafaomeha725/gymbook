@@ -2,6 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/network/network_service.dart';
+import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +19,7 @@ class ServiceLocator {
 
     /// Features
     _initAuth();
+    _initAdmin();
     // _initHome();
   }
 
@@ -45,6 +49,25 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<RegisterCubit>()) {
       sl.registerFactory(() => RegisterCubit(sl()));
+    }
+  }
+
+  /// =============================
+  /// ADMIN FEATURE
+  /// =============================
+  void _initAdmin() {
+    if (!sl.isRegistered<AdminBranchRepository>()) {
+      sl.registerLazySingleton<AdminBranchRepository>(
+        () => AdminBranchRepositoryImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<CreateBranchCubit>()) {
+      sl.registerFactory(() => CreateBranchCubit(sl()));
+    }
+
+    if (!sl.isRegistered<BranchWorkingHoursCubit>()) {
+      sl.registerFactory(() => BranchWorkingHoursCubit(sl()));
     }
   }
 

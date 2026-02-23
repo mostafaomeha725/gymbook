@@ -21,6 +21,12 @@ class TimePickerField extends StatefulWidget {
 }
 
 class _TimePickerFieldState extends State<TimePickerField> {
+  String _formatToApiTime(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute:00';
+  }
+
   Future<void> _selectTime() async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -28,7 +34,7 @@ class _TimePickerFieldState extends State<TimePickerField> {
     );
 
     if (picked != null) {
-      final timeString = picked.format(context);
+      final timeString = _formatToApiTime(picked);
       widget.controller.text = timeString;
       widget.onTimeSelected?.call(timeString);
     }

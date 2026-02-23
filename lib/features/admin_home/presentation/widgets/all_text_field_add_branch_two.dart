@@ -10,7 +10,9 @@ import 'package:gymbook/core/widgets/governorate_dropdown.dart';
 import 'package:gymbook/features/auth/presentation/widgets/location_on_map_card.dart';
 
 class AllTextFieldAddBranchTwo extends StatefulWidget {
-  const AllTextFieldAddBranchTwo({super.key});
+  final int branchId;
+
+  const AllTextFieldAddBranchTwo({super.key, this.branchId = 0});
 
   @override
   State<AllTextFieldAddBranchTwo> createState() =>
@@ -64,7 +66,9 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
           AppButton(
             text: 'Next: Working Hours',
             onPressed: () {
-              GoRouter.of(context).push(Routes.otpScreen);
+              GoRouter.of(context).push(
+                '${Routes.addBranchThreeScreen}?branchId=${widget.branchId}',
+              );
             },
             textSize: 16.sp,
             gradient: const LinearGradient(

@@ -5,6 +5,7 @@ import 'package:gymbook/core/services/google_sign_in_service.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/auth/data/model/login_response.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
+import 'package:gymbook/core/enums/app_enums.dart';
 import '/core/di/services_locator.dart';
 
 part 'login_state.dart';
@@ -73,6 +74,8 @@ class LoginCubit extends Cubit<LoginState> {
   // ─── Helpers ───────────────────────────────────────────────────────────────
 
   Future<void> _saveSession(LoginResponse response) async {
-    await sl<PreferencesStorage>().saveUserToken(response.accessToken);
+    final storage = sl<PreferencesStorage>();
+    await storage.saveUserToken(response.accessToken);
+    await storage.saveUserRole(response.user.role == AppUserRole.admin);
   }
 }

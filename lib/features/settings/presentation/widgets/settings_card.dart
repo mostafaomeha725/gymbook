@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/cache/preferences_storage.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/widgets/switch_open_gym.dart';
 import 'package:gymbook/features/settings/presentation/widgets/settings_item.dart';
@@ -74,8 +76,13 @@ class SettingsCardState extends State<SettingsCard> {
             icon: Icons.logout,
             title: "Logout",
             titleColor: Colors.red,
-            onTap: () {
-              GoRouter.of(context).pushReplacement(Routes.loginScreen);
+            onTap: () async {
+              final storage = sl<PreferencesStorage>();
+              await storage.deleteUserToken();
+              await storage.deleteUserRole();
+              if (context.mounted) {
+                GoRouter.of(context).go(Routes.loginScreen);
+              }
             },
           ),
         ],
