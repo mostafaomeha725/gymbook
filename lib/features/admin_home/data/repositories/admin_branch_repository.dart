@@ -33,6 +33,14 @@ abstract class AdminBranchRepository {
     required int branchId,
     required CreatePackageRequest request,
   });
+
+  Future<Either<String, void>> updateBranchDetails({
+    required int branchId,
+    required String name,
+    required String email,
+    required String phoneNumber,
+    required int branchType,
+  });
 }
 
 class AdminBranchRepositoryImpl implements AdminBranchRepository {
@@ -123,5 +131,25 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
       (data) =>
           Right(CreatePackageResponse.fromJson(data as Map<String, dynamic>)),
     );
+  }
+
+  @override
+  Future<Either<String, void>> updateBranchDetails({
+    required int branchId,
+    required String name,
+    required String email,
+    required String phoneNumber,
+    required int branchType,
+  }) async {
+    final response = await networkService.patchData(
+      endPoint: EndPoints.updateBranchDetails(branchId),
+      data: {
+        'name': name,
+        'email': email,
+        'phoneNumber': phoneNumber,
+        'branchType': branchType,
+      },
+    );
+    return response.fold((failure) => Left(failure), (_) => const Right(null));
   }
 }

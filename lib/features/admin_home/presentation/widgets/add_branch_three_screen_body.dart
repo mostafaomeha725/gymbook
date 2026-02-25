@@ -12,7 +12,13 @@ import 'package:gymbook/features/auth/presentation/widgets/appbar_auth_card.dart
 
 class AddBranchThreeScreenBody extends StatefulWidget {
   final int branchId;
-  const AddBranchThreeScreenBody({super.key, this.branchId = 0});
+  final bool isEditMode;
+
+  const AddBranchThreeScreenBody({
+    super.key,
+    this.branchId = 0,
+    this.isEditMode = false,
+  });
 
   @override
   State<AddBranchThreeScreenBody> createState() =>
@@ -42,7 +48,11 @@ class _AddBranchThreeScreenBodyState extends State<AddBranchThreeScreenBody> {
         context,
         message: 'Working hours saved successfully',
       );
-      GoRouter.of(context).push(Routes.addBranchFourScreen);
+      if (widget.isEditMode) {
+        GoRouter.of(context).pop();
+      } else {
+        GoRouter.of(context).push(Routes.addBranchFourScreen);
+      }
     }
   }
 
@@ -73,7 +83,7 @@ class _AddBranchThreeScreenBodyState extends State<AddBranchThreeScreenBody> {
 
             SizedBox(height: 16.h),
             AppButton(
-              text: 'Next: Add Photos',
+              text: widget.isEditMode ? 'Save Changes' : 'Next: Add Photos',
               onPressed: _isLoading ? null : _submitWorkingHours,
               textSize: 16.sp,
               contentPadding: EdgeInsets.symmetric(horizontal: 8.w),

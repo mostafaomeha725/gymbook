@@ -7,11 +7,14 @@ import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
 import 'package:gymbook/features/auth/presentation/widgets/gym_type_selector.dart';
 
 class AllTextFieldAddBranchOne extends StatefulWidget {
-  const AllTextFieldAddBranchOne({super.key});
+  final BranchScreenArgs? args;
+
+  const AllTextFieldAddBranchOne({super.key, this.args});
 
   @override
   State<AllTextFieldAddBranchOne> createState() =>
@@ -22,7 +25,23 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
   final TextEditingController branchNameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  int? selectedBranchType; // null=not selected, 0=male, 1=female, 2=mixed
+  int? selectedBranchType;
+  GymType? _initialGymType;
+
+  @override
+  void initState() {
+    super.initState();
+    final branch = widget.args?.branch;
+    if (branch != null) {
+      branchNameController.text = branch.name ?? '';
+      selectedBranchType = branch.branchType;
+      _initialGymType = branch.branchType == 0
+          ? GymType.menOnly
+          : branch.branchType == 1
+          ? GymType.womenOnly
+          : GymType.mixed;
+    }
+  }
 
   @override
   void dispose() {
@@ -111,6 +130,7 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
             ),
             SizedBox(height: 24.h),
             GymTypeSelector(
+              initialValue: _initialGymType,
               onChanged: (value) {
                 setState(() {
                   // Convert GymType enum to branch type int: menOnly=0, womenOnly=1, mixed=2
@@ -124,13 +144,14 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
             ),
             SizedBox(height: 24.h),
             AppButton(
-              text: 'Create Branch',
+              text: widget.args?.isEditMode == true
+                  ? 'Save Changes'
+                  : 'Create Branch',
               onPressed: () {
                 final branchName = branchNameController.text.trim();
                 final email = emailController.text.trim();
                 final phoneNumber = phoneNumberController.text.trim();
 
-                // Validation
                 if (branchName.isEmpty) {
                   showError('Please enter branch name');
                   return;
@@ -146,7 +167,6 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
                   return;
                 }
 
-                // Validate gym type selection
                 if (selectedBranchType == null ||
                     selectedBranchType! < 0 ||
                     selectedBranchType! > 2) {
@@ -156,12 +176,22 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
                   return;
                 }
 
-                context.read<CreateBranchCubit>().createBranch(
-                  name: branchName,
-                  email: email,
-                  phoneNumber: phoneNumber,
-                  branchType: selectedBranchType!,
-                );
+                if (widget.args?.isEditMode == true) {
+                  context.read<CreateBranchCubit>().editBranch(
+                    branchId: widget.args!.branchId,
+                    name: branchName,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    branchType: selectedBranchType!,
+                  );
+                } else {
+                  context.read<CreateBranchCubit>().createBranch(
+                    name: branchName,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    branchType: selectedBranchType!,
+                  );
+                }
               },
               textSize: 16.sp,
               gradient: const LinearGradient(

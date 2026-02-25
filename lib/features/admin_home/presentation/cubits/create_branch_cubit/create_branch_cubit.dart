@@ -46,4 +46,45 @@ class CreateBranchCubit extends Cubit<CreateBranchState> {
       },
     );
   }
+
+  Future<void> editBranch({
+    required int branchId,
+    required String name,
+    required String email,
+    required String phoneNumber,
+    required int branchType,
+  }) async {
+    emit(CreateBranchLoading());
+    showLoading();
+
+    final response = await repository.updateBranchDetails(
+      branchId: branchId,
+      name: name,
+      email: email,
+      phoneNumber: phoneNumber,
+      branchType: branchType,
+    );
+
+    hideLoading();
+
+    response.fold(
+      (failure) {
+        showError(failure);
+        emit(CreateBranchFailure(failure));
+      },
+      (_) {
+        emit(
+          CreateBranchSuccess(
+            CreateBranchResponse(
+              id: branchId,
+              name: name,
+              email: email,
+              phoneNumber: phoneNumber,
+              branchType: branchType,
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

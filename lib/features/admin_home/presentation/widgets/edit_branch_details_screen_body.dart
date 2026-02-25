@@ -23,7 +23,7 @@ class EditBranchDetailsScreenBody extends StatelessWidget {
         onTap: () => GoRouter.of(context).push(
           Routes.addBranchOneScreen,
           extra: BranchScreenArgs(
-            branchId: branch.id ?? 0,
+            branchId: branch.id,
             isEditMode: true,
             branch: branch,
           ),
@@ -38,7 +38,7 @@ class EditBranchDetailsScreenBody extends StatelessWidget {
         onTap: () => GoRouter.of(context).push(
           Routes.addBranchTwoScreen,
           extra: BranchScreenArgs(
-            branchId: branch.id ?? 0,
+            branchId: branch.id,
             isEditMode: true,
             branch: branch,
           ),
@@ -53,7 +53,7 @@ class EditBranchDetailsScreenBody extends StatelessWidget {
         onTap: () => GoRouter.of(context).push(
           Routes.addBranchThreeScreen,
           extra: BranchScreenArgs(
-            branchId: branch.id ?? 0,
+            branchId: branch.id,
             isEditMode: true,
             branch: branch,
           ),

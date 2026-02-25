@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/all_current_status.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_buttom.dart';
@@ -33,7 +35,11 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
           BranchButtom(
             text: 'Edit Branch Details',
             icon: Icons.arrow_forward,
-            onTap: () {},
+            onTap: () {
+              GoRouter.of(
+                context,
+              ).push(Routes.editBranchDetailsScreen, extra: widget.branch);
+            },
           ),
 
           SizedBox(height: 16.h),

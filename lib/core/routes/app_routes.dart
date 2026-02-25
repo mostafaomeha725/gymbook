@@ -151,22 +151,32 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: Routes.addBranchOneScreen,
-        builder: (context, state) => const AddBranchOneScreen(),
+        builder: (context, state) {
+          final args = state.extra as BranchScreenArgs?;
+          return AddBranchOneScreen(args: args);
+        },
       ),
       GoRoute(
         path: Routes.addBranchTwoScreen,
         builder: (context, state) {
+          final args = state.extra as BranchScreenArgs?;
           final branchId =
-              int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0;
-          return AddBranchTwoScreen(branchId: branchId);
+              args?.branchId ??
+              (int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0);
+          return AddBranchTwoScreen(branchId: branchId, args: args);
         },
       ),
       GoRoute(
         path: Routes.addBranchThreeScreen,
         builder: (context, state) {
+          final args = state.extra as BranchScreenArgs?;
           final branchId =
-              int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0;
-          return AddBranchThreeScreen(branchId: branchId);
+              args?.branchId ??
+              (int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0);
+          return AddBranchThreeScreen(
+            branchId: branchId,
+            isEditMode: args?.isEditMode ?? false,
+          );
         },
       ),
       GoRoute(
@@ -202,14 +212,16 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.adminBranchScreen,
         builder: (context, state) {
-          final branch = state.extra as BranchItem;
+          final branch = state.extra as BranchItem?;
+          if (branch == null) return const SizedBox.shrink();
           return AdminBranchScreen(branch: branch);
         },
       ),
       GoRoute(
         path: Routes.editBranchDetailsScreen,
         builder: (context, state) {
-          final branch = state.extra as BranchItem;
+          final branch = state.extra as BranchItem?;
+          if (branch == null) return const SizedBox.shrink();
           return EditBranchDetailsScreen(branch: branch);
         },
       ),

@@ -6,7 +6,6 @@ import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/widgets/card_owner_information.dart';
 
 class AllTextFieldRegisterBussiness extends StatefulWidget {

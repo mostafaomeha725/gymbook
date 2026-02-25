@@ -6,14 +6,24 @@ import 'package:gymbook/features/admin_home/presentation/widgets/add_branch_thre
 
 class AddBranchThreeScreen extends StatelessWidget {
   final int branchId;
+  final bool isEditMode;
 
-  const AddBranchThreeScreen({super.key, this.branchId = 0});
+  const AddBranchThreeScreen({
+    super.key,
+    this.branchId = 0,
+    this.isEditMode = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<BranchWorkingHoursCubit>(),
-      child: Scaffold(body: AddBranchThreeScreenBody(branchId: branchId)),
+      child: Scaffold(
+        body: AddBranchThreeScreenBody(
+          branchId: branchId,
+          isEditMode: isEditMode,
+        ),
+      ),
     );
   }
 }

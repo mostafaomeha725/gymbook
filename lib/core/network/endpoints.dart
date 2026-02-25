@@ -35,4 +35,6 @@ class EndPoints {
 
   static String createPackage(int branchId) =>
       'Owner/Branches/$branchId/packages';
+
+  static String updateBranchDetails(int branchId) => 'Owner/Branches/$branchId';
 }

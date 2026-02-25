@@ -101,3 +101,15 @@ class BranchGovernorate {
     return BranchGovernorate(id: json['id'] ?? 0, name: json['name'] ?? '');
   }
 }
+
+class BranchScreenArgs {
+  final int branchId;
+  final bool isEditMode;
+  final BranchItem? branch;
+
+  const BranchScreenArgs({
+    required this.branchId,
+    this.isEditMode = false,
+    this.branch,
+  });
+}

@@ -9,13 +9,15 @@ import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_snack_bar.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/governorate_dropdown.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
 import 'package:gymbook/features/auth/presentation/widgets/location_on_map_card.dart';
 
 class AllTextFieldAddBranchTwo extends StatefulWidget {
   final int branchId;
+  final BranchScreenArgs? args;
 
-  const AllTextFieldAddBranchTwo({super.key, this.branchId = 0});
+  const AllTextFieldAddBranchTwo({super.key, this.branchId = 0, this.args});
 
   @override
   State<AllTextFieldAddBranchTwo> createState() =>
@@ -25,6 +27,16 @@ class AllTextFieldAddBranchTwo extends StatefulWidget {
 class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
   final TextEditingController addresscontroller = TextEditingController();
   String? selectedGovernorate;
+
+  @override
+  void initState() {
+    super.initState();
+    final branch = widget.args?.branch;
+    if (branch != null) {
+      addresscontroller.text = branch.address ?? '';
+      selectedGovernorate = branch.governorate?.name;
+    }
+  }
 
   @override
   void dispose() {
@@ -49,9 +61,13 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
             context,
             message: 'Location saved successfully',
           );
-          GoRouter.of(
-            context,
-          ).push('${Routes.addBranchThreeScreen}?branchId=${widget.branchId}');
+          if (widget.args?.isEditMode == true) {
+            GoRouter.of(context).pop();
+          } else {
+            GoRouter.of(context).push(
+              '${Routes.addBranchThreeScreen}?branchId=${widget.branchId}',
+            );
+          }
         }
       },
       child: Padding(
@@ -97,7 +113,9 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
             SizedBox(height: 24.h),
 
             AppButton(
-              text: 'Next: Working Hours',
+              text: widget.args?.isEditMode == true
+                  ? 'Save Changes'
+                  : 'Next: Working Hours',
               onPressed: _submit,
               textSize: 16.sp,
               gradient: const LinearGradient(
