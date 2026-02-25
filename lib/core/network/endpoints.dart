@@ -27,4 +27,9 @@ class EndPoints {
 
   static String updateBranchWorkingHours(int branchId) =>
       'Owner/Branches/$branchId/working-hours';
+
+  static String updateBranchLocationDetails(int branchId) =>
+      'Owner/Branches/$branchId/location-details';
+
+  static const String getBranches = 'Branches';
 }

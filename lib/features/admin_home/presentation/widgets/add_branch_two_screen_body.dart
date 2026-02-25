@@ -16,7 +16,7 @@ class AddBranchTwoScreenBody extends StatelessWidget {
         child: Column(
           children: [
             const AppbarAuthCard(
-              title: 'Login',
+              title: 'Add Branch',
               subtitle: 'Step 2 of 4: Location Details',
               currentStep: 2,
               totalSteps: 4,

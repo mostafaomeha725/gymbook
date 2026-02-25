@@ -3,7 +3,9 @@ import 'package:get_it/get_it.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
@@ -68,6 +70,14 @@ class ServiceLocator {
 
     if (!sl.isRegistered<BranchWorkingHoursCubit>()) {
       sl.registerFactory(() => BranchWorkingHoursCubit(sl()));
+    }
+
+    if (!sl.isRegistered<BranchLocationCubit>()) {
+      sl.registerFactory(() => BranchLocationCubit(sl()));
+    }
+
+    if (!sl.isRegistered<BranchesListCubit>()) {
+      sl.registerFactory(() => BranchesListCubit(sl()));
     }
   }
 

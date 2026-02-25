@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
 
 abstract class AdminBranchRepository {
@@ -14,6 +15,17 @@ abstract class AdminBranchRepository {
   Future<Either<String, void>> updateBranchWorkingHours({
     required int branchId,
     required List<Map<String, dynamic>> workingHours,
+  });
+
+  Future<Either<String, void>> updateBranchLocationDetails({
+    required int branchId,
+    required int governorateId,
+    required String address,
+  });
+
+  Future<Either<String, BranchListResponse>> getBranches({
+    int pageNumber = 1,
+    int pageSize = 10,
   });
 }
 
@@ -57,5 +69,36 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
     );
 
     return response.fold((failure) => Left(failure), (_) => const Right(null));
+  }
+
+  @override
+  Future<Either<String, void>> updateBranchLocationDetails({
+    required int branchId,
+    required int governorateId,
+    required String address,
+  }) async {
+    final response = await networkService.patchData(
+      endPoint: EndPoints.updateBranchLocationDetails(branchId),
+      data: {'governorateId': governorateId, 'address': address},
+    );
+
+    return response.fold((failure) => Left(failure), (_) => const Right(null));
+  }
+
+  @override
+  Future<Either<String, BranchListResponse>> getBranches({
+    int pageNumber = 1,
+    int pageSize = 10,
+  }) async {
+    final response = await networkService.getData(
+      endPoint: EndPoints.getBranches,
+      queryParameters: {'PageNumber': pageNumber, 'PageSize': pageSize},
+    );
+
+    return response.fold(
+      (failure) => Left(failure.message),
+      (data) =>
+          Right(BranchListResponse.fromJson(data as Map<String, dynamic>)),
+    );
   }
 }

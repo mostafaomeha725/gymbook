@@ -10,8 +10,13 @@ import 'package:geocoding/geocoding.dart'; // استيراد المكتبة ال
 
 class LocationOnMapCard extends StatefulWidget {
   final Color? borderColor;
+  final void Function(String address)? onAddressSelected;
 
-  const LocationOnMapCard({super.key, this.borderColor});
+  const LocationOnMapCard({
+    super.key,
+    this.borderColor,
+    this.onAddressSelected,
+  });
 
   @override
   State<LocationOnMapCard> createState() => _LocationOnMapCardState();
@@ -41,10 +46,8 @@ class _LocationOnMapCardState extends State<LocationOnMapCard> {
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
     try {
-      // 1. تحديد اللغة بشكل منفصل قبل جيب العنوان
-      await setLocaleIdentifier("ar"); // اكتب "en" لو عاوزه بالإنجليزي
+      await setLocaleIdentifier("en");
 
-      // 2. استدعاء الدالة بدون الـ localeIdentifier الذي سبب المشكلة
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
@@ -53,14 +56,32 @@ class _LocationOnMapCardState extends State<LocationOnMapCard> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
 
+        // Plus codes look like "XWFC+97X" — filter any part containing them
+        final plusCodePattern = RegExp(r'[A-Z0-9]{4,}\+[A-Z0-9]+');
+
+        final parts =
+            [
+                  place.street,
+                  place.subLocality,
+                  place.locality,
+                  place.administrativeArea,
+                ]
+                .where(
+                  (p) =>
+                      p != null && p.isNotEmpty && !plusCodePattern.hasMatch(p),
+                )
+                .cast<String>()
+                .toList();
+
+        final address = parts.join(', ');
         setState(() {
-          // نجمع البيانات المتاحة (شارع، مدينة، إلخ)
-          _address = "${place.street}, ${place.subLocality}, ${place.locality}";
+          _address = address;
           _isFetchingAddress = false;
         });
+        widget.onAddressSelected?.call(address);
       }
     } catch (e) {
-      debugPrint(e.toString()); // لمتابعة الخطأ في الـ console
+      debugPrint(e.toString());
       setState(() {
         _address = "Address not found";
         _isFetchingAddress = false;
