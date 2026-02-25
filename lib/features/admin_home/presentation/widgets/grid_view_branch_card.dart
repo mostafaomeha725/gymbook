@@ -5,7 +5,9 @@ import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/admin_branch_card.dart';
 
 class GridViewBranchCard extends StatelessWidget {
-  const GridViewBranchCard({super.key});
+  final int branchId;
+
+  const GridViewBranchCard({super.key, required this.branchId});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,9 @@ class GridViewBranchCard extends StatelessWidget {
             colors: [Color(0xFFFF8A00), Color(0xFFFF5E00)],
           ),
           onTap: () {
-            GoRouter.of(context).push(Routes.managePackageScreen);
+            GoRouter.of(
+              context,
+            ).push(Routes.managePackageScreen, extra: branchId);
           },
         ),
 

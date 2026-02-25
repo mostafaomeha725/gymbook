@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/admin_home/presentation/screens/admin_branch_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/admin_home_screen.dart';
 import 'package:gymbook/features/settings/presentation/screens/settings_screen.dart';
 
@@ -13,7 +12,7 @@ class AdminNavData {
 
   static const List<Widget> screens = [
     AdminHomeScreen(),
-    AdminBranchScreen(),
+    AdminHomeScreen(),
     AdminHomeScreen(),
     SettingsScreen(),
   ];

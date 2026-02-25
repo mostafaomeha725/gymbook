@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/all_current_status.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_buttom.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_header_section.dart';
@@ -7,9 +8,10 @@ import 'package:gymbook/features/admin_home/presentation/widgets/custom_segmente
 import 'package:gymbook/features/admin_home/presentation/widgets/grid_view_branch_card.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/grid_view_status_card.dart';
 
-
 class AdminBranchScreenBody extends StatefulWidget {
-  const AdminBranchScreenBody({super.key});
+  final BranchItem branch;
+
+  const AdminBranchScreenBody({super.key, required this.branch});
 
   @override
   State<AdminBranchScreenBody> createState() => _AdminBranchScreenBodyState();
@@ -25,7 +27,7 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const BranchHeaderSection(),
+          BranchHeaderSection(branch: widget.branch),
           SizedBox(height: 24.h),
 
           BranchButtom(
@@ -35,7 +37,7 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
           ),
 
           SizedBox(height: 16.h),
-          const GridViewBranchCard(),
+          GridViewBranchCard(branchId: widget.branch.id),
           SizedBox(height: 24.h),
           const AllCurrentStatus(),
           SizedBox(height: 24.h),

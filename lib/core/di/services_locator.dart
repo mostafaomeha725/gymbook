@@ -7,6 +7,7 @@ import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/create_package_cubit/create_package_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -78,6 +79,10 @@ class ServiceLocator {
 
     if (!sl.isRegistered<BranchesListCubit>()) {
       sl.registerFactory(() => BranchesListCubit(sl()));
+    }
+
+    if (!sl.isRegistered<CreatePackageCubit>()) {
+      sl.registerFactory(() => CreatePackageCubit(sl()));
     }
   }
 

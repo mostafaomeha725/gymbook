@@ -10,9 +10,10 @@ import 'package:gymbook/features/admin_home/presentation/widgets/manage_package_
 import 'package:gymbook/features/admin_home/presentation/widgets/package_card.dart';
 import 'package:gymbook/features/home/presentation/widgets/gym_pagination_widget.dart';
 
-
 class ManagePackageScreenBody extends StatefulWidget {
-  const ManagePackageScreenBody({super.key});
+  final int branchId;
+
+  const ManagePackageScreenBody({super.key, required this.branchId});
 
   @override
   State<ManagePackageScreenBody> createState() =>
@@ -64,7 +65,9 @@ class _ManagePackageScreenBodyState extends State<ManagePackageScreenBody> {
             text: 'Add New Package',
             icon: Icons.add,
             onTap: () {
-              GoRouter.of(context).push(Routes.addNewPackageScreen);
+              GoRouter.of(
+                context,
+              ).push(Routes.addNewPackageScreen, extra: widget.branchId);
             },
           ),
 
@@ -83,7 +86,9 @@ class _ManagePackageScreenBodyState extends State<ManagePackageScreenBody> {
 
             return PackageCard(
               onEdit: () {
-                GoRouter.of(context).push(Routes.addNewPackageScreen);
+                GoRouter.of(
+                  context,
+                ).push(Routes.addNewPackageScreen, extra: widget.branchId);
               },
               title: pkg["title"],
               months: pkg["months"],

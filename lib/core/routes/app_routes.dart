@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/di/services_locator.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_four_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_one_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_three_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_two_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_new_package_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/admin_add_subscription_screen.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/admin_branch_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/admin_manage_subscriptions_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/admin_subscription_details_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/manage_package_screen.dart';
@@ -171,11 +173,17 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: Routes.addNewPackageScreen,
-        builder: (context, state) => const AddNewPackageScreen(),
+        builder: (context, state) {
+          final branchId = state.extra as int;
+          return AddNewPackageScreen(branchId: branchId);
+        },
       ),
       GoRoute(
         path: Routes.managePackageScreen,
-        builder: (context, state) => const ManagePackageScreen(),
+        builder: (context, state) {
+          final branchId = state.extra as int;
+          return ManagePackageScreen(branchId: branchId);
+        },
       ),
       GoRoute(
         path: Routes.adminManageSubscriptionsScreen,
@@ -188,6 +196,13 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.adminAddSubscriptionScreen,
         builder: (context, state) => const AdminAddSubscriptionScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminBranchScreen,
+        builder: (context, state) {
+          final branch = state.extra as BranchItem;
+          return AdminBranchScreen(branch: branch);
+        },
       ),
     ],
   );

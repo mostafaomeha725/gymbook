@@ -32,4 +32,7 @@ class EndPoints {
       'Owner/Branches/$branchId/location-details';
 
   static const String getBranches = 'Branches';
+
+  static String createPackage(int branchId) =>
+      'Owner/Branches/$branchId/packages';
 }

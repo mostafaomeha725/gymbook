@@ -3,6 +3,7 @@ import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
+import 'package:gymbook/features/admin_home/data/models/package_model.dart';
 
 abstract class AdminBranchRepository {
   Future<Either<String, CreateBranchResponse>> createBranch({
@@ -26,6 +27,11 @@ abstract class AdminBranchRepository {
   Future<Either<String, BranchListResponse>> getBranches({
     int pageNumber = 1,
     int pageSize = 10,
+  });
+
+  Future<Either<String, CreatePackageResponse>> createPackage({
+    required int branchId,
+    required CreatePackageRequest request,
   });
 }
 
@@ -99,6 +105,23 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
       (failure) => Left(failure.message),
       (data) =>
           Right(BranchListResponse.fromJson(data as Map<String, dynamic>)),
+    );
+  }
+
+  @override
+  Future<Either<String, CreatePackageResponse>> createPackage({
+    required int branchId,
+    required CreatePackageRequest request,
+  }) async {
+    final response = await networkService.postData(
+      endPoint: EndPoints.createPackage(branchId),
+      data: request.toJson(),
+    );
+
+    return response.fold(
+      (failure) => Left(failure.message),
+      (data) =>
+          Right(CreatePackageResponse.fromJson(data as Map<String, dynamic>)),
     );
   }
 }
