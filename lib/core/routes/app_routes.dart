@@ -13,6 +13,7 @@ import 'package:gymbook/features/admin_home/presentation/screens/admin_add_subsc
 import 'package:gymbook/features/admin_home/presentation/screens/admin_branch_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/admin_manage_subscriptions_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/admin_subscription_details_screen.dart';
+import 'package:gymbook/features/admin_home/presentation/screens/edit_branch_details_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/manage_package_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/gym_register_details_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/join_us_screen.dart';
@@ -41,6 +42,7 @@ String _getInitialLocation() {
   final token = storage.getUserToken();
   return token != null && token.isNotEmpty
       ? Routes.mainNavigationScreen
+      // ? Routes.editBranchDetailsScreen
       : Routes.loginScreen;
 }
 
@@ -202,6 +204,13 @@ GoRouter createRouter() {
         builder: (context, state) {
           final branch = state.extra as BranchItem;
           return AdminBranchScreen(branch: branch);
+        },
+      ),
+      GoRoute(
+        path: Routes.editBranchDetailsScreen,
+        builder: (context, state) {
+          final branch = state.extra as BranchItem;
+          return EditBranchDetailsScreen(branch: branch);
         },
       ),
     ],
