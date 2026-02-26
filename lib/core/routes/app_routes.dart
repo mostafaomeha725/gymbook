@@ -181,7 +181,20 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: Routes.addBranchFourScreen,
-        builder: (context, state) => const AddBranchFourScreen(),
+        builder: (context, state) {
+          final branchId =
+              int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0;
+          final isEditMode =
+              state.uri.queryParameters['isEditMode']?.toLowerCase() == 'true';
+          final imageId = int.tryParse(
+            state.uri.queryParameters['imageId'] ?? '',
+          );
+          return AddBranchFourScreen(
+            branchId: branchId,
+            isEditMode: isEditMode,
+            imageId: imageId,
+          );
+        },
       ),
       GoRoute(
         path: Routes.addNewPackageScreen,

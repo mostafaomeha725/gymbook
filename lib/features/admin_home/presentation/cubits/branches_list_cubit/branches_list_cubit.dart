@@ -10,10 +10,14 @@ class BranchesListCubit extends Cubit<BranchesListState> {
   final AdminBranchRepository repository;
 
   int _currentPage = 1;
-  static const int _pageSize = 10;
+  static const int _pageSize = 3;
 
-  Future<void> loadBranches({bool refresh = false}) async {
-    if (refresh) _currentPage = 1;
+  Future<void> loadBranches({bool refresh = false, int? pageNumber}) async {
+    if (refresh) {
+      _currentPage = 1;
+    } else if (pageNumber != null && pageNumber > 0) {
+      _currentPage = pageNumber;
+    }
 
     emit(BranchesListLoading());
 

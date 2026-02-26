@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
+import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_card.dart';
 
 class BranchesListView extends StatelessWidget {
@@ -19,11 +22,11 @@ class BranchesListView extends StatelessWidget {
     if (branches.isEmpty) {
       return Padding(
         padding: EdgeInsets.symmetric(vertical: 60.h),
-        child: const Center(
-          child: AppText(
-            'No branches found.\nTap + to add your first branch.',
-            textAlign: TextAlign.center,
-          ),
+        child: AppText(
+          'No branches found.\nTap + to add your first branch.',
+          alignment: AlignmentDirectional.center,
+          textAlign: TextAlign.center,
+          style: font18w500,
         ),
       );
     }
@@ -44,10 +47,14 @@ class BranchesListView extends StatelessWidget {
             location: branch.displayLocation,
             tags: [branch.branchTypeName, branch.branchStatusName],
             subscriptions: branch.subscriptionsCount,
-            onTap: () {
-              GoRouter.of(
+            onTap: () async {
+              await GoRouter.of(
                 context,
               ).push(Routes.adminBranchScreen, extra: branch);
+
+              if (context.mounted) {
+                context.read<BranchesListCubit>().loadBranches(refresh: true);
+              }
             },
           ),
         );

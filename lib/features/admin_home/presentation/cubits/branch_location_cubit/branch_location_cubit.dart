@@ -19,6 +19,8 @@ class BranchLocationCubit extends Cubit<BranchLocationState> {
     required int branchId,
     required String? governorateName,
     required String address,
+    required double? latitude,
+    required double? longitude,
   }) async {
     if (branchId <= 0) {
       const message = 'Invalid branch ID';
@@ -42,6 +44,13 @@ class BranchLocationCubit extends Cubit<BranchLocationState> {
       return false;
     }
 
+    if (latitude == null || longitude == null) {
+      const message = 'Please select location on map';
+      showError(message);
+      emit(BranchLocationFailure(message));
+      return false;
+    }
+
     emit(BranchLocationLoading());
     showLoading();
 
@@ -49,6 +58,8 @@ class BranchLocationCubit extends Cubit<BranchLocationState> {
       branchId: branchId,
       governorateId: governorateId,
       address: address.trim(),
+      latitude: latitude,
+      longitude: longitude,
     );
 
     hideLoading();

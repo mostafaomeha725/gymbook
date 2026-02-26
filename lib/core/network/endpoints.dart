@@ -36,5 +36,12 @@ class EndPoints {
   static String createPackage(int branchId) =>
       'Owner/Branches/$branchId/packages';
 
-  static String updateBranchDetails(int branchId) => 'Owner/Branches/$branchId';
+  static String addBranchImage(int branchId) =>
+      'Owner/Branches/$branchId/images';
+
+  static String updateBranchImage(int branchId, int imageId) =>
+      'Owner/Branches/$branchId/images/$imageId';
+
+  static String updateBranchDetails(int branchId) =>
+      'Owner/Branches/$branchId/bussiness-details';
 }

@@ -6,6 +6,7 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branches_list_view.dart';
 import 'package:gymbook/features/home/presentation/widgets/appbar_admin_home_widget.dart';
+import 'package:gymbook/features/home/presentation/widgets/gym_pagination_widget.dart';
 
 class AdminHomeScreenBody extends StatelessWidget {
   const AdminHomeScreenBody({super.key});
@@ -81,7 +82,21 @@ class AdminHomeScreenBody extends StatelessWidget {
                     ),
                   )
                 else if (state is BranchesListSuccess)
-                  BranchesListView(branches: state.response.data)
+                  Column(
+                    children: [
+                      BranchesListView(branches: state.response.data),
+                      if (state.response.totalPages > 1)
+                        GymPaginationWidget(
+                          totalPages: state.response.totalPages,
+                          currentPage: state.response.currentPage,
+                          onPageChanged: (page) {
+                            context.read<BranchesListCubit>().loadBranches(
+                              pageNumber: page,
+                            );
+                          },
+                        ),
+                    ],
+                  )
                 else
                   const SizedBox.shrink(),
 

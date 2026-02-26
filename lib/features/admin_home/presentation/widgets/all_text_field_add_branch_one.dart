@@ -28,12 +28,61 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
   int? selectedBranchType;
   GymType? _initialGymType;
 
+  String _normalizeArabicDigits(String value) {
+    const arabicIndic = '٠١٢٣٤٥٦٧٨٩';
+    const easternArabicIndic = '۰۱۲۳۴۵۶۷۸۹';
+    var result = value;
+    for (var index = 0; index < 10; index++) {
+      result = result
+          .replaceAll(arabicIndic[index], '$index')
+          .replaceAll(easternArabicIndic[index], '$index');
+    }
+    return result;
+  }
+
+  String _normalizeEmail(String value) {
+    return value.trim().toLowerCase();
+  }
+
+  String _normalizePhoneNumber(String value) {
+    var normalized = _normalizeArabicDigits(value).trim();
+    normalized = normalized.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+
+    if (normalized.startsWith('00')) {
+      normalized = '+${normalized.substring(2)}';
+    }
+
+    if (normalized.startsWith('+')) {
+      return normalized;
+    }
+
+    if (normalized.startsWith('0') && normalized.length == 11) {
+      return '+2$normalized';
+    }
+
+    if (normalized.startsWith('20') && normalized.length == 12) {
+      return '+$normalized';
+    }
+
+    return normalized;
+  }
+
+  bool _isValidEmail(String value) {
+    return RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(value);
+  }
+
+  bool _isValidPhoneNumber(String value) {
+    return RegExp(r'^\+[1-9]\d{8,14}$').hasMatch(value);
+  }
+
   @override
   void initState() {
     super.initState();
     final branch = widget.args?.branch;
     if (branch != null) {
       branchNameController.text = branch.name ?? '';
+      phoneNumberController.text = branch.phoneNumber ?? '';
+      emailController.text = branch.email ?? '';
       selectedBranchType = branch.branchType;
       _initialGymType = branch.branchType == 0
           ? GymType.menOnly
@@ -149,8 +198,13 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
                   : 'Create Branch',
               onPressed: () {
                 final branchName = branchNameController.text.trim();
-                final email = emailController.text.trim();
-                final phoneNumber = phoneNumberController.text.trim();
+                final email = _normalizeEmail(emailController.text);
+                final phoneNumber = _normalizePhoneNumber(
+                  phoneNumberController.text,
+                );
+                final isUpdateRequest =
+                    widget.args?.isEditMode == true &&
+                    (widget.args?.branchId ?? 0) > 0;
 
                 if (branchName.isEmpty) {
                   showError('Please enter branch name');
@@ -162,8 +216,20 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
                   return;
                 }
 
+                if (!_isValidEmail(email)) {
+                  showError('Invalid email address format');
+                  return;
+                }
+
                 if (phoneNumber.isEmpty) {
                   showError('Please enter phone number');
+                  return;
+                }
+
+                if (!_isValidPhoneNumber(phoneNumber)) {
+                  showError(
+                    'Phone number is not valid. Use format like +201012345678',
+                  );
                   return;
                 }
 
@@ -176,7 +242,7 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
                   return;
                 }
 
-                if (widget.args?.isEditMode == true) {
+                if (isUpdateRequest) {
                   context.read<CreateBranchCubit>().editBranch(
                     branchId: widget.args!.branchId,
                     name: branchName,

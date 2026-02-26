@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/all_current_status.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_buttom.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_header_section.dart';
@@ -21,29 +23,61 @@ class AdminBranchScreenBody extends StatefulWidget {
 
 class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   int selectedTab = 0;
+  late BranchItem currentBranch;
 
   final tabs = const ["Today", "This Week", "This Month", "This Year", "All"];
+
+  @override
+  void initState() {
+    super.initState();
+    currentBranch = widget.branch;
+  }
+
+  Future<void> _refreshCurrentBranch() async {
+    final response = await sl<AdminBranchRepository>().getBranches(
+      pageNumber: 1,
+      pageSize: 100,
+    );
+
+    if (!mounted) return;
+
+    response.fold((_) {}, (branchesResponse) {
+      final updatedBranch = branchesResponse.data
+          .cast<BranchItem?>()
+          .firstWhere(
+            (branch) => branch?.id == currentBranch.id,
+            orElse: () => null,
+          );
+
+      if (updatedBranch != null) {
+        setState(() {
+          currentBranch = updatedBranch;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          BranchHeaderSection(branch: widget.branch),
+          BranchHeaderSection(branch: currentBranch),
           SizedBox(height: 24.h),
 
           BranchButtom(
             text: 'Edit Branch Details',
             icon: Icons.arrow_forward,
-            onTap: () {
-              GoRouter.of(
+            onTap: () async {
+              await GoRouter.of(
                 context,
-              ).push(Routes.editBranchDetailsScreen, extra: widget.branch);
+              ).push(Routes.editBranchDetailsScreen, extra: currentBranch);
+              await _refreshCurrentBranch();
             },
           ),
 
           SizedBox(height: 16.h),
-          GridViewBranchCard(branchId: widget.branch.id),
+          GridViewBranchCard(branchId: currentBranch.id),
           SizedBox(height: 24.h),
           const AllCurrentStatus(),
           SizedBox(height: 24.h),

@@ -27,6 +27,8 @@ class AllTextFieldAddBranchTwo extends StatefulWidget {
 class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
   final TextEditingController addresscontroller = TextEditingController();
   String? selectedGovernorate;
+  double? selectedLatitude;
+  double? selectedLongitude;
 
   @override
   void initState() {
@@ -49,6 +51,8 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
       branchId: widget.branchId,
       governorateName: selectedGovernorate,
       address: addresscontroller.text,
+      latitude: selectedLatitude,
+      longitude: selectedLongitude,
     );
   }
 
@@ -62,7 +66,7 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
             message: 'Location saved successfully',
           );
           if (widget.args?.isEditMode == true) {
-            GoRouter.of(context).pop();
+            GoRouter.of(context).pop(true);
           } else {
             GoRouter.of(context).push(
               '${Routes.addBranchThreeScreen}?branchId=${widget.branchId}',
@@ -91,6 +95,10 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
               borderColor: const Color(0xff0EA5E9),
               onAddressSelected: (address) {
                 addresscontroller.text = address;
+              },
+              onLocationSelected: (latitude, longitude) {
+                selectedLatitude = latitude;
+                selectedLongitude = longitude;
               },
             ),
             SizedBox(height: 24.h),

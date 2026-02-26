@@ -49,9 +49,11 @@ class _AddBranchThreeScreenBodyState extends State<AddBranchThreeScreenBody> {
         message: 'Working hours saved successfully',
       );
       if (widget.isEditMode) {
-        GoRouter.of(context).pop();
+        GoRouter.of(context).pop(true);
       } else {
-        GoRouter.of(context).push(Routes.addBranchFourScreen);
+        GoRouter.of(
+          context,
+        ).push('${Routes.addBranchFourScreen}?branchId=${widget.branchId}');
       }
     }
   }

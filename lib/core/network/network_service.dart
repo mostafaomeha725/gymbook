@@ -250,14 +250,11 @@ class NetworkService {
       return const Left("Format Exception");
     } on DioException catch (e) {
       if (e.type == DioExceptionType.badResponse) {
-        final data = e.response?.data;
-        if (data is Map && data['message'] != null) {
-          return Left(data['message']);
-        } else if (data is Map && data['title'] != null) {
-          return Left(data['title']);
-        } else {
-          return Left(e.message ?? 'Bad response');
-        }
+        final message = _extractErrorMessage(
+          e.response?.data,
+          fallback: e.message ?? 'Bad response',
+        );
+        return Left(message);
       } else if (e.type == DioExceptionType.connectionTimeout) {
         // safePrint('check your connection');
         return const Left("Check your connection");
@@ -291,14 +288,11 @@ class NetworkService {
       return const Left("Format Exception");
     } on DioException catch (e) {
       if (e.type == DioExceptionType.badResponse) {
-        final data = e.response?.data;
-        if (data is Map && data['message'] != null) {
-          return Left(data['message']);
-        } else if (data is Map && data['title'] != null) {
-          return Left(data['title']);
-        } else {
-          return Left(e.message ?? 'Bad response');
-        }
+        final message = _extractErrorMessage(
+          e.response?.data,
+          fallback: e.message ?? 'Bad response',
+        );
+        return Left(message);
       } else if (e.type == DioExceptionType.connectionTimeout) {
         // safePrint('check your connection');
         return const Left("Check your connection");
@@ -386,6 +380,55 @@ class NetworkService {
     } else {
       return Left(Failure(e.message ?? ""));
     }
+  }
+
+  String _extractErrorMessage(dynamic data, {required String fallback}) {
+    if (data is Map<String, dynamic>) {
+      final errors = data['errors'];
+
+      if (errors is List && errors.isNotEmpty) {
+        final first = errors.first;
+        if (first is Map<String, dynamic>) {
+          final description = first['description'];
+          if (description is String && description.isNotEmpty) {
+            return description;
+          }
+          final message = first['message'];
+          if (message is String && message.isNotEmpty) {
+            return message;
+          }
+        }
+        if (first is String && first.isNotEmpty) {
+          return first;
+        }
+      }
+
+      if (errors is Map) {
+        for (final value in errors.values) {
+          if (value is List && value.isNotEmpty) {
+            final first = value.first;
+            if (first is String && first.isNotEmpty) {
+              return first;
+            }
+          }
+          if (value is String && value.isNotEmpty) {
+            return value;
+          }
+        }
+      }
+
+      final message = data['message'];
+      if (message is String && message.isNotEmpty) {
+        return message;
+      }
+
+      final title = data['title'];
+      if (title is String && title.isNotEmpty) {
+        return title;
+      }
+    }
+
+    return fallback;
   }
 
   String hmacSha256(String data) {

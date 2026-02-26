@@ -11,11 +11,13 @@ import 'package:geocoding/geocoding.dart'; // استيراد المكتبة ال
 class LocationOnMapCard extends StatefulWidget {
   final Color? borderColor;
   final void Function(String address)? onAddressSelected;
+  final void Function(double latitude, double longitude)? onLocationSelected;
 
   const LocationOnMapCard({
     super.key,
     this.borderColor,
     this.onAddressSelected,
+    this.onLocationSelected,
   });
 
   @override
@@ -38,6 +40,7 @@ class _LocationOnMapCardState extends State<LocationOnMapCard> {
         _selectedLocation = result;
         _isFetchingAddress = true; // بدأنا نجيب العنوان
       });
+      widget.onLocationSelected?.call(result.latitude, result.longitude);
 
       // تحويل الإحداثيات لعنوان
       await _getAddressFromLatLng(result);

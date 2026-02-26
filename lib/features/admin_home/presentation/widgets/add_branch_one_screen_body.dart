@@ -24,7 +24,8 @@ class AddBranchOneScreenBody extends StatelessWidget {
           if (state is CreateBranchSuccess) {
             hideLoading();
             if (args?.isEditMode == true) {
-              GoRouter.of(context).pop();
+              showSuccess('Business details updated successfully');
+              GoRouter.of(context).pop(true);
             } else {
               showSuccess('Branch created successfully!');
               GoRouter.of(context).go(

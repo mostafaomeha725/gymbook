@@ -1,9 +1,11 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
 import 'package:gymbook/features/admin_home/data/models/package_model.dart';
+import 'dart:io';
 
 abstract class AdminBranchRepository {
   Future<Either<String, CreateBranchResponse>> createBranch({
@@ -22,6 +24,8 @@ abstract class AdminBranchRepository {
     required int branchId,
     required int governorateId,
     required String address,
+    required double latitude,
+    required double longitude,
   });
 
   Future<Either<String, BranchListResponse>> getBranches({
@@ -40,6 +44,17 @@ abstract class AdminBranchRepository {
     required String email,
     required String phoneNumber,
     required int branchType,
+  });
+
+  Future<Either<String, String>> uploadBranchImage({
+    required int branchId,
+    required File imageFile,
+  });
+
+  Future<Either<String, String>> updateBranchImage({
+    required int branchId,
+    required int imageId,
+    required File imageFile,
   });
 }
 
@@ -90,10 +105,17 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
     required int branchId,
     required int governorateId,
     required String address,
+    required double latitude,
+    required double longitude,
   }) async {
     final response = await networkService.patchData(
       endPoint: EndPoints.updateBranchLocationDetails(branchId),
-      data: {'governorateId': governorateId, 'address': address},
+      data: {
+        'governorateId': governorateId,
+        'address': address,
+        'latitude': latitude,
+        'longitude': longitude,
+      },
     );
 
     return response.fold((failure) => Left(failure), (_) => const Right(null));
@@ -151,5 +173,78 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
       },
     );
     return response.fold((failure) => Left(failure), (_) => const Right(null));
+  }
+
+  @override
+  Future<Either<String, String>> uploadBranchImage({
+    required int branchId,
+    required File imageFile,
+  }) async {
+    final fileName = imageFile.path.split(Platform.pathSeparator).last;
+
+    final formData = FormData.fromMap({
+      'ImageFile': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: fileName,
+      ),
+    });
+
+    final response = await networkService.uploadFile(
+      endPoint: EndPoints.addBranchImage(branchId),
+      formData: formData,
+    );
+
+    return response.fold((failure) => Left(failure.message), (data) {
+      if (data is Map<String, dynamic>) {
+        return Right((data['imageUrl'] ?? '').toString());
+      }
+      return const Right('');
+    });
+  }
+
+  @override
+  Future<Either<String, String>> updateBranchImage({
+    required int branchId,
+    required int imageId,
+    required File imageFile,
+  }) async {
+    final fileName = imageFile.path.split(Platform.pathSeparator).last;
+
+    final formData = FormData.fromMap({
+      'ImageFile': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: fileName,
+      ),
+    });
+
+    try {
+      final response = await networkService.dio.patch(
+        EndPoints.updateBranchImage(branchId, imageId),
+        data: formData,
+      );
+
+      if (response.statusCode != null &&
+          response.statusCode! >= 200 &&
+          response.statusCode! <= 299) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          return Right((data['imageUrl'] ?? '').toString());
+        }
+        return const Right('');
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['message'] != null) {
+        return Left(data['message'].toString());
+      }
+      return Left('Error ${response.statusCode}');
+    } on DioException catch (error) {
+      final handled = networkService.handleDioExceoptions(error);
+      return handled.fold((failure) => Left(failure.message), (_) {
+        return Left(error.message ?? 'Request failed');
+      });
+    } catch (error) {
+      return Left(error.toString());
+    }
   }
 }

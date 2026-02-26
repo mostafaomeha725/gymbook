@@ -35,9 +35,14 @@ class BranchListResponse {
 class BranchItem {
   final int id;
   final String? name;
+  final String? email;
+  final String? phoneNumber;
   final BranchGovernorate? governorate;
   final String? address;
+  final double? latitude;
+  final double? longitude;
   final int branchType;
+  final int? logoImageId;
   final String? logo;
   final int branchStatus;
   final int subscriptionsCount;
@@ -45,29 +50,71 @@ class BranchItem {
   BranchItem({
     required this.id,
     this.name,
+    this.email,
+    this.phoneNumber,
     this.governorate,
     this.address,
+    this.latitude,
+    this.longitude,
     required this.branchType,
+    this.logoImageId,
     this.logo,
     required this.branchStatus,
     required this.subscriptionsCount,
   });
 
   factory BranchItem.fromJson(Map<String, dynamic> json) {
+    final location = json['location'] as Map<String, dynamic>?;
+    final coordinates = location?['coordinates'] as Map<String, dynamic>?;
+    final governorateJson =
+        (location?['governorate'] ?? json['governorate'])
+            as Map<String, dynamic>?;
+
     return BranchItem(
       id: json['id'] ?? 0,
       name: json['name'],
-      governorate: json['governorate'] != null
-          ? BranchGovernorate.fromJson(
-              json['governorate'] as Map<String, dynamic>,
-            )
+      email: json['email'] as String?,
+      phoneNumber: json['phoneNumber'] as String?,
+      governorate: governorateJson != null
+          ? BranchGovernorate.fromJson(governorateJson)
           : null,
-      address: json['address'],
+      address: (location?['address'] ?? json['address']) as String?,
+      latitude: _asDouble(coordinates?['latitude']),
+      longitude: _asDouble(coordinates?['longitude']),
       branchType: json['branchType'] ?? 0,
-      logo: json['logo'],
+      logoImageId: _asLogoImageId(json['logo']),
+      logo: _asLogoUrl(json['logo']),
       branchStatus: json['branchStatus'] ?? 0,
       subscriptionsCount: json['subscriptionsCount'] ?? 0,
     );
+  }
+
+  static double? _asDouble(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
+
+  static String? _asLogoUrl(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return value;
+    if (value is Map<String, dynamic>) {
+      final imageUrl = value['imageUrl'];
+      if (imageUrl is String) return imageUrl;
+
+      final url = value['url'];
+      if (url is String) return url;
+    }
+    return null;
+  }
+
+  static int? _asLogoImageId(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      final imageId = value['imageId'];
+      if (imageId is int) return imageId;
+      if (imageId is String) return int.tryParse(imageId);
+    }
+    return null;
   }
 
   /// 0=MaleOnly, 1=FemaleOnly, 2=Mixed
