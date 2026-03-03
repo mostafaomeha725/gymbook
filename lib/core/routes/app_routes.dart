@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/data/models/package_model.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_four_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_one_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_three_screen.dart';
@@ -199,8 +200,8 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.addNewPackageScreen,
         builder: (context, state) {
-          final branchId = state.extra as int;
-          return AddNewPackageScreen(branchId: branchId);
+          final args = state.extra as PackageScreenArgs;
+          return AddNewPackageScreen(args: args);
         },
       ),
       GoRoute(

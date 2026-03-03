@@ -15,3 +15,7 @@ final class CreatePackageFailure extends CreatePackageState {
   final String message;
   CreatePackageFailure(this.message);
 }
+
+final class PackageStatusUpdated extends CreatePackageState {}
+
+final class PackageDeleted extends CreatePackageState {}

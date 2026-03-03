@@ -70,4 +70,109 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
       },
     );
   }
+
+  Future<void> updatePackage({
+    required int branchId,
+    required int packageId,
+    required String name,
+    required String priceText,
+    required String durationText,
+    required String freezesText,
+    required bool isActive,
+  }) async {
+    if (name.trim().isEmpty) {
+      showError("Package name can't be empty");
+      emit(CreatePackageFailure("Package name can't be empty"));
+      return;
+    }
+
+    final price = double.tryParse(priceText.trim());
+    if (price == null || price <= 0) {
+      showError('Price must be greater than 0');
+      emit(CreatePackageFailure('Price must be greater than 0'));
+      return;
+    }
+
+    final duration = int.tryParse(durationText.trim());
+    if (duration == null || duration <= 0) {
+      showError('Duration must be greater than 0');
+      emit(CreatePackageFailure('Duration must be greater than 0'));
+      return;
+    }
+
+    final freezes = int.tryParse(freezesText.trim()) ?? 0;
+
+    emit(CreatePackageLoading());
+    showLoading();
+
+    final request = UpdatePackageRequest(
+      name: name.trim(),
+      price: price,
+      durationInMonths: duration,
+      isActive: isActive,
+      numberOfFreezes: freezes,
+      freezeDurationInDays: 0,
+    );
+
+    final result = await repository.updatePackage(
+      branchId: branchId,
+      packageId: packageId,
+      request: request,
+    );
+
+    hideLoading();
+
+    result.fold(
+      (failure) {
+        showError(failure);
+        emit(CreatePackageFailure(failure));
+      },
+      (response) {
+        showSuccess('Package updated successfully');
+        emit(CreatePackageSuccess(response));
+      },
+    );
+  }
+
+  Future<void> togglePackageStatus({
+    required int branchId,
+    required int packageId,
+    required bool isActive,
+  }) async {
+    emit(CreatePackageLoading());
+    showLoading();
+
+    final result = await repository.updatePackageStatus(
+      branchId: branchId,
+      packageId: packageId,
+      isActive: isActive,
+    );
+
+    hideLoading();
+
+    result.fold((failure) {
+      showError(failure);
+      emit(CreatePackageFailure(failure));
+    }, (_) => emit(PackageStatusUpdated()));
+  }
+
+  Future<void> deletePackage({
+    required int branchId,
+    required int packageId,
+  }) async {
+    emit(CreatePackageLoading());
+    showLoading();
+
+    final result = await repository.deletePackage(
+      branchId: branchId,
+      packageId: packageId,
+    );
+
+    hideLoading();
+
+    result.fold((failure) {
+      showError(failure);
+      emit(CreatePackageFailure(failure));
+    }, (_) => emit(PackageDeleted()));
+  }
 }

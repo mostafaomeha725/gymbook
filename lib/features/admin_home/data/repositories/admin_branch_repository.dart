@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_details_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
 import 'package:gymbook/features/admin_home/data/models/package_model.dart';
-import 'dart:io';
 
 abstract class AdminBranchRepository {
   Future<Either<String, CreateBranchResponse>> createBranch({
@@ -33,9 +35,34 @@ abstract class AdminBranchRepository {
     int pageSize = 10,
   });
 
+  Future<Either<String, BranchDetailsResponse>> getBranchDetails(int branchId);
+
   Future<Either<String, CreatePackageResponse>> createPackage({
     required int branchId,
     required CreatePackageRequest request,
+  });
+
+  Future<Either<String, BranchPackagesResponse>> getBranchPackages({
+    required int branchId,
+    required int pageNumber,
+    required int pageSize,
+  });
+
+  Future<Either<String, CreatePackageResponse>> updatePackage({
+    required int branchId,
+    required int packageId,
+    required UpdatePackageRequest request,
+  });
+
+  Future<Either<String, void>> updatePackageStatus({
+    required int branchId,
+    required int packageId,
+    required bool isActive,
+  });
+
+  Future<Either<String, void>> deletePackage({
+    required int branchId,
+    required int packageId,
   });
 
   Future<Either<String, void>> updateBranchDetails({
@@ -44,6 +71,11 @@ abstract class AdminBranchRepository {
     required String email,
     required String phoneNumber,
     required int branchType,
+  });
+
+  Future<Either<String, void>> updateBranchStatus({
+    required int branchId,
+    required int branchStatus,
   });
 
   Future<Either<String, String>> uploadBranchImage({
@@ -139,6 +171,20 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
   }
 
   @override
+  Future<Either<String, BranchDetailsResponse>> getBranchDetails(
+    int branchId,
+  ) async {
+    final response = await networkService.getData(
+      endPoint: EndPoints.getBranchDetails(branchId),
+    );
+    return response.fold(
+      (failure) => Left(failure.message),
+      (data) =>
+          Right(BranchDetailsResponse.fromJson(data as Map<String, dynamic>)),
+    );
+  }
+
+  @override
   Future<Either<String, CreatePackageResponse>> createPackage({
     required int branchId,
     required CreatePackageRequest request,
@@ -153,6 +199,66 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
       (data) =>
           Right(CreatePackageResponse.fromJson(data as Map<String, dynamic>)),
     );
+  }
+
+  @override
+  Future<Either<String, BranchPackagesResponse>> getBranchPackages({
+    required int branchId,
+    required int pageNumber,
+    required int pageSize,
+  }) async {
+    final response = await networkService.getData(
+      endPoint: EndPoints.getBranchPackages(branchId),
+      queryParameters: {'PageNumber': pageNumber, 'PageSize': pageSize},
+    );
+
+    return response.fold(
+      (failure) => Left(failure.message),
+      (data) =>
+          Right(BranchPackagesResponse.fromJson(data as Map<String, dynamic>)),
+    );
+  }
+
+  @override
+  Future<Either<String, CreatePackageResponse>> updatePackage({
+    required int branchId,
+    required int packageId,
+    required UpdatePackageRequest request,
+  }) async {
+    final response = await networkService.patchData(
+      endPoint: EndPoints.updatePackage(branchId, packageId),
+      data: request.toJson(),
+    );
+
+    return response.fold(
+      (failure) => Left(failure),
+      (data) =>
+          Right(CreatePackageResponse.fromJson(data as Map<String, dynamic>)),
+    );
+  }
+
+  @override
+  Future<Either<String, void>> updatePackageStatus({
+    required int branchId,
+    required int packageId,
+    required bool isActive,
+  }) async {
+    final response = await networkService.patchData(
+      endPoint: EndPoints.updatePackageStatus(branchId, packageId),
+      data: {'isActive': isActive},
+    );
+    return response.fold((failure) => Left(failure), (_) => const Right(null));
+  }
+
+  @override
+  Future<Either<String, void>> deletePackage({
+    required int branchId,
+    required int packageId,
+  }) async {
+    final response = await networkService.deleteData(
+      endPoint: EndPoints.deletePackage(branchId, packageId),
+    );
+    return response.fold((failure) => Left(failure), (_) => const Right(null));
   }
 
   @override
@@ -171,6 +277,18 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
         'phoneNumber': phoneNumber,
         'branchType': branchType,
       },
+    );
+    return response.fold((failure) => Left(failure), (_) => const Right(null));
+  }
+
+  @override
+  Future<Either<String, void>> updateBranchStatus({
+    required int branchId,
+    required int branchStatus,
+  }) async {
+    final response = await networkService.patchData(
+      endPoint: EndPoints.updateBranchStatus(branchId),
+      data: {'branchStatus': branchStatus},
     );
     return response.fold((failure) => Left(failure), (_) => const Right(null));
   }

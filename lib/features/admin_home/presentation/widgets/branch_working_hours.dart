@@ -13,13 +13,55 @@ class BranchWorkingHours extends StatefulWidget {
 
 class _BranchWorkingHoursState extends State<BranchWorkingHours> {
   final List<Map<String, dynamic>> workingDays = [
-    {'day': 'Saturday', 'isOpen': false, 'openTime': '', 'closeTime': ''},
-    {'day': 'Sunday', 'isOpen': true, 'openTime': '', 'closeTime': ''},
-    {'day': 'Monday', 'isOpen': true, 'openTime': '', 'closeTime': ''},
-    {'day': 'Tuesday', 'isOpen': true, 'openTime': '', 'closeTime': ''},
-    {'day': 'Wednesday', 'isOpen': true, 'openTime': '', 'closeTime': ''},
-    {'day': 'Thursday', 'isOpen': true, 'openTime': '', 'closeTime': ''},
-    {'day': 'Friday', 'isOpen': false, 'openTime': '', 'closeTime': ''},
+    {
+      'day': 'Saturday',
+      'dayIndex': 6,
+      'isOpen': false,
+      'openTime': '',
+      'closeTime': '',
+    },
+    {
+      'day': 'Sunday',
+      'dayIndex': 0,
+      'isOpen': true,
+      'openTime': '',
+      'closeTime': '',
+    },
+    {
+      'day': 'Monday',
+      'dayIndex': 1,
+      'isOpen': true,
+      'openTime': '',
+      'closeTime': '',
+    },
+    {
+      'day': 'Tuesday',
+      'dayIndex': 2,
+      'isOpen': true,
+      'openTime': '',
+      'closeTime': '',
+    },
+    {
+      'day': 'Wednesday',
+      'dayIndex': 3,
+      'isOpen': true,
+      'openTime': '',
+      'closeTime': '',
+    },
+    {
+      'day': 'Thursday',
+      'dayIndex': 4,
+      'isOpen': true,
+      'openTime': '',
+      'closeTime': '',
+    },
+    {
+      'day': 'Friday',
+      'dayIndex': 5,
+      'isOpen': false,
+      'openTime': '',
+      'closeTime': '',
+    },
   ];
 
   late List<TextEditingController> openTimeControllers;
@@ -67,14 +109,14 @@ class _BranchWorkingHoursState extends State<BranchWorkingHours> {
         final closeTime = closeTimeControllers[i].text.trim();
 
         workingHours.add({
-          'day': i,
+          'day': workingDays[i]['dayIndex'],
           'openTime': openTime.isNotEmpty ? openTime : null,
           'closeTime': closeTime.isNotEmpty ? closeTime : null,
           'isClosed': false,
         });
       } else {
         workingHours.add({
-          'day': i,
+          'day': workingDays[i]['dayIndex'],
           'openTime': null,
           'closeTime': null,
           'isClosed': true,

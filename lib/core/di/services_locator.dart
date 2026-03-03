@@ -3,7 +3,9 @@ import 'package:get_it/get_it.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
@@ -83,6 +85,14 @@ class ServiceLocator {
 
     if (!sl.isRegistered<CreatePackageCubit>()) {
       sl.registerFactory(() => CreatePackageCubit(sl()));
+    }
+
+    if (!sl.isRegistered<BranchPackagesListCubit>()) {
+      sl.registerFactory(() => BranchPackagesListCubit(sl()));
+    }
+
+    if (!sl.isRegistered<BranchDetailsCubit>()) {
+      sl.registerFactory(() => BranchDetailsCubit(sl()));
     }
   }
 

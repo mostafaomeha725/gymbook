@@ -33,8 +33,22 @@ class EndPoints {
 
   static const String getBranches = 'Branches';
 
+  static String getBranchDetails(int branchId) => 'Branches/$branchId';
+
   static String createPackage(int branchId) =>
       'Owner/Branches/$branchId/packages';
+
+  static String getBranchPackages(int branchId) =>
+      'Owner/Branches/$branchId/packages';
+
+  static String updatePackage(int branchId, int packageId) =>
+      'Owner/Branches/$branchId/packages/$packageId';
+
+  static String updatePackageStatus(int branchId, int packageId) =>
+      'Owner/Branches/$branchId/packages/$packageId/status';
+
+  static String deletePackage(int branchId, int packageId) =>
+      'Owner/Branches/$branchId/packages/$packageId';
 
   static String addBranchImage(int branchId) =>
       'Owner/Branches/$branchId/images';
@@ -44,4 +58,7 @@ class EndPoints {
 
   static String updateBranchDetails(int branchId) =>
       'Owner/Branches/$branchId/bussiness-details';
+
+  static String updateBranchStatus(int branchId) =>
+      'Owner/Branches/$branchId/status';
 }

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/app_image.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/switch_open_gym.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/tag_bage.dart';
 
 class BranchHeaderSection extends StatefulWidget {
@@ -28,6 +31,22 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
   void initState() {
     super.initState();
     isActive = widget.branch.branchStatus == 1;
+  }
+
+  Future<void> _updateStatus(bool value) async {
+    setState(() => isActive = value);
+
+    showLoading();
+    final result = await sl<AdminBranchRepository>().updateBranchStatus(
+      branchId: widget.branch.id,
+      branchStatus: value ? 1 : 0,
+    );
+    hideLoading();
+
+    result.fold((failure) {
+      setState(() => isActive = !value); // revert
+      showError(failure);
+    }, (_) {});
   }
 
   @override
@@ -109,11 +128,7 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
                     scale: 0.8.h,
                     child: OpenGymSwitch(
                       value: isActive,
-                      onChanged: (value) {
-                        setState(() => isActive = value);
-                        // TODO: call API to update status
-                        // value ? status = 1 (Active) : status = 2 (Inactive)
-                      },
+                      onChanged: _updateStatus,
                     ),
                   ),
                   AppText(
