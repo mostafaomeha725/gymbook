@@ -9,7 +9,7 @@ final class CreateBranchInitial extends CreateBranchState {}
 final class CreateBranchLoading extends CreateBranchState {}
 
 final class CreateBranchSuccess extends CreateBranchState {
-  final CreateBranchResponse branchResponse;
+  final CreatedBranchEntity branchResponse;
 
   const CreateBranchSuccess(this.branchResponse);
 }

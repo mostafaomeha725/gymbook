@@ -1,14 +1,25 @@
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/admin_home/data/models/package_model.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/entities/created_package_entity.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/create_package_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/delete_package_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_package_status_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_package_usecase.dart';
 
 part 'create_package_state.dart';
 
 class CreatePackageCubit extends Cubit<CreatePackageState> {
-  CreatePackageCubit(this.repository) : super(CreatePackageInitial());
+  CreatePackageCubit({
+    required this.createPackageUseCase,
+    required this.updatePackageUseCase,
+    required this.updatePackageStatusUseCase,
+    required this.deletePackageUseCase,
+  }) : super(CreatePackageInitial());
 
-  final AdminBranchRepository repository;
+  final CreatePackageUseCase createPackageUseCase;
+  final UpdatePackageUseCase updatePackageUseCase;
+  final UpdatePackageStatusUseCase updatePackageStatusUseCase;
+  final DeletePackageUseCase deletePackageUseCase;
 
   Future<void> submitPackage({
     required int branchId,
@@ -43,7 +54,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     emit(CreatePackageLoading());
     showLoading();
 
-    final request = CreatePackageRequest(
+    final result = await createPackageUseCase(
       branchId: branchId,
       name: name.trim(),
       price: price,
@@ -52,21 +63,16 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
       numberOfFreezes: freezes,
     );
 
-    final result = await repository.createPackage(
-      branchId: branchId,
-      request: request,
-    );
-
     hideLoading();
 
     result.fold(
       (failure) {
-        showError(failure);
-        emit(CreatePackageFailure(failure));
+        showError(failure.message);
+        emit(CreatePackageFailure(failure.message));
       },
-      (response) {
+      (entity) {
         showSuccess('Package created successfully');
-        emit(CreatePackageSuccess(response));
+        emit(CreatePackageSuccess(entity));
       },
     );
   }
@@ -105,31 +111,26 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     emit(CreatePackageLoading());
     showLoading();
 
-    final request = UpdatePackageRequest(
+    final result = await updatePackageUseCase(
+      branchId: branchId,
+      packageId: packageId,
       name: name.trim(),
       price: price,
       durationInMonths: duration,
       isActive: isActive,
       numberOfFreezes: freezes,
-      freezeDurationInDays: 0,
-    );
-
-    final result = await repository.updatePackage(
-      branchId: branchId,
-      packageId: packageId,
-      request: request,
     );
 
     hideLoading();
 
     result.fold(
       (failure) {
-        showError(failure);
-        emit(CreatePackageFailure(failure));
+        showError(failure.message);
+        emit(CreatePackageFailure(failure.message));
       },
-      (response) {
+      (entity) {
         showSuccess('Package updated successfully');
-        emit(CreatePackageSuccess(response));
+        emit(CreatePackageSuccess(entity));
       },
     );
   }
@@ -142,7 +143,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     emit(CreatePackageLoading());
     showLoading();
 
-    final result = await repository.updatePackageStatus(
+    final result = await updatePackageStatusUseCase(
       branchId: branchId,
       packageId: packageId,
       isActive: isActive,
@@ -151,8 +152,8 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     hideLoading();
 
     result.fold((failure) {
-      showError(failure);
-      emit(CreatePackageFailure(failure));
+      showError(failure.message);
+      emit(CreatePackageFailure(failure.message));
     }, (_) => emit(PackageStatusUpdated()));
   }
 
@@ -163,7 +164,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     emit(CreatePackageLoading());
     showLoading();
 
-    final result = await repository.deletePackage(
+    final result = await deletePackageUseCase(
       branchId: branchId,
       packageId: packageId,
     );
@@ -171,8 +172,8 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     hideLoading();
 
     result.fold((failure) {
-      showError(failure);
-      emit(CreatePackageFailure(failure));
+      showError(failure.message);
+      emit(CreatePackageFailure(failure.message));
     }, (_) => emit(PackageDeleted()));
   }
 }

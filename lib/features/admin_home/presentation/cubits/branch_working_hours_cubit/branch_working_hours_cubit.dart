@@ -1,13 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_working_hours_usecase.dart';
 
 part 'branch_working_hours_state.dart';
 
 class BranchWorkingHoursCubit extends Cubit<BranchWorkingHoursState> {
-  BranchWorkingHoursCubit(this.repository) : super(BranchWorkingHoursInitial());
+  BranchWorkingHoursCubit(this.updateWorkingHoursUseCase)
+    : super(BranchWorkingHoursInitial());
 
-  final AdminBranchRepository repository;
+  final UpdateWorkingHoursUseCase updateWorkingHoursUseCase;
 
   Future<bool> submitBranchWorkingHours({
     required int branchId,
@@ -46,17 +47,17 @@ class BranchWorkingHoursCubit extends Cubit<BranchWorkingHoursState> {
     emit(BranchWorkingHoursLoading());
     showLoading();
 
-    final response = await repository.updateBranchWorkingHours(
+    final result = await updateWorkingHoursUseCase(
       branchId: branchId,
       workingHours: workingHours,
     );
 
     hideLoading();
 
-    return response.fold(
+    return result.fold(
       (failure) {
-        showError(failure);
-        emit(BranchWorkingHoursFailure(failure));
+        showError(failure.message);
+        emit(BranchWorkingHoursFailure(failure.message));
         return false;
       },
       (_) {

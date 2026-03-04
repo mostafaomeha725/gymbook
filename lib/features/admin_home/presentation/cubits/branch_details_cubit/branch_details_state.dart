@@ -7,7 +7,7 @@ final class BranchDetailsInitial extends BranchDetailsState {}
 final class BranchDetailsLoading extends BranchDetailsState {}
 
 final class BranchDetailsSuccess extends BranchDetailsState {
-  final BranchDetailsResponse response;
+  final BranchDetailsEntity response;
   BranchDetailsSuccess(this.response);
 }
 

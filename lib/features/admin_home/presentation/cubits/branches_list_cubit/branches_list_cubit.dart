@@ -1,13 +1,13 @@
 import 'package:bloc/bloc.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_list_entity.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branches_usecase.dart';
 
 part 'branches_list_state.dart';
 
 class BranchesListCubit extends Cubit<BranchesListState> {
-  BranchesListCubit(this.repository) : super(BranchesListInitial());
+  BranchesListCubit(this.getBranchesUseCase) : super(BranchesListInitial());
 
-  final AdminBranchRepository repository;
+  final GetBranchesUseCase getBranchesUseCase;
 
   int _currentPage = 1;
   static const int _pageSize = 3;
@@ -21,14 +21,14 @@ class BranchesListCubit extends Cubit<BranchesListState> {
 
     emit(BranchesListLoading());
 
-    final result = await repository.getBranches(
+    final result = await getBranchesUseCase(
       pageNumber: _currentPage,
       pageSize: _pageSize,
     );
 
     result.fold(
-      (failure) => emit(BranchesListFailure(failure)),
-      (response) => emit(BranchesListSuccess(response)),
+      (failure) => emit(BranchesListFailure(failure.message)),
+      (entity) => emit(BranchesListSuccess(entity)),
     );
   }
 }

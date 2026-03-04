@@ -2,7 +2,22 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/network/network_service.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/data/datasources/admin_branch_remote_datasource.dart';
+import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository_impl.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/create_branch_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/create_package_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/delete_package_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/edit_branch_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branch_details_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branch_packages_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branches_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_branch_location_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_branch_status_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_package_status_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_package_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_working_hours_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/upload_branch_image_usecase.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
@@ -99,36 +114,92 @@ class ServiceLocator {
   /// ADMIN FEATURE
   /// =============================
   void _initAdmin() {
+    // DataSource
+    if (!sl.isRegistered<AdminBranchRemoteDataSource>()) {
+      sl.registerLazySingleton<AdminBranchRemoteDataSource>(
+        () => AdminBranchRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    // Repository
     if (!sl.isRegistered<AdminBranchRepository>()) {
       sl.registerLazySingleton<AdminBranchRepository>(
         () => AdminBranchRepositoryImpl(sl()),
       );
     }
 
-    if (!sl.isRegistered<CreateBranchCubit>()) {
-      sl.registerFactory(() => CreateBranchCubit(sl()));
+    // Use Cases
+    if (!sl.isRegistered<CreateBranchUseCase>()) {
+      sl.registerLazySingleton(() => CreateBranchUseCase(sl()));
+    }
+    if (!sl.isRegistered<EditBranchUseCase>()) {
+      sl.registerLazySingleton(() => EditBranchUseCase(sl()));
+    }
+    if (!sl.isRegistered<GetBranchesUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchesUseCase(sl()));
+    }
+    if (!sl.isRegistered<GetBranchDetailsUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchDetailsUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdateWorkingHoursUseCase>()) {
+      sl.registerLazySingleton(() => UpdateWorkingHoursUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdateBranchLocationUseCase>()) {
+      sl.registerLazySingleton(() => UpdateBranchLocationUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdateBranchStatusUseCase>()) {
+      sl.registerLazySingleton(() => UpdateBranchStatusUseCase(sl()));
+    }
+    if (!sl.isRegistered<CreatePackageUseCase>()) {
+      sl.registerLazySingleton(() => CreatePackageUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdatePackageUseCase>()) {
+      sl.registerLazySingleton(() => UpdatePackageUseCase(sl()));
+    }
+    if (!sl.isRegistered<GetBranchPackagesUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchPackagesUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdatePackageStatusUseCase>()) {
+      sl.registerLazySingleton(() => UpdatePackageStatusUseCase(sl()));
+    }
+    if (!sl.isRegistered<DeletePackageUseCase>()) {
+      sl.registerLazySingleton(() => DeletePackageUseCase(sl()));
+    }
+    if (!sl.isRegistered<UploadBranchImageUseCase>()) {
+      sl.registerLazySingleton(() => UploadBranchImageUseCase(sl()));
     }
 
+    // Cubits
+    if (!sl.isRegistered<CreateBranchCubit>()) {
+      sl.registerFactory(
+        () => CreateBranchCubit(
+          createBranchUseCase: sl(),
+          editBranchUseCase: sl(),
+        ),
+      );
+    }
     if (!sl.isRegistered<BranchWorkingHoursCubit>()) {
       sl.registerFactory(() => BranchWorkingHoursCubit(sl()));
     }
-
     if (!sl.isRegistered<BranchLocationCubit>()) {
       sl.registerFactory(() => BranchLocationCubit(sl()));
     }
-
     if (!sl.isRegistered<BranchesListCubit>()) {
       sl.registerFactory(() => BranchesListCubit(sl()));
     }
-
     if (!sl.isRegistered<CreatePackageCubit>()) {
-      sl.registerFactory(() => CreatePackageCubit(sl()));
+      sl.registerFactory(
+        () => CreatePackageCubit(
+          createPackageUseCase: sl(),
+          updatePackageUseCase: sl(),
+          updatePackageStatusUseCase: sl(),
+          deletePackageUseCase: sl(),
+        ),
+      );
     }
-
     if (!sl.isRegistered<BranchPackagesListCubit>()) {
       sl.registerFactory(() => BranchPackagesListCubit(sl()));
     }
-
     if (!sl.isRegistered<BranchDetailsCubit>()) {
       sl.registerFactory(() => BranchDetailsCubit(sl()));
     }

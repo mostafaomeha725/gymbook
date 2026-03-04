@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/edit_branch_details_screen_body.dart';
 
 class EditBranchDetailsScreen extends StatelessWidget {
-  final BranchItem branch;
+  final BranchEntity branch;
 
   const EditBranchDetailsScreen({super.key, required this.branch});
 

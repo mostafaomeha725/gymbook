@@ -7,7 +7,7 @@ final class BranchesListInitial extends BranchesListState {}
 final class BranchesListLoading extends BranchesListState {}
 
 final class BranchesListSuccess extends BranchesListState {
-  final BranchListResponse response;
+  final BranchListEntity response;
   BranchesListSuccess(this.response);
 }
 

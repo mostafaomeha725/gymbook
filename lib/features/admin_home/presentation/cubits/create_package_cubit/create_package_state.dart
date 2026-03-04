@@ -7,7 +7,7 @@ final class CreatePackageInitial extends CreatePackageState {}
 final class CreatePackageLoading extends CreatePackageState {}
 
 final class CreatePackageSuccess extends CreatePackageState {
-  final CreatePackageResponse package;
+  final CreatedPackageEntity package;
   CreatePackageSuccess(this.package);
 }
 

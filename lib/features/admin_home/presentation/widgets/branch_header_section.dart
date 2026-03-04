@@ -7,12 +7,12 @@ import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/app_image.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/switch_open_gym.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/tag_bage.dart';
 
 class BranchHeaderSection extends StatefulWidget {
-  final BranchItem branch;
+  final BranchEntity branch;
 
   const BranchHeaderSection({super.key, required this.branch});
 
@@ -45,7 +45,7 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
 
     result.fold((failure) {
       setState(() => isActive = !value); // revert
-      showError(failure);
+      showError(failure.message);
     }, (_) {});
   }
 

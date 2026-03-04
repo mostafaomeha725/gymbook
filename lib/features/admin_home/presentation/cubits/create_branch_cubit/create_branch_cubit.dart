@@ -1,14 +1,19 @@
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/entities/created_branch_entity.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/create_branch_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/edit_branch_usecase.dart';
 
 part 'create_branch_state.dart';
 
 class CreateBranchCubit extends Cubit<CreateBranchState> {
-  CreateBranchCubit(this.repository) : super(CreateBranchInitial());
+  CreateBranchCubit({
+    required this.createBranchUseCase,
+    required this.editBranchUseCase,
+  }) : super(CreateBranchInitial());
 
-  final AdminBranchRepository repository;
+  final CreateBranchUseCase createBranchUseCase;
+  final EditBranchUseCase editBranchUseCase;
 
   Future<void> createBranch({
     required String name,
@@ -19,7 +24,7 @@ class CreateBranchCubit extends Cubit<CreateBranchState> {
     emit(CreateBranchLoading());
     showLoading();
 
-    final response = await repository.createBranch(
+    final result = await createBranchUseCase(
       name: name,
       email: email,
       phoneNumber: phoneNumber,
@@ -28,21 +33,23 @@ class CreateBranchCubit extends Cubit<CreateBranchState> {
 
     hideLoading();
 
-    response.fold(
+    result.fold(
       (failure) {
-        showError(failure);
-        emit(CreateBranchFailure(failure));
+        showError(failure.message);
+        emit(CreateBranchFailure(failure.message));
       },
-      (branchResponse) {
-        // Create response with all original data for state
-        final successResponse = CreateBranchResponse(
-          id: branchResponse.id,
-          name: name,
-          email: email,
-          phoneNumber: phoneNumber,
-          branchType: branchType,
+      (entity) {
+        emit(
+          CreateBranchSuccess(
+            CreatedBranchEntity(
+              id: entity.id,
+              name: name,
+              email: email,
+              phoneNumber: phoneNumber,
+              branchType: branchType,
+            ),
+          ),
         );
-        emit(CreateBranchSuccess(successResponse));
       },
     );
   }
@@ -57,7 +64,7 @@ class CreateBranchCubit extends Cubit<CreateBranchState> {
     emit(CreateBranchLoading());
     showLoading();
 
-    final response = await repository.updateBranchDetails(
+    final result = await editBranchUseCase(
       branchId: branchId,
       name: name,
       email: email,
@@ -67,15 +74,15 @@ class CreateBranchCubit extends Cubit<CreateBranchState> {
 
     hideLoading();
 
-    response.fold(
+    result.fold(
       (failure) {
-        showError(failure);
-        emit(CreateBranchFailure(failure));
+        showError(failure.message);
+        emit(CreateBranchFailure(failure.message));
       },
       (_) {
         emit(
           CreateBranchSuccess(
-            CreateBranchResponse(
+            CreatedBranchEntity(
               id: branchId,
               name: name,
               email: email,

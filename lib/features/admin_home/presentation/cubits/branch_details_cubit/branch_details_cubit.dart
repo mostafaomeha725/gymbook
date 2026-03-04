@@ -1,26 +1,27 @@
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_details_model.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branch_details_usecase.dart';
 
 part 'branch_details_state.dart';
 
 class BranchDetailsCubit extends Cubit<BranchDetailsState> {
-  BranchDetailsCubit(this.repository) : super(BranchDetailsInitial());
+  BranchDetailsCubit(this.getBranchDetailsUseCase)
+    : super(BranchDetailsInitial());
 
-  final AdminBranchRepository repository;
+  final GetBranchDetailsUseCase getBranchDetailsUseCase;
 
   Future<void> loadBranchDetails(int branchId) async {
     emit(BranchDetailsLoading());
     showLoading();
 
-    final result = await repository.getBranchDetails(branchId);
+    final result = await getBranchDetailsUseCase(branchId);
 
     hideLoading();
 
     result.fold(
-      (failure) => emit(BranchDetailsFailure(failure)),
-      (response) => emit(BranchDetailsSuccess(response)),
+      (failure) => emit(BranchDetailsFailure(failure.message)),
+      (entity) => emit(BranchDetailsSuccess(entity)),
     );
   }
 }

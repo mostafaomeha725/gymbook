@@ -1,8 +1,8 @@
-import 'package:gymbook/features/admin_home/data/models/branch_package_item.dart';
+import 'package:gymbook/features/admin_home/domain/entities/package_entity.dart';
 
 class PackageScreenArgs {
   final int branchId;
-  final BranchPackageItem? packageItem;
+  final PackageEntity? packageItem;
 
   const PackageScreenArgs({required this.branchId, this.packageItem});
 

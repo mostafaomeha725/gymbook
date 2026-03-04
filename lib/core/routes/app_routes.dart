@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/data/models/package_model.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_four_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/add_branch_one_screen.dart';
@@ -16,7 +17,6 @@ import 'package:gymbook/features/admin_home/presentation/screens/admin_manage_su
 import 'package:gymbook/features/admin_home/presentation/screens/admin_subscription_details_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/edit_branch_details_screen.dart';
 import 'package:gymbook/features/admin_home/presentation/screens/manage_package_screen.dart';
-import 'package:gymbook/features/auth/presentation/screens/gym_register_details_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/join_us_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/login_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
@@ -107,10 +107,6 @@ GoRouter createRouter() {
         },
       ),
 
-      GoRoute(
-        path: Routes.gymRegisterDetailesScreen,
-        builder: (context, state) => const GymRegisterDetailsScreen(),
-      ),
       GoRoute(
         path: Routes.mainNavigationScreen,
         builder: (context, state) {
@@ -226,7 +222,7 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.adminBranchScreen,
         builder: (context, state) {
-          final branch = state.extra as BranchItem?;
+          final branch = state.extra as BranchEntity?;
           if (branch == null) return const SizedBox.shrink();
           return AdminBranchScreen(branch: branch);
         },
@@ -234,7 +230,7 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.editBranchDetailsScreen,
         builder: (context, state) {
-          final branch = state.extra as BranchItem?;
+          final branch = state.extra as BranchEntity?;
           if (branch == null) return const SizedBox.shrink();
           return EditBranchDetailsScreen(branch: branch);
         },

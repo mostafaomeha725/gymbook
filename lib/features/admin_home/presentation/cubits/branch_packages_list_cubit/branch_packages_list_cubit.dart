@@ -1,14 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/admin_home/data/models/package_model.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/entities/packages_list_entity.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branch_packages_usecase.dart';
 
 part 'branch_packages_list_state.dart';
 
 class BranchPackagesListCubit extends Cubit<BranchPackagesListState> {
-  BranchPackagesListCubit(this.repository) : super(BranchPackagesListInitial());
+  BranchPackagesListCubit(this.getBranchPackagesUseCase)
+    : super(BranchPackagesListInitial());
 
-  final AdminBranchRepository repository;
+  final GetBranchPackagesUseCase getBranchPackagesUseCase;
 
   int _currentPage = 1;
   static const int _pageSize = 10;
@@ -27,7 +28,7 @@ class BranchPackagesListCubit extends Cubit<BranchPackagesListState> {
     emit(BranchPackagesListLoading());
     showLoading();
 
-    final result = await repository.getBranchPackages(
+    final result = await getBranchPackagesUseCase(
       branchId: branchId,
       pageNumber: _currentPage,
       pageSize: _pageSize,
@@ -36,11 +37,11 @@ class BranchPackagesListCubit extends Cubit<BranchPackagesListState> {
     result.fold(
       (failure) {
         hideLoading();
-        emit(BranchPackagesListFailure(failure));
+        emit(BranchPackagesListFailure(failure.message));
       },
-      (response) {
+      (entity) {
         hideLoading();
-        emit(BranchPackagesListSuccess(response));
+        emit(BranchPackagesListSuccess(entity));
       },
     );
   }

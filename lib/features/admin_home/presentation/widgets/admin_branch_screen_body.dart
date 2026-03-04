@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/all_current_status.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_buttom.dart';
@@ -14,7 +14,7 @@ import 'package:gymbook/features/admin_home/presentation/widgets/grid_view_branc
 import 'package:gymbook/features/admin_home/presentation/widgets/grid_view_status_card.dart';
 
 class AdminBranchScreenBody extends StatefulWidget {
-  final BranchItem branch;
+  final BranchEntity branch;
 
   const AdminBranchScreenBody({super.key, required this.branch});
 
@@ -24,7 +24,7 @@ class AdminBranchScreenBody extends StatefulWidget {
 
 class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   int selectedTab = 0;
-  late BranchItem currentBranch;
+  late BranchEntity currentBranch;
 
   final tabs = const ["Today", "This Week", "This Month", "This Year", "All"];
 

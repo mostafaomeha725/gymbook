@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_card.dart';
 
 class BranchesListView extends StatelessWidget {
-  final List<BranchItem> branches;
+  final List<BranchEntity> branches;
 
   const BranchesListView({super.key, required this.branches});
 

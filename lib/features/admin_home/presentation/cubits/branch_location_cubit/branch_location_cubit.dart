@@ -1,14 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/constants/strings.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/update_branch_location_usecase.dart';
 
 part 'branch_location_state.dart';
 
 class BranchLocationCubit extends Cubit<BranchLocationState> {
-  BranchLocationCubit(this.repository) : super(BranchLocationInitial());
+  BranchLocationCubit(this.updateBranchLocationUseCase)
+    : super(BranchLocationInitial());
 
-  final AdminBranchRepository repository;
+  final UpdateBranchLocationUseCase updateBranchLocationUseCase;
 
   int? getGovernorateId(String? governorateName) {
     if (governorateName == null) return null;
@@ -54,7 +55,7 @@ class BranchLocationCubit extends Cubit<BranchLocationState> {
     emit(BranchLocationLoading());
     showLoading();
 
-    final response = await repository.updateBranchLocationDetails(
+    final result = await updateBranchLocationUseCase(
       branchId: branchId,
       governorateId: governorateId,
       address: address.trim(),
@@ -64,10 +65,10 @@ class BranchLocationCubit extends Cubit<BranchLocationState> {
 
     hideLoading();
 
-    return response.fold(
+    return result.fold(
       (failure) {
-        showError(failure);
-        emit(BranchLocationFailure(failure));
+        showError(failure.message);
+        emit(BranchLocationFailure(failure.message));
         return false;
       },
       (_) {

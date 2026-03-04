@@ -1,3 +1,5 @@
+import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
+
 class BranchListResponse {
   final List<BranchItem> data;
   final int currentPage;
@@ -152,7 +154,7 @@ class BranchGovernorate {
 class BranchScreenArgs {
   final int branchId;
   final bool isEditMode;
-  final BranchItem? branch;
+  final BranchEntity? branch;
 
   const BranchScreenArgs({
     required this.branchId,

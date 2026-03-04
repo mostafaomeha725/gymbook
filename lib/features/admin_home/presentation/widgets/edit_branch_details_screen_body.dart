@@ -3,11 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/edit_option_tile.dart';
 
 class EditBranchDetailsScreenBody extends StatelessWidget {
-  final BranchItem branch;
+  final BranchEntity branch;
 
   const EditBranchDetailsScreenBody({super.key, required this.branch});
 

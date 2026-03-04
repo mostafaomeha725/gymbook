@@ -7,7 +7,7 @@ final class BranchPackagesListInitial extends BranchPackagesListState {}
 final class BranchPackagesListLoading extends BranchPackagesListState {}
 
 final class BranchPackagesListSuccess extends BranchPackagesListState {
-  final BranchPackagesResponse response;
+  final PackagesListEntity response;
 
   BranchPackagesListSuccess(this.response);
 }
