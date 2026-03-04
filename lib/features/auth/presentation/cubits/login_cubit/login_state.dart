@@ -9,11 +9,11 @@ final class LoginInitial extends LoginState {}
 final class LoginLoading extends LoginState {}
 
 final class LoginSuccess extends LoginState {
-  final LoginResponse loginResponse;
-  const LoginSuccess(this.loginResponse);
+  final LoginResultEntity loginResult;
+  const LoginSuccess(this.loginResult);
 }
 
 final class LoginFailure extends LoginState {
   final String message;
-  LoginFailure(this.message);
+  const LoginFailure(this.message);
 }

@@ -1,15 +1,14 @@
 import 'package:bloc/bloc.dart';
-import 'package:gymbook/core/network/endpoints.dart';
-import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/auth/data/model/register_response.dart';
+import 'package:gymbook/features/auth/domain/entities/user_entity.dart';
+import 'package:gymbook/features/auth/domain/usecases/register_usecase.dart';
 
 part 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
-  RegisterCubit(this.networkService) : super(RegisterInitial());
+  RegisterCubit(this.registerUseCase) : super(RegisterInitial());
 
-  final NetworkService networkService;
+  final RegisterUseCase registerUseCase;
 
   Future<void> register({
     required String firstName,
@@ -23,29 +22,21 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(RegisterLoading());
     showLoading();
 
-    final response = await networkService.postData(
-      endPoint: isOwner ? EndPoints.registerOwner : EndPoints.registerUser,
-      data: {
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'password': password,
-        'confirmPassword': confirmPassword,
-        'phoneNumber': phoneNumber,
-      },
+    final result = await registerUseCase(
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword,
+      phoneNumber: phoneNumber,
+      isOwner: isOwner,
     );
 
     hideLoading();
 
-    response.fold(
-      (failure) {
-        showError(failure.message);
-        emit(RegisterFailure(failure.message));
-      },
-      (data) {
-        final registerResponse = RegisterResponse.fromJson(data);
-        emit(RegisterSuccess(registerResponse));
-      },
-    );
+    result.fold((failure) {
+      showError(failure.message);
+      emit(RegisterFailure(failure.message));
+    }, (user) => emit(RegisterSuccess(user)));
   }
 }

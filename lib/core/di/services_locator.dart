@@ -10,6 +10,12 @@ import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_h
 import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/create_package_cubit/create_package_cubit.dart';
+import 'package:gymbook/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:gymbook/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:gymbook/features/auth/domain/repositories/auth_repository.dart';
+import 'package:gymbook/features/auth/domain/usecases/login_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/login_with_google_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/register_usecase.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,8 +55,40 @@ class ServiceLocator {
   /// AUTH FEATURE
   /// =============================
   void _initAuth() {
+    // DataSource
+    if (!sl.isRegistered<AuthRemoteDataSource>()) {
+      sl.registerLazySingleton<AuthRemoteDataSource>(
+        () => AuthRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    // Repository
+    if (!sl.isRegistered<AuthRepository>()) {
+      sl.registerLazySingleton<AuthRepository>(
+        () => AuthRepositoryImpl(
+          remoteDataSource: sl(),
+          storage: sl(),
+          networkService: sl(),
+        ),
+      );
+    }
+
+    // Use Cases
+    if (!sl.isRegistered<LoginUseCase>()) {
+      sl.registerLazySingleton(() => LoginUseCase(sl()));
+    }
+    if (!sl.isRegistered<LoginWithGoogleUseCase>()) {
+      sl.registerLazySingleton(() => LoginWithGoogleUseCase(sl()));
+    }
+    if (!sl.isRegistered<RegisterUseCase>()) {
+      sl.registerLazySingleton(() => RegisterUseCase(sl()));
+    }
+
+    // Cubits
     if (!sl.isRegistered<LoginCubit>()) {
-      sl.registerFactory(() => LoginCubit(sl()));
+      sl.registerFactory(
+        () => LoginCubit(loginUseCase: sl(), loginWithGoogleUseCase: sl()),
+      );
     }
     if (!sl.isRegistered<RegisterCubit>()) {
       sl.registerFactory(() => RegisterCubit(sl()));

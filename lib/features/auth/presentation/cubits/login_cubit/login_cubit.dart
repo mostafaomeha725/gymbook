@@ -1,19 +1,18 @@
 import 'package:bloc/bloc.dart';
-import 'package:gymbook/core/network/endpoints.dart';
-import 'package:gymbook/core/network/network_service.dart';
-import 'package:gymbook/core/services/google_sign_in_service.dart';
+import 'package:gymbook/core/error/failure.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/features/auth/data/model/login_response.dart';
-import 'package:gymbook/core/cache/preferences_storage.dart';
-import 'package:gymbook/core/enums/app_enums.dart';
-import '/core/di/services_locator.dart';
+import 'package:gymbook/features/auth/domain/entities/login_result_entity.dart';
+import 'package:gymbook/features/auth/domain/usecases/login_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/login_with_google_usecase.dart';
 
 part 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  LoginCubit(this.networkService) : super(LoginInitial());
+  LoginCubit({required this.loginUseCase, required this.loginWithGoogleUseCase})
+    : super(LoginInitial());
 
-  final NetworkService networkService;
+  final LoginUseCase loginUseCase;
+  final LoginWithGoogleUseCase loginWithGoogleUseCase;
 
   // ─── Email / Password Login ────────────────────────────────────────────────
 
@@ -21,61 +20,33 @@ class LoginCubit extends Cubit<LoginState> {
     emit(LoginLoading());
     showLoading();
 
-    final response = await networkService.postData(
-      endPoint: EndPoints.login,
-      data: {'email': email, 'password': password},
-    );
+    final result = await loginUseCase(email: email, password: password);
 
     hideLoading();
 
-    response.fold(
-      (failure) {
-        showError(failure.message);
-        emit(LoginFailure(failure.message));
-      },
-      (data) async {
-        final loginResponse = LoginResponse.fromJson(data);
-        await _saveSession(loginResponse);
-        emit(LoginSuccess(loginResponse));
-      },
-    );
+    result.fold((failure) {
+      showError(failure.message);
+      emit(LoginFailure(failure.message));
+    }, (loginResult) => emit(LoginSuccess(loginResult)));
   }
 
   // ─── Google Login ──────────────────────────────────────────────────────────
 
   Future<void> loginWithGoogle() async {
-    final idToken = await GoogleSignInService.getIdToken();
-
-    if (idToken == null) return; // user cancelled
-
     emit(LoginLoading());
     showLoading();
 
-    final response = await networkService.postData(
-      endPoint: EndPoints.googleLogin,
-      data: {'idToken': idToken},
-    );
+    final result = await loginWithGoogleUseCase();
 
     hideLoading();
 
-    response.fold(
-      (failure) {
-        showError(failure.message);
-        emit(LoginFailure(failure.message));
-      },
-      (data) async {
-        final loginResponse = LoginResponse.fromJson(data);
-        await _saveSession(loginResponse);
-        emit(LoginSuccess(loginResponse));
-      },
-    );
-  }
-
-  // ─── Helpers ───────────────────────────────────────────────────────────────
-
-  Future<void> _saveSession(LoginResponse response) async {
-    final storage = sl<PreferencesStorage>();
-    await storage.saveUserToken(response.accessToken);
-    await storage.saveUserRole(response.user.role == AppUserRole.admin);
+    result.fold((failure) {
+      if (failure is UserCancelledFailure) {
+        emit(LoginInitial());
+        return;
+      }
+      showError(failure.message);
+      emit(LoginFailure(failure.message));
+    }, (loginResult) => emit(LoginSuccess(loginResult)));
   }
 }

@@ -43,7 +43,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           hideLoading();
           GoRouter.of(context).pushReplacement(
             Routes.mainNavigationScreen,
-            extra: state.loginResponse.user.isAdmin,
+            extra: state.loginResult.user.isAdmin,
           );
         }
       },

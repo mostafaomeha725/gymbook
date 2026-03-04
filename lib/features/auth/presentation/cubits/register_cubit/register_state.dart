@@ -9,8 +9,8 @@ final class RegisterInitial extends RegisterState {}
 final class RegisterLoading extends RegisterState {}
 
 final class RegisterSuccess extends RegisterState {
-  final RegisterResponse response;
-  const RegisterSuccess(this.response);
+  final UserEntity user;
+  const RegisterSuccess(this.user);
 }
 
 final class RegisterFailure extends RegisterState {

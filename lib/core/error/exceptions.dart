@@ -30,6 +30,10 @@ class NotFoundException extends ServerException {
   const NotFoundException(super.message);
 }
 
+class UserCancelledException implements Exception {
+  const UserCancelledException();
+}
+
 class ConflictException extends ServerException {
   const ConflictException(super.message);
 }

@@ -23,6 +23,13 @@ class CacheFailure extends Failure {
   List<Object> get props => [message];
 }
 
+class UserCancelledFailure extends Failure {
+  const UserCancelledFailure() : super('');
+
+  @override
+  List<Object> get props => [];
+}
+
 // String mapFailureToMessage(Failure failure) {
 //   switch (failure.runtimeType) {
 //     case ServerFailure:
