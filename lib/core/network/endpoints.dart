@@ -61,4 +61,18 @@ class EndPoints {
 
   static String updateBranchStatus(int branchId) =>
       'Owner/Branches/$branchId/status';
+
+  static String getBranchStatistics(int branchId) =>
+      'Owner/Branches/$branchId/statistics';
+
+  static String addSubscription(int branchId) =>
+      'Owner/branches/$branchId/subscriptions';
+
+  static String addMember(int branchId) => 'Owner/branches/$branchId/members';
+
+  static String getBranchSubscriptions(int branchId) =>
+      'Owner/Branches/$branchId/subscriptions';
+
+  static String cancelSubscription(int subscriptionId) =>
+      'Owner/Subscriptions/$subscriptionId/cancel';
 }

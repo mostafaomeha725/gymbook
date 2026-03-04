@@ -209,15 +209,24 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: Routes.adminManageSubscriptionsScreen,
-        builder: (context, state) => const AdminManageSubscriptionsScreen(),
+        builder: (context, state) {
+          final branchId = state.extra as int? ?? 0;
+          return AdminManageSubscriptionsScreen(branchId: branchId);
+        },
       ),
       GoRoute(
         path: Routes.adminSubscriptionDetailsScreen,
-        builder: (context, state) => const AdminSubscriptionDetailsScreen(),
+        builder: (context, state) {
+          final subscriptionId = state.extra as int? ?? 0;
+          return AdminSubscriptionDetailsScreen(subscriptionId: subscriptionId);
+        },
       ),
       GoRoute(
         path: Routes.adminAddSubscriptionScreen,
-        builder: (context, state) => const AdminAddSubscriptionScreen(),
+        builder: (context, state) {
+          final branchId = state.extra as int? ?? 0;
+          return AdminAddSubscriptionScreen(branchId: branchId);
+        },
       ),
       GoRoute(
         path: Routes.adminBranchScreen,

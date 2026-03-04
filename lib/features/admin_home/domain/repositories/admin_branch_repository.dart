@@ -2,8 +2,12 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/failure.dart';
+import 'package:gymbook/features/admin_home/domain/entities/add_member_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/add_subscription_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/subscription_item_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_list_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_statistics_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/created_branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/created_package_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/packages_list_entity.dart';
@@ -96,5 +100,37 @@ abstract class AdminBranchRepository {
     required int branchId,
     required int imageId,
     required File imageFile,
+  });
+
+  Future<Either<Failure, BranchStatisticsEntity>> getBranchStatistics({
+    required int branchId,
+    required StatisticsTimePeriod timePeriod,
+  });
+
+  Future<Either<Failure, AddSubscriptionEntity>> addSubscription({
+    required int branchId,
+    required String email,
+    required int packageId,
+  });
+
+  Future<Either<Failure, AddMemberEntity>> addMember({
+    required int branchId,
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+    required String email,
+    required int packageId,
+  });
+
+  Future<Either<Failure, SubscriptionsListEntity>> getBranchSubscriptions({
+    required int branchId,
+    required int pageNumber,
+    required int pageSize,
+    String? search,
+    int? status,
+  });
+
+  Future<Either<Failure, void>> cancelSubscription({
+    required int subscriptionId,
   });
 }

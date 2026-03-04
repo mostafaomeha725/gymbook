@@ -13,9 +13,14 @@ import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart
 import 'package:gymbook/features/admin_home/data/models/create_package_request.dart';
 import 'package:gymbook/features/admin_home/data/models/create_package_response.dart';
 import 'package:gymbook/features/admin_home/data/models/update_package_request.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_subscriptions_model.dart';
+import 'package:gymbook/features/admin_home/domain/entities/add_member_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/add_subscription_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/subscription_item_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_list_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_statistics_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/created_branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/created_package_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/governorate_entity.dart';
@@ -405,5 +410,117 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
       numberOfFreezes: m.numberOfFreezes,
       freezeDurationInDays: m.freezeDurationInDays,
     );
+  }
+
+  @override
+  Future<Either<Failure, BranchStatisticsEntity>> getBranchStatistics({
+    required int branchId,
+    required StatisticsTimePeriod timePeriod,
+  }) async {
+    try {
+      final model = await remoteDataSource.getBranchStatistics(
+        branchId: branchId,
+        timePeriod: timePeriod,
+      );
+      return Right(
+        BranchStatisticsEntity(
+          branchId: model.branchId,
+          newSubscriptionsCount: model.newSubscriptionsCount,
+          expiredSubscriptionsCount: model.expiredSubscriptionsCount,
+          totalRevenue: model.totalRevenue,
+          checkInsCount: model.checkInsCount,
+        ),
+      );
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AddSubscriptionEntity>> addSubscription({
+    required int branchId,
+    required String email,
+    required int packageId,
+  }) async {
+    try {
+      final model = await remoteDataSource.addSubscription(
+        branchId: branchId,
+        email: email,
+        packageId: packageId,
+      );
+      return Right(AddSubscriptionEntity(id: model.id));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AddMemberEntity>> addMember({
+    required int branchId,
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+    required String email,
+    required int packageId,
+  }) async {
+    try {
+      final model = await remoteDataSource.addMember(
+        branchId: branchId,
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+        email: email,
+        packageId: packageId,
+      );
+      return Right(AddMemberEntity(id: model.id));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, SubscriptionsListEntity>> getBranchSubscriptions({
+    required int branchId,
+    required int pageNumber,
+    required int pageSize,
+    String? search,
+    int? status,
+  }) async {
+    try {
+      final model = await remoteDataSource.getBranchSubscriptions(
+        branchId: branchId,
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        search: search,
+        status: status,
+      );
+      return Right(_mapSubscriptionsList(model));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  SubscriptionsListEntity _mapSubscriptionsList(BranchSubscriptionsResponse m) {
+    return SubscriptionsListEntity(
+      data: m.data.map((item) => item.toEntity()).toList(),
+      currentPage: m.currentPage,
+      totalPages: m.totalPages,
+      totalCount: m.totalCount,
+      pageSize: m.pageSize,
+      hasPreviousPage: m.hasPreviousPage,
+      hasNextPage: m.hasNextPage,
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> cancelSubscription({
+    required int subscriptionId,
+  }) async {
+    try {
+      await remoteDataSource.cancelSubscription(subscriptionId: subscriptionId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
   }
 }

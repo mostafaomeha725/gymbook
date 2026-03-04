@@ -31,6 +31,12 @@ class GetTypeColor {
       case 'open now':
         return const Color(0xFF4CAF50);
 
+      case 'scheduled':
+        return const Color(0xFFF59E0B);
+
+      case 'cancelled':
+        return const Color(0xFF6B7280);
+
       case 'closed':
         return const Color(0xFF991B1B);
 

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
-import 'package:gymbook/core/widgets/bouncing_social_button.dart';
-import 'package:gymbook/features/admin_home/presentation/widgets/package_select_card.dart';
-import 'package:gymbook/features/admin_home/presentation/widgets/subscription_summary_card.dart';
-import 'package:gymbook/features/admin_home/presentation/widgets/user_detail_form.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/add_member_cubit/add_member_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/add_subscription_cubit/add_subscription_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/widgets/existing_user_form.dart';
+import 'package:gymbook/features/admin_home/presentation/widgets/new_user_form.dart';
+import 'package:gymbook/features/admin_home/presentation/widgets/packages_list_section.dart';
+import 'package:gymbook/features/admin_home/presentation/widgets/subscription_submit_section.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/user_type_selector.dart';
 
-
 class AdminAddSubscriptionScreenBody extends StatefulWidget {
-  const AdminAddSubscriptionScreenBody({super.key});
+  final int branchId;
+  const AdminAddSubscriptionScreenBody({super.key, required this.branchId});
 
   @override
   State<AdminAddSubscriptionScreenBody> createState() =>
@@ -18,123 +24,124 @@ class AdminAddSubscriptionScreenBody extends StatefulWidget {
 
 class _AdminAddSubscriptionScreenBodyState
     extends State<AdminAddSubscriptionScreenBody> {
-  int selectedUserType = 0;
+  // Existing user
+  final _emailController = TextEditingController();
 
-  int selectedPackage = 0;
+  // New user
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _newUserEmailController = TextEditingController();
 
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
+  int? _selectedPackageIndex;
 
-  final List<Map<String, dynamic>> packages = [
-    {
-      "title": "Basic Monthly",
-      "duration": "1m",
-      "price": "500",
-      "freezes": "1",
-      "icon": Icons.inventory_2_outlined,
-    },
-    {
-      "title": "Standard Quarterly",
-      "duration": "3m",
-      "price": "1350",
-      "freezes": "2",
-      "icon": Icons.inventory_2_outlined,
-    },
-    {
-      "title": "Basic Monthly",
-      "duration": "1m",
-      "price": "500",
-      "freezes": "1",
-      "icon": Icons.inventory_2_outlined,
-    },
-    {
-      "title": "Standard Quarterly",
-      "duration": "3m",
-      "price": "1350",
-      "freezes": "2",
-      "icon": Icons.inventory_2_outlined,
-    },
-  ];
+  /// 0 = New User, 1 = Existing User
+  int _userTypeIndex = 1;
 
   @override
   void dispose() {
-    nameController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
+    _emailController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _phoneController.dispose();
+    _newUserEmailController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const AppbarSubscriptionWidget(text: 'Add Subscription'),
-          SizedBox(height: 24.h),
-
-          UserTypeSelector(
-            selectedIndex: selectedUserType,
-            onChanged: (i) => setState(() => selectedUserType = i),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) =>
+              sl<BranchPackagesListCubit>()
+                ..loadPackages(branchId: widget.branchId, refresh: true),
+        ),
+        BlocProvider(create: (_) => sl<AddSubscriptionCubit>()),
+        BlocProvider(create: (_) => sl<AddMemberCubit>()),
+      ],
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<AddSubscriptionCubit, AddSubscriptionState>(
+            listener: (context, state) {
+              if (state is AddSubscriptionSuccess) {
+                GoRouter.of(context).pop(true);
+              }
+            },
           ),
-
-          SizedBox(height: 24.h),
-
-          UserDetailsForm(
-            nameController: nameController,
-            phoneController: phoneController,
-            emailController: emailController,
-            isExistingUser: selectedUserType == 1,
+          BlocListener<AddMemberCubit, AddMemberState>(
+            listener: (context, state) {
+              if (state is AddMemberSuccess) {
+                GoRouter.of(context).pop(true);
+              }
+            },
           ),
-
-          SizedBox(height: 24.h),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22.w),
-            child: Column(
-              children: List.generate(packages.length, (index) {
-                final pkg = packages[index];
-
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: PackageSelectCard(
-                    title: pkg["title"],
-                    duration: pkg["duration"],
-                    price: pkg["price"],
-                    freezes: pkg["freezes"],
-                    icon: pkg["icon"],
-                    isActive: selectedPackage == index,
-                    onTap: () {
-                      setState(() => selectedPackage = index);
-                    },
-                  ),
-                );
-              }),
-            ),
-          ),
-          SizedBox(height: 12.h),
-          SubscriptionSummaryCard(
-            planName: packages[selectedPackage]["title"],
-            price: packages[selectedPackage]["price"],
-          ),
-
-          SizedBox(height: 24.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22.w),
-            child: BouncingSocialButton(
-              text: 'Add Subscription',
-
-              textSize: 16.sp,
-              icon: Icons.check,
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF0EA5E9), Color(0xFF0284C7)],
-              ),
-            ),
-          ),
-          SizedBox(height: 40.h),
         ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AppbarSubscriptionWidget(text: 'Add Subscription'),
+              SizedBox(height: 24.h),
+
+              // ── User type toggle ─────────────────────────────────────
+              UserTypeSelector(
+                selectedIndex: _userTypeIndex,
+                onChanged: (index) => setState(() {
+                  _userTypeIndex = index;
+                  _selectedPackageIndex = null;
+                }),
+              ),
+              SizedBox(height: 24.h),
+
+              // ── Form (switches by user type) ─────────────────────────
+              if (_userTypeIndex == 0) ...[
+                NewUserForm(
+                  firstNameController: _firstNameController,
+                  lastNameController: _lastNameController,
+                  phoneController: _phoneController,
+                  emailController: _newUserEmailController,
+                ),
+              ] else ...[
+                ExistingUserForm(emailController: _emailController),
+              ],
+              SizedBox(height: 24.h),
+
+              // ── Packages + summary ───────────────────────────────────
+              PackagesListSection(
+                selectedPackageIndex: _selectedPackageIndex,
+                onPackageSelected: (index) =>
+                    setState(() => _selectedPackageIndex = index),
+              ),
+
+              // ── Submit button ────────────────────────────────────────
+              SubscriptionSubmitSection(
+                selectedPackageIndex: _selectedPackageIndex,
+                userTypeIndex: _userTypeIndex,
+                onSubmit: (pkg) => () {
+                  if (_userTypeIndex == 0) {
+                    context.read<AddMemberCubit>().addMember(
+                      branchId: widget.branchId,
+                      firstName: _firstNameController.text,
+                      lastName: _lastNameController.text,
+                      phoneNumber: _phoneController.text,
+                      email: _newUserEmailController.text,
+                      packageId: pkg.id,
+                    );
+                  } else {
+                    context.read<AddSubscriptionCubit>().addSubscription(
+                      branchId: widget.branchId,
+                      email: _emailController.text,
+                      packageId: pkg.id,
+                    );
+                  }
+                },
+              ),
+
+              SizedBox(height: 40.h),
+            ],
+          ),
+        ),
       ),
     );
   }

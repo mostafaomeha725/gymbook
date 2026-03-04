@@ -44,7 +44,9 @@ class GridViewBranchCard extends StatelessWidget {
             colors: [Color(0xFF34D399), Color(0xFF059669)],
           ),
           onTap: () {
-            GoRouter.of(context).push(Routes.adminManageSubscriptionsScreen);
+            GoRouter.of(
+              context,
+            ).push(Routes.adminManageSubscriptionsScreen, extra: branchId);
           },
         ),
 

@@ -5,12 +5,17 @@ import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/admin_home/data/datasources/admin_branch_remote_datasource.dart';
 import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository_impl.dart';
 import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/add_member_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/add_subscription_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/cancel_subscription_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branch_subscriptions_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/create_branch_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/create_package_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/delete_package_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/edit_branch_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_details_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_packages_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branch_statistics_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branches_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/update_branch_location_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/update_branch_status_usecase.dart';
@@ -18,9 +23,14 @@ import 'package:gymbook/features/admin_home/domain/usecases/update_package_statu
 import 'package:gymbook/features/admin_home/domain/usecases/update_package_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/update_working_hours_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/upload_branch_image_usecase.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/add_member_cubit/add_member_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/add_subscription_cubit/add_subscription_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_subscriptions_list_cubit/branch_subscriptions_list_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/cancel_subscription_cubit/cancel_subscription_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_statistics_cubit/branch_statistics_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
@@ -168,6 +178,18 @@ class ServiceLocator {
     if (!sl.isRegistered<UploadBranchImageUseCase>()) {
       sl.registerLazySingleton(() => UploadBranchImageUseCase(sl()));
     }
+    if (!sl.isRegistered<GetBranchStatisticsUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchStatisticsUseCase(sl()));
+    }
+    if (!sl.isRegistered<AddSubscriptionUseCase>()) {
+      sl.registerLazySingleton(() => AddSubscriptionUseCase(sl()));
+    }
+    if (!sl.isRegistered<AddMemberUseCase>()) {
+      sl.registerLazySingleton(() => AddMemberUseCase(sl()));
+    }
+    if (!sl.isRegistered<GetBranchSubscriptionsUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchSubscriptionsUseCase(sl()));
+    }
 
     // Cubits
     if (!sl.isRegistered<CreateBranchCubit>()) {
@@ -202,6 +224,24 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<BranchDetailsCubit>()) {
       sl.registerFactory(() => BranchDetailsCubit(sl()));
+    }
+    if (!sl.isRegistered<BranchStatisticsCubit>()) {
+      sl.registerFactory(() => BranchStatisticsCubit(sl()));
+    }
+    if (!sl.isRegistered<AddSubscriptionCubit>()) {
+      sl.registerFactory(() => AddSubscriptionCubit(sl()));
+    }
+    if (!sl.isRegistered<AddMemberCubit>()) {
+      sl.registerFactory(() => AddMemberCubit(sl()));
+    }
+    if (!sl.isRegistered<BranchSubscriptionsListCubit>()) {
+      sl.registerFactory(() => BranchSubscriptionsListCubit(sl()));
+    }
+    if (!sl.isRegistered<CancelSubscriptionUseCase>()) {
+      sl.registerLazySingleton(() => CancelSubscriptionUseCase(sl()));
+    }
+    if (!sl.isRegistered<CancelSubscriptionCubit>()) {
+      sl.registerFactory(() => CancelSubscriptionCubit(sl()));
     }
   }
 
