@@ -30,12 +30,19 @@ class LoginResponse {
 
 AppUserRole parseAppUserRole(dynamic rawRole) {
   if (rawRole is int) {
-    return rawRole == 1 ? AppUserRole.admin : AppUserRole.customer;
+    // userType: 1 = customer, 2 = PartnerAdmin
+    return (rawRole == 1 || rawRole == 2)
+        ? AppUserRole.admin
+        : AppUserRole.customer;
   }
 
   if (rawRole is String) {
     final normalized = rawRole.trim().toLowerCase();
-    if (normalized == '1' || normalized == 'admin' || normalized == 'owner') {
+    if (normalized == '1' ||
+        normalized == '2' ||
+        normalized == 'admin' ||
+        normalized == 'owner' ||
+        normalized == 'partneradmin') {
       return AppUserRole.admin;
     }
     if (normalized == '0' || normalized == 'customer') {
@@ -96,7 +103,7 @@ class LoginUser {
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
       fullName: json['fullName'] ?? '',
-      role: parseAppUserRole(json['role']),
+      role: parseAppUserRole(json['userType'] ?? json['role']),
     );
   }
 

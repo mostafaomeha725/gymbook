@@ -75,4 +75,7 @@ class EndPoints {
 
   static String cancelSubscription(int subscriptionId) =>
       'Owner/Subscriptions/$subscriptionId/cancel';
+
+  static String getSubscriptionDetails(int subscriptionId) =>
+      'Subscriptions/$subscriptionId';
 }

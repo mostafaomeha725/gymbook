@@ -8,6 +8,7 @@ import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_rep
 import 'package:gymbook/features/admin_home/domain/usecases/add_member_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/add_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/cancel_subscription_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_subscription_details_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_subscriptions_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/create_branch_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/create_package_usecase.dart';
@@ -27,6 +28,7 @@ import 'package:gymbook/features/admin_home/presentation/cubits/add_member_cubit
 import 'package:gymbook/features/admin_home/presentation/cubits/add_subscription_cubit/add_subscription_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_subscriptions_list_cubit/branch_subscriptions_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/cancel_subscription_cubit/cancel_subscription_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/subscription_details_cubit/subscription_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
@@ -242,6 +244,12 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<CancelSubscriptionCubit>()) {
       sl.registerFactory(() => CancelSubscriptionCubit(sl()));
+    }
+    if (!sl.isRegistered<GetSubscriptionDetailsUseCase>()) {
+      sl.registerLazySingleton(() => GetSubscriptionDetailsUseCase(sl()));
+    }
+    if (!sl.isRegistered<SubscriptionDetailsCubit>()) {
+      sl.registerFactory(() => SubscriptionDetailsCubit(sl()));
     }
   }
 

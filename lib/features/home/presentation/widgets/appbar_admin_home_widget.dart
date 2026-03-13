@@ -10,11 +10,13 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 class AppbarAdminHomeWidget extends StatefulWidget {
   final String userName;
   final String location;
+  final ValueChanged<String>? onSearchChanged;
 
   const AppbarAdminHomeWidget({
     super.key,
     required this.userName,
     required this.location,
+    this.onSearchChanged,
   });
 
   @override
@@ -81,7 +83,7 @@ class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
             CustomSearch(
               controller: searchController,
               hintText: "Search branches...",
-              onChanged: (text) {},
+              onChanged: widget.onSearchChanged,
             ),
             SizedBox(height: 16.h),
             BouncingSocialButton(

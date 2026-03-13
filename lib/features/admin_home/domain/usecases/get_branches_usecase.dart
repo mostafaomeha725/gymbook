@@ -11,7 +11,12 @@ class GetBranchesUseCase {
   Future<Either<Failure, BranchListEntity>> call({
     int pageNumber = 1,
     int pageSize = 10,
+    String? search,
   }) {
-    return repository.getBranches(pageNumber: pageNumber, pageSize: pageSize);
+    return repository.getBranches(
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      search: search,
+    );
   }
 }

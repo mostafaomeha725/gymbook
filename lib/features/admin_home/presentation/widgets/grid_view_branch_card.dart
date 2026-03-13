@@ -6,8 +6,9 @@ import 'package:gymbook/features/admin_home/presentation/widgets/admin_branch_ca
 
 class GridViewBranchCard extends StatelessWidget {
   final int branchId;
+  final VoidCallback? onRefresh;
 
-  const GridViewBranchCard({super.key, required this.branchId});
+  const GridViewBranchCard({super.key, required this.branchId, this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +29,11 @@ class GridViewBranchCard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFFFF8A00), Color(0xFFFF5E00)],
           ),
-          onTap: () {
-            GoRouter.of(
+          onTap: () async {
+            await GoRouter.of(
               context,
             ).push(Routes.managePackageScreen, extra: branchId);
+            onRefresh?.call();
           },
         ),
 
@@ -43,10 +45,11 @@ class GridViewBranchCard extends StatelessWidget {
           gradient: const LinearGradient(
             colors: [Color(0xFF34D399), Color(0xFF059669)],
           ),
-          onTap: () {
-            GoRouter.of(
+          onTap: () async {
+            await GoRouter.of(
               context,
             ).push(Routes.adminManageSubscriptionsScreen, extra: branchId);
+            onRefresh?.call();
           },
         ),
 

@@ -1,11 +1,27 @@
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 
+class BranchImageModel {
+  final int id;
+  final int type; // 0 = Logo, 1 = MarketPlace
+  final String url;
+
+  BranchImageModel({required this.id, required this.type, required this.url});
+
+  factory BranchImageModel.fromJson(Map<String, dynamic> json) {
+    return BranchImageModel(
+      id: json['id'] ?? 0,
+      type: json['type'] ?? 0,
+      url: json['url'] ?? '',
+    );
+  }
+}
+
 class BranchDetailsResponse {
   final int id;
   final String name;
   final int branchType;
   final int branchStatus;
-  final List<dynamic> images;
+  final List<BranchImageModel> images;
   final BranchGovernorate? governorate;
   final String address;
   final bool isOpenNow;
@@ -31,7 +47,9 @@ class BranchDetailsResponse {
       name: json['name'] ?? '',
       branchType: json['branchType'] ?? 0,
       branchStatus: json['branchStatus'] ?? 0,
-      images: json['images'] as List<dynamic>? ?? [],
+      images: (json['images'] as List<dynamic>? ?? [])
+          .map((e) => BranchImageModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
       governorate: json['governorate'] != null
           ? BranchGovernorate.fromJson(
               json['governorate'] as Map<String, dynamic>,

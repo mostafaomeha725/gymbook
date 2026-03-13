@@ -77,69 +77,71 @@ class _AdminAddSubscriptionScreenBodyState
             },
           ),
         ],
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AppbarSubscriptionWidget(text: 'Add Subscription'),
-              SizedBox(height: 24.h),
+        child: Builder(
+          builder: (context) => SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const AppbarSubscriptionWidget(text: 'Add Subscription'),
+                SizedBox(height: 24.h),
 
-              // ── User type toggle ─────────────────────────────────────
-              UserTypeSelector(
-                selectedIndex: _userTypeIndex,
-                onChanged: (index) => setState(() {
-                  _userTypeIndex = index;
-                  _selectedPackageIndex = null;
-                }),
-              ),
-              SizedBox(height: 24.h),
-
-              // ── Form (switches by user type) ─────────────────────────
-              if (_userTypeIndex == 0) ...[
-                NewUserForm(
-                  firstNameController: _firstNameController,
-                  lastNameController: _lastNameController,
-                  phoneController: _phoneController,
-                  emailController: _newUserEmailController,
+                // ── User type toggle ─────────────────────────────────────
+                UserTypeSelector(
+                  selectedIndex: _userTypeIndex,
+                  onChanged: (index) => setState(() {
+                    _userTypeIndex = index;
+                    _selectedPackageIndex = null;
+                  }),
                 ),
-              ] else ...[
-                ExistingUserForm(emailController: _emailController),
+                SizedBox(height: 24.h),
+
+                // ── Form (switches by user type) ─────────────────────────
+                if (_userTypeIndex == 0) ...[
+                  NewUserForm(
+                    firstNameController: _firstNameController,
+                    lastNameController: _lastNameController,
+                    phoneController: _phoneController,
+                    emailController: _newUserEmailController,
+                  ),
+                ] else ...[
+                  ExistingUserForm(emailController: _emailController),
+                ],
+                SizedBox(height: 24.h),
+
+                // ── Packages + summary ───────────────────────────────────
+                PackagesListSection(
+                  selectedPackageIndex: _selectedPackageIndex,
+                  onPackageSelected: (index) =>
+                      setState(() => _selectedPackageIndex = index),
+                ),
+
+                // ── Submit button ────────────────────────────────────────
+                SubscriptionSubmitSection(
+                  selectedPackageIndex: _selectedPackageIndex,
+                  userTypeIndex: _userTypeIndex,
+                  onSubmit: (pkg) => () {
+                    if (_userTypeIndex == 0) {
+                      context.read<AddMemberCubit>().addMember(
+                        branchId: widget.branchId,
+                        firstName: _firstNameController.text,
+                        lastName: _lastNameController.text,
+                        phoneNumber: _phoneController.text,
+                        email: _newUserEmailController.text,
+                        packageId: pkg.id,
+                      );
+                    } else {
+                      context.read<AddSubscriptionCubit>().addSubscription(
+                        branchId: widget.branchId,
+                        email: _emailController.text,
+                        packageId: pkg.id,
+                      );
+                    }
+                  },
+                ),
+
+                SizedBox(height: 40.h),
               ],
-              SizedBox(height: 24.h),
-
-              // ── Packages + summary ───────────────────────────────────
-              PackagesListSection(
-                selectedPackageIndex: _selectedPackageIndex,
-                onPackageSelected: (index) =>
-                    setState(() => _selectedPackageIndex = index),
-              ),
-
-              // ── Submit button ────────────────────────────────────────
-              SubscriptionSubmitSection(
-                selectedPackageIndex: _selectedPackageIndex,
-                userTypeIndex: _userTypeIndex,
-                onSubmit: (pkg) => () {
-                  if (_userTypeIndex == 0) {
-                    context.read<AddMemberCubit>().addMember(
-                      branchId: widget.branchId,
-                      firstName: _firstNameController.text,
-                      lastName: _lastNameController.text,
-                      phoneNumber: _phoneController.text,
-                      email: _newUserEmailController.text,
-                      packageId: pkg.id,
-                    );
-                  } else {
-                    context.read<AddSubscriptionCubit>().addSubscription(
-                      branchId: widget.branchId,
-                      email: _emailController.text,
-                      packageId: pkg.id,
-                    );
-                  }
-                },
-              ),
-
-              SizedBox(height: 40.h),
-            ],
+            ),
           ),
         ),
       ),

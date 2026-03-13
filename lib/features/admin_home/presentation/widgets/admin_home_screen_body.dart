@@ -26,9 +26,12 @@ class AdminHomeScreenBody extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: Column(
                     children: [
-                      const AppbarAdminHomeWidget(
+                      AppbarAdminHomeWidget(
                         userName: 'My Branches',
                         location: 'Manage all your gym locations',
+                        onSearchChanged: (value) => context
+                            .read<BranchesListCubit>()
+                            .loadBranches(search: value),
                       ),
                       SizedBox(height: 16.h),
                       if (state is BranchesListSuccess)

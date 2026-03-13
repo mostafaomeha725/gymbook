@@ -17,6 +17,7 @@ import 'package:gymbook/features/admin_home/data/models/branch_subscriptions_mod
 import 'package:gymbook/features/admin_home/domain/entities/add_member_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/add_subscription_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/subscription_item_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/subscription_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_list_entity.dart';
@@ -134,11 +135,13 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
   Future<Either<Failure, BranchListEntity>> getBranches({
     int pageNumber = 1,
     int pageSize = 10,
+    String? search,
   }) async {
     try {
       final model = await remoteDataSource.getBranches(
         pageNumber: pageNumber,
         pageSize: pageSize,
+        search: search,
       );
       return Right(_mapBranchList(model));
     } on ServerException catch (e) {
@@ -358,7 +361,12 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
       name: m.name,
       branchType: m.branchType,
       branchStatus: m.branchStatus,
-      images: m.images,
+      images: m.images
+          .map(
+            (img) =>
+                BranchImageEntity(id: img.id, type: img.type, url: img.url),
+          )
+          .toList(),
       governorate: _mapGovernorate(m.governorate),
       address: m.address,
       isOpenNow: m.isOpenNow,
@@ -519,6 +527,38 @@ class AdminBranchRepositoryImpl implements AdminBranchRepository {
     try {
       await remoteDataSource.cancelSubscription(subscriptionId: subscriptionId);
       return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, SubscriptionDetailsEntity>> getSubscriptionDetails(
+    int subscriptionId,
+  ) async {
+    try {
+      final model = await remoteDataSource.getSubscriptionDetails(
+        subscriptionId,
+      );
+      return Right(
+        SubscriptionDetailsEntity(
+          subscriptionId: model.subscriptionId,
+          activationDate: DateTime.parse(model.activationDate),
+          expirationDate: DateTime.parse(model.expirationDate),
+          durationInMonths: model.durationInMonths,
+          remainingDays: model.remainingDays,
+          paidAmount: model.paidAmount,
+          status: model.status,
+          packageName: model.packageName,
+          totalFreezesCount: model.totalFreezesCount,
+          remainingFreezesCount: model.remainingFreezesCount,
+          member: SubscriptionMemberEntity(
+            fullName: model.member.fullName,
+            email: model.member.email,
+            phoneNumber: model.member.phoneNumber,
+          ),
+        ),
+      );
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }

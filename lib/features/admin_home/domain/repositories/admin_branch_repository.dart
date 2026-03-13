@@ -5,6 +5,7 @@ import 'package:gymbook/core/error/failure.dart';
 import 'package:gymbook/features/admin_home/domain/entities/add_member_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/add_subscription_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/subscription_item_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/subscription_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_list_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_statistics_entity.dart';
@@ -49,6 +50,7 @@ abstract class AdminBranchRepository {
   Future<Either<Failure, BranchListEntity>> getBranches({
     int pageNumber = 1,
     int pageSize = 10,
+    String? search,
   });
 
   Future<Either<Failure, BranchDetailsEntity>> getBranchDetails(int branchId);
@@ -133,4 +135,8 @@ abstract class AdminBranchRepository {
   Future<Either<Failure, void>> cancelSubscription({
     required int subscriptionId,
   });
+
+  Future<Either<Failure, SubscriptionDetailsEntity>> getSubscriptionDetails(
+    int subscriptionId,
+  );
 }

@@ -27,6 +27,8 @@ class AdminBranchScreenBody extends StatefulWidget {
 class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   int selectedTab = 0;
   late BranchEntity currentBranch;
+  late BranchDetailsCubit _detailsCubit;
+  late BranchStatisticsCubit _statisticsCubit;
 
   static const _timePeriods = [
     StatisticsTimePeriod.today,
@@ -40,15 +42,29 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   void initState() {
     super.initState();
     currentBranch = widget.branch;
+    _detailsCubit = sl<BranchDetailsCubit>()
+      ..loadBranchDetails(currentBranch.id);
+    _statisticsCubit = sl<BranchStatisticsCubit>()
+      ..loadStatistics(
+        branchId: currentBranch.id,
+        timePeriod: StatisticsTimePeriod.today,
+      );
   }
 
-  Future<void> _refreshCurrentBranch() async {
+  @override
+  void dispose() {
+    _detailsCubit.close();
+    _statisticsCubit.close();
+    super.dispose();
+  }
+
+  void _refreshCurrentBranch() {
     if (!mounted) return;
-    context.read<BranchDetailsCubit>().loadBranchDetails(currentBranch.id);
+    _detailsCubit.loadBranchDetails(currentBranch.id);
   }
 
-  void _loadStatistics(BuildContext context, int tabIndex) {
-    context.read<BranchStatisticsCubit>().loadStatistics(
+  void _loadStatistics(int tabIndex) {
+    _statisticsCubit.loadStatistics(
       branchId: currentBranch.id,
       timePeriod: _timePeriods[tabIndex],
     );
@@ -58,56 +74,48 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) =>
-              sl<BranchDetailsCubit>()..loadBranchDetails(currentBranch.id),
-        ),
-        BlocProvider(
-          create: (ctx) => sl<BranchStatisticsCubit>()
-            ..loadStatistics(
-              branchId: currentBranch.id,
-              timePeriod: StatisticsTimePeriod.today,
-            ),
-        ),
+        BlocProvider.value(value: _detailsCubit),
+        BlocProvider.value(value: _statisticsCubit),
       ],
-      child: Builder(
-        builder: (context) => SingleChildScrollView(
-          child: Column(
-            children: [
-              BranchHeaderSection(branch: currentBranch),
-              SizedBox(height: 24.h),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            BranchHeaderSection(branch: currentBranch),
+            SizedBox(height: 24.h),
 
-              BranchButtom(
-                text: 'Edit Branch Details',
-                icon: Icons.arrow_forward,
-                onTap: () async {
-                  await GoRouter.of(
-                    context,
-                  ).push(Routes.editBranchDetailsScreen, extra: currentBranch);
-                  await _refreshCurrentBranch();
-                },
-              ),
+            BranchButtom(
+              text: 'Edit Branch Details',
+              icon: Icons.arrow_forward,
+              onTap: () async {
+                await GoRouter.of(
+                  context,
+                ).push(Routes.editBranchDetailsScreen, extra: currentBranch);
+                _refreshCurrentBranch();
+              },
+            ),
 
-              SizedBox(height: 16.h),
-              GridViewBranchCard(branchId: currentBranch.id),
-              SizedBox(height: 24.h),
-              const AllCurrentStatus(),
-              SizedBox(height: 24.h),
+            SizedBox(height: 16.h),
+            GridViewBranchCard(
+              branchId: currentBranch.id,
+              onRefresh: _refreshCurrentBranch,
+            ),
+            SizedBox(height: 24.h),
+            const AllCurrentStatus(),
+            SizedBox(height: 24.h),
 
-              CustomSegmentedTabs(
-                tabs: tabs,
-                selectedIndex: selectedTab,
-                onChanged: (value) {
-                  setState(() => selectedTab = value);
-                  _loadStatistics(context, value);
-                },
-              ),
+            CustomSegmentedTabs(
+              tabs: tabs,
+              selectedIndex: selectedTab,
+              onChanged: (value) {
+                setState(() => selectedTab = value);
+                _loadStatistics(value);
+              },
+            ),
 
-              SizedBox(height: 12.h),
-              const GridViewStatusCard(),
-              SizedBox(height: 152.h),
-            ],
-          ),
+            SizedBox(height: 12.h),
+            const GridViewStatusCard(),
+            SizedBox(height: 152.h),
+          ],
         ),
       ),
     );

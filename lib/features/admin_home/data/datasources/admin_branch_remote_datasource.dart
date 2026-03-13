@@ -5,6 +5,7 @@ import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/admin_home/data/models/add_member_model.dart';
+import 'package:gymbook/features/admin_home/data/models/subscription_details_model.dart';
 import 'package:gymbook/features/admin_home/data/models/add_subscription_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_subscriptions_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_details_model.dart';
@@ -54,6 +55,7 @@ abstract class AdminBranchRemoteDataSource {
   Future<BranchListResponse> getBranches({
     required int pageNumber,
     required int pageSize,
+    String? search,
   });
 
   Future<BranchDetailsResponse> getBranchDetails(int branchId);
@@ -123,6 +125,8 @@ abstract class AdminBranchRemoteDataSource {
   });
 
   Future<void> cancelSubscription({required int subscriptionId});
+
+  Future<SubscriptionDetailsModel> getSubscriptionDetails(int subscriptionId);
 }
 
 class AdminBranchRemoteDataSourceImpl implements AdminBranchRemoteDataSource {
@@ -220,10 +224,18 @@ class AdminBranchRemoteDataSourceImpl implements AdminBranchRemoteDataSource {
   Future<BranchListResponse> getBranches({
     required int pageNumber,
     required int pageSize,
+    String? search,
   }) async {
+    final params = <String, dynamic>{
+      'PageNumber': pageNumber,
+      'PageSize': pageSize,
+    };
+    if (search != null && search.trim().isNotEmpty) {
+      params['Search'] = search.trim();
+    }
     final response = await networkService.getData(
       endPoint: EndPoints.getBranches,
-      queryParameters: {'PageNumber': pageNumber, 'PageSize': pageSize},
+      queryParameters: params,
     );
     return response.fold(
       (failure) => throw ServerException(failure.message),
@@ -385,14 +397,30 @@ class AdminBranchRemoteDataSourceImpl implements AdminBranchRemoteDataSource {
     required int branchId,
     required StatisticsTimePeriod timePeriod,
   }) async {
-    final response = await networkService.postData(
-      endPoint: EndPoints.getBranchStatistics(branchId),
-      data: {'timePeriod': timePeriod.value},
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) => BranchStatisticsModel.fromJson(data as Map<String, dynamic>),
-    );
+    try {
+      final response = await networkService.dio.request(
+        EndPoints.getBranchStatistics(branchId),
+        data: {'timePeriod': timePeriod.value},
+        options: Options(method: 'GET', contentType: Headers.jsonContentType),
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw ServerException('Invalid statistics response format');
+      }
+
+      final statisticsJson = data['data'] is Map<String, dynamic>
+          ? data['data'] as Map<String, dynamic>
+          : data;
+
+      return BranchStatisticsModel.fromJson(statisticsJson);
+    } on DioException catch (error) {
+      final handled = networkService.handleDioExceoptions(error);
+      return handled.fold(
+        (failure) => throw ServerException(failure.message),
+        (_) => throw ServerException(error.message ?? 'Request failed'),
+      );
+    }
   }
 
   @override
@@ -471,5 +499,18 @@ class AdminBranchRemoteDataSourceImpl implements AdminBranchRemoteDataSource {
       data: {},
     );
     response.fold((failure) => throw ServerException(failure), (_) => null);
+  }
+
+  @override
+  Future<SubscriptionDetailsModel> getSubscriptionDetails(
+    int subscriptionId,
+  ) async {
+    final response = await networkService.getData(
+      endPoint: EndPoints.getSubscriptionDetails(subscriptionId),
+    );
+    return response.fold(
+      (failure) => throw ServerException(failure.message),
+      (data) => SubscriptionDetailsModel.fromJson(data as Map<String, dynamic>),
+    );
   }
 }

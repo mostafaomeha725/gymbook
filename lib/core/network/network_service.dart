@@ -85,9 +85,30 @@ class NetworkService {
         return Right(body);
       } else {
         final body = response.data;
-        final msg = body is Map<String, dynamic>
-            ? body['message']?.toString()
-            : null;
+        String? msg;
+        if (body is Map<String, dynamic>) {
+          // errors as List: {"errors": [{"description": "..."}]}
+          if (body['errors'] is List && (body['errors'] as List).isNotEmpty) {
+            final first = (body['errors'] as List).first;
+            if (first is Map<String, dynamic>) {
+              msg = first['description']?.toString();
+            }
+          }
+          // errors as Map: {"errors": {"Field": ["..."]}}
+          if (msg == null && body['errors'] is Map) {
+            for (final fieldErrors in (body['errors'] as Map).values) {
+              if (fieldErrors is List && fieldErrors.isNotEmpty) {
+                msg = fieldErrors.first.toString();
+                break;
+              }
+            }
+          }
+          // top-level detail field (e.g. FluentValidation 500 errors)
+          if (msg == null && body['detail'] != null) {
+            msg = body['detail'].toString();
+          }
+          msg ??= body['message']?.toString() ?? body['title']?.toString();
+        }
         return Left(Failure(msg ?? 'Error ${response.statusCode}'));
       }
     } on SocketException {
@@ -362,6 +383,10 @@ class NetworkService {
               Failure(firstError['description']?.toString() ?? 'Unknown error'),
             );
           }
+        }
+        // Handle top-level detail field (e.g. FluentValidation 500 errors)
+        if (data['detail'] != null) {
+          return Left(Failure(data['detail'].toString()));
         }
         // Handle message field format
         if (data['message'] != null) {

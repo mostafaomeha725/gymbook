@@ -1,11 +1,23 @@
 import 'package:gymbook/features/admin_home/domain/entities/governorate_entity.dart';
 
+class BranchImageEntity {
+  final int id;
+  final int type; // 0 = Logo, 1 = MarketPlace
+  final String url;
+
+  const BranchImageEntity({
+    required this.id,
+    required this.type,
+    required this.url,
+  });
+}
+
 class BranchDetailsEntity {
   final int id;
   final String name;
   final int branchType;
   final int branchStatus;
-  final List<dynamic> images;
+  final List<BranchImageEntity> images;
   final GovernorateEntity? governorate;
   final String address;
   final bool isOpenNow;

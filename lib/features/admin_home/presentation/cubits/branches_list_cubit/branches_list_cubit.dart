@@ -11,12 +11,22 @@ class BranchesListCubit extends Cubit<BranchesListState> {
 
   int _currentPage = 1;
   static const int _pageSize = 3;
+  String? _currentSearch;
 
-  Future<void> loadBranches({bool refresh = false, int? pageNumber}) async {
+  Future<void> loadBranches({
+    bool refresh = false,
+    int? pageNumber,
+    String? search,
+  }) async {
     if (refresh) {
       _currentPage = 1;
-    } else if (pageNumber != null && pageNumber > 0) {
-      _currentPage = pageNumber;
+      _currentSearch = null;
+    } else {
+      if (pageNumber != null && pageNumber > 0) _currentPage = pageNumber;
+      if (search != null) {
+        _currentSearch = search.trim().isEmpty ? null : search.trim();
+        _currentPage = 1;
+      }
     }
 
     emit(BranchesListLoading());
@@ -24,6 +34,7 @@ class BranchesListCubit extends Cubit<BranchesListState> {
     final result = await getBranchesUseCase(
       pageNumber: _currentPage,
       pageSize: _pageSize,
+      search: _currentSearch,
     );
 
     result.fold(

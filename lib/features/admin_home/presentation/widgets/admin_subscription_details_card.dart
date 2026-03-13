@@ -27,7 +27,7 @@ class AdminSubscriptionDetailsCard extends StatelessWidget {
     final colorHelper = GetTypeColor();
     final mainColor = colorHelper.getTypeColor(status);
 
-    final progress = total == 0 ? 0.0 : remaining / total;
+    final progress = total == 0 ? 0.0 : (remaining / total).clamp(0.0, 1.0);
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 22.w, vertical: 10.h),
