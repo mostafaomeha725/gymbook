@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/failure.dart';
-import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/branch_repository.dart';
 
 class UploadBranchImageUseCase {
-  final AdminBranchRepository repository;
+  final BranchRepository repository;
 
   UploadBranchImageUseCase(this.repository);
 

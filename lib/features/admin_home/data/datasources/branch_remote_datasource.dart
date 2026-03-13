@@ -4,21 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
-import 'package:gymbook/features/admin_home/data/models/add_member_model.dart';
-import 'package:gymbook/features/admin_home/data/models/subscription_details_model.dart';
-import 'package:gymbook/features/admin_home/data/models/add_subscription_model.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_subscriptions_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_details_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
-import 'package:gymbook/features/admin_home/data/models/branch_packages_response.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_statistics_model.dart';
 import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
-import 'package:gymbook/features/admin_home/data/models/create_package_request.dart';
-import 'package:gymbook/features/admin_home/data/models/create_package_response.dart';
-import 'package:gymbook/features/admin_home/data/models/update_package_request.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_statistics_entity.dart';
 
-abstract class AdminBranchRemoteDataSource {
+abstract class BranchRemoteDataSource {
   Future<CreateBranchResponse> createBranch({
     required String name,
     required String email,
@@ -60,31 +52,6 @@ abstract class AdminBranchRemoteDataSource {
 
   Future<BranchDetailsResponse> getBranchDetails(int branchId);
 
-  Future<CreatePackageResponse> createPackage({
-    required int branchId,
-    required CreatePackageRequest request,
-  });
-
-  Future<CreatePackageResponse> updatePackage({
-    required int branchId,
-    required int packageId,
-    required UpdatePackageRequest request,
-  });
-
-  Future<BranchPackagesResponse> getBranchPackages({
-    required int branchId,
-    required int pageNumber,
-    required int pageSize,
-  });
-
-  Future<void> updatePackageStatus({
-    required int branchId,
-    required int packageId,
-    required bool isActive,
-  });
-
-  Future<void> deletePackage({required int branchId, required int packageId});
-
   Future<String> uploadBranchImage({
     required int branchId,
     required File imageFile,
@@ -100,39 +67,12 @@ abstract class AdminBranchRemoteDataSource {
     required int branchId,
     required StatisticsTimePeriod timePeriod,
   });
-
-  Future<AddSubscriptionModel> addSubscription({
-    required int branchId,
-    required String email,
-    required int packageId,
-  });
-
-  Future<AddMemberModel> addMember({
-    required int branchId,
-    required String firstName,
-    required String lastName,
-    required String phoneNumber,
-    required String email,
-    required int packageId,
-  });
-
-  Future<BranchSubscriptionsResponse> getBranchSubscriptions({
-    required int branchId,
-    required int pageNumber,
-    required int pageSize,
-    String? search,
-    int? status,
-  });
-
-  Future<void> cancelSubscription({required int subscriptionId});
-
-  Future<SubscriptionDetailsModel> getSubscriptionDetails(int subscriptionId);
 }
 
-class AdminBranchRemoteDataSourceImpl implements AdminBranchRemoteDataSource {
+class BranchRemoteDataSourceImpl implements BranchRemoteDataSource {
   final NetworkService networkService;
 
-  AdminBranchRemoteDataSourceImpl(this.networkService);
+  BranchRemoteDataSourceImpl(this.networkService);
 
   @override
   Future<CreateBranchResponse> createBranch({
@@ -255,77 +195,6 @@ class AdminBranchRemoteDataSourceImpl implements AdminBranchRemoteDataSource {
   }
 
   @override
-  Future<CreatePackageResponse> createPackage({
-    required int branchId,
-    required CreatePackageRequest request,
-  }) async {
-    final response = await networkService.postData(
-      endPoint: EndPoints.createPackage(branchId),
-      data: request.toJson(),
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) => CreatePackageResponse.fromJson(data as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  Future<CreatePackageResponse> updatePackage({
-    required int branchId,
-    required int packageId,
-    required UpdatePackageRequest request,
-  }) async {
-    final response = await networkService.patchData(
-      endPoint: EndPoints.updatePackage(branchId, packageId),
-      data: request.toJson(),
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure),
-      (data) => CreatePackageResponse.fromJson(data as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  Future<BranchPackagesResponse> getBranchPackages({
-    required int branchId,
-    required int pageNumber,
-    required int pageSize,
-  }) async {
-    final response = await networkService.getData(
-      endPoint: EndPoints.getBranchPackages(branchId),
-      queryParameters: {'PageNumber': pageNumber, 'PageSize': pageSize},
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) => BranchPackagesResponse.fromJson(data as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  Future<void> updatePackageStatus({
-    required int branchId,
-    required int packageId,
-    required bool isActive,
-  }) async {
-    final response = await networkService.patchData(
-      endPoint: EndPoints.updatePackageStatus(branchId, packageId),
-      data: {'isActive': isActive},
-    );
-    response.fold((failure) => throw ServerException(failure), (_) => null);
-  }
-
-  @override
-  Future<void> deletePackage({
-    required int branchId,
-    required int packageId,
-  }) async {
-    final response = await networkService.deleteData(
-      endPoint: EndPoints.deletePackage(branchId, packageId),
-    );
-    response.fold((failure) => throw ServerException(failure), (_) => null);
-  }
-
-  @override
   Future<String> uploadBranchImage({
     required int branchId,
     required File imageFile,
@@ -421,96 +290,5 @@ class AdminBranchRemoteDataSourceImpl implements AdminBranchRemoteDataSource {
         (_) => throw ServerException(error.message ?? 'Request failed'),
       );
     }
-  }
-
-  @override
-  Future<AddSubscriptionModel> addSubscription({
-    required int branchId,
-    required String email,
-    required int packageId,
-  }) async {
-    final response = await networkService.postData(
-      endPoint: EndPoints.addSubscription(branchId),
-      data: {'email': email, 'packageId': packageId},
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) => AddSubscriptionModel.fromJson(data as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  Future<AddMemberModel> addMember({
-    required int branchId,
-    required String firstName,
-    required String lastName,
-    required String phoneNumber,
-    required String email,
-    required int packageId,
-  }) async {
-    final response = await networkService.postData(
-      endPoint: EndPoints.addMember(branchId),
-      data: {
-        'firstName': firstName,
-        'lastName': lastName,
-        'phoneNumber': phoneNumber,
-        'email': email,
-        'packageId': packageId,
-        'branchId': branchId,
-      },
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) => AddMemberModel.fromJson(data as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  Future<BranchSubscriptionsResponse> getBranchSubscriptions({
-    required int branchId,
-    required int pageNumber,
-    required int pageSize,
-    String? search,
-    int? status,
-  }) async {
-    final params = <String, dynamic>{
-      'PageNumber': pageNumber,
-      'PageSize': pageSize,
-    };
-    if (search != null && search.trim().isNotEmpty) {
-      params['Search'] = search.trim();
-    }
-    // Note: Status filtering is done client-side (API does not support it)
-    final response = await networkService.getData(
-      endPoint: EndPoints.getBranchSubscriptions(branchId),
-      queryParameters: params,
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) =>
-          BranchSubscriptionsResponse.fromJson(data as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  Future<void> cancelSubscription({required int subscriptionId}) async {
-    final response = await networkService.patchData(
-      endPoint: EndPoints.cancelSubscription(subscriptionId),
-      data: {},
-    );
-    response.fold((failure) => throw ServerException(failure), (_) => null);
-  }
-
-  @override
-  Future<SubscriptionDetailsModel> getSubscriptionDetails(
-    int subscriptionId,
-  ) async {
-    final response = await networkService.getData(
-      endPoint: EndPoints.getSubscriptionDetails(subscriptionId),
-    );
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) => SubscriptionDetailsModel.fromJson(data as Map<String, dynamic>),
-    );
   }
 }

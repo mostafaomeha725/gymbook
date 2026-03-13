@@ -8,7 +8,7 @@ import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/branch_repository.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/gym_photos_grid.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/gym_photos_uploader.dart';
 
@@ -81,7 +81,7 @@ class _AddBranchFourScreenBodyState extends State<AddBranchFourScreenBody> {
     );
   }
 
-  Future<int?> _resolveImageId(AdminBranchRepository repository) async {
+  Future<int?> _resolveImageId(BranchRepository repository) async {
     if ((widget.imageId ?? 0) > 0) {
       return widget.imageId;
     }
@@ -114,7 +114,7 @@ class _AddBranchFourScreenBodyState extends State<AddBranchFourScreenBody> {
 
     setState(() => _isUploading = true);
 
-    final repository = sl<AdminBranchRepository>();
+    final repository = sl<BranchRepository>();
     final effectiveImageId = widget.isEditMode
         ? await _resolveImageId(repository)
         : null;
@@ -141,13 +141,16 @@ class _AddBranchFourScreenBodyState extends State<AddBranchFourScreenBody> {
 
     if (!mounted) return;
 
-    final failed = response.fold((failure) => failure, (_) => null);
-    if (failed != null) {
-      if (failed.contains('BRANCH_LOGO_ALREADY_EXISTS') ||
-          failed.toLowerCase().contains('already has a logo')) {
+    final failedMessage = response.fold(
+      (failure) => failure.message,
+      (_) => null,
+    );
+    if (failedMessage != null) {
+      if (failedMessage.contains('BRANCH_LOGO_ALREADY_EXISTS') ||
+          failedMessage.toLowerCase().contains('already has a logo')) {
         _showMessage('This branch already has a logo.');
       } else {
-        _showMessage(failed);
+        _showMessage(failedMessage);
       }
       setState(() => _isUploading = false);
       return;

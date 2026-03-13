@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/failure.dart';
 import 'package:gymbook/features/admin_home/domain/entities/created_package_entity.dart';
-import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/package_repository.dart';
 
 class CreatePackageUseCase {
-  final AdminBranchRepository repository;
+  final PackageRepository repository;
 
   CreatePackageUseCase(this.repository);
 

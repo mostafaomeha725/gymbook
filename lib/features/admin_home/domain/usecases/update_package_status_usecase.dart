@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/failure.dart';
-import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/package_repository.dart';
 
 class UpdatePackageStatusUseCase {
-  final AdminBranchRepository repository;
+  final PackageRepository repository;
 
   UpdatePackageStatusUseCase(this.repository);
 

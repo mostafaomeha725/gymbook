@@ -10,7 +10,7 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/switch_open_gym.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
-import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/branch_repository.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/tag_bage.dart';
 
@@ -40,7 +40,7 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
     setState(() => isActive = value);
 
     showLoading();
-    final result = await sl<AdminBranchRepository>().updateBranchStatus(
+    final result = await sl<BranchRepository>().updateBranchStatus(
       branchId: widget.branch.id,
       branchStatus: value ? 1 : 2,
     );

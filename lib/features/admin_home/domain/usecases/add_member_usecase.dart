@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/failure.dart';
 import 'package:gymbook/features/admin_home/domain/entities/add_member_entity.dart';
-import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/subscription_repository.dart';
 
 class AddMemberUseCase {
-  final AdminBranchRepository repository;
+  final SubscriptionRepository repository;
   AddMemberUseCase(this.repository);
 
   Future<Either<Failure, AddMemberEntity>> call({

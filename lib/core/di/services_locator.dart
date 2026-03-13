@@ -2,9 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/network/network_service.dart';
-import 'package:gymbook/features/admin_home/data/datasources/admin_branch_remote_datasource.dart';
-import 'package:gymbook/features/admin_home/data/repositories/admin_branch_repository_impl.dart';
-import 'package:gymbook/features/admin_home/domain/repositories/admin_branch_repository.dart';
+import 'package:gymbook/features/admin_home/data/datasources/branch_remote_datasource.dart';
+import 'package:gymbook/features/admin_home/data/datasources/package_remote_datasource.dart';
+import 'package:gymbook/features/admin_home/data/datasources/subscription_remote_datasource.dart';
+import 'package:gymbook/features/admin_home/data/repositories/branch_repository_impl.dart';
+import 'package:gymbook/features/admin_home/data/repositories/package_repository_impl.dart';
+import 'package:gymbook/features/admin_home/data/repositories/subscription_repository_impl.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/package_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/subscription_repository.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/add_member_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/add_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/cancel_subscription_usecase.dart';
@@ -127,16 +133,36 @@ class ServiceLocator {
   /// =============================
   void _initAdmin() {
     // DataSource
-    if (!sl.isRegistered<AdminBranchRemoteDataSource>()) {
-      sl.registerLazySingleton<AdminBranchRemoteDataSource>(
-        () => AdminBranchRemoteDataSourceImpl(sl()),
+    if (!sl.isRegistered<BranchRemoteDataSource>()) {
+      sl.registerLazySingleton<BranchRemoteDataSource>(
+        () => BranchRemoteDataSourceImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<PackageRemoteDataSource>()) {
+      sl.registerLazySingleton<PackageRemoteDataSource>(
+        () => PackageRemoteDataSourceImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<SubscriptionRemoteDataSource>()) {
+      sl.registerLazySingleton<SubscriptionRemoteDataSource>(
+        () => SubscriptionRemoteDataSourceImpl(sl()),
       );
     }
 
     // Repository
-    if (!sl.isRegistered<AdminBranchRepository>()) {
-      sl.registerLazySingleton<AdminBranchRepository>(
-        () => AdminBranchRepositoryImpl(sl()),
+    if (!sl.isRegistered<BranchRepository>()) {
+      sl.registerLazySingleton<BranchRepository>(
+        () => BranchRepositoryImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<PackageRepository>()) {
+      sl.registerLazySingleton<PackageRepository>(
+        () => PackageRepositoryImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<SubscriptionRepository>()) {
+      sl.registerLazySingleton<SubscriptionRepository>(
+        () => SubscriptionRepositoryImpl(sl()),
       );
     }
 
