@@ -12,7 +12,7 @@ import 'package:gymbook/features/admin_home/presentation/cubits/create_package_c
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_buttom.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/manage_package_status.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/package_card.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_pagination_widget.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
 class ManagePackageScreenBody extends StatelessWidget {
   final int branchId;

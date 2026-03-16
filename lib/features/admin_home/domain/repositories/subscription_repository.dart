@@ -33,6 +33,14 @@ abstract class SubscriptionRepository {
     required int subscriptionId,
   });
 
+  Future<Either<Failure, void>> freezeSubscription({
+    required int subscriptionId,
+  });
+
+  Future<Either<Failure, void>> unfreezeSubscription({
+    required int subscriptionId,
+  });
+
   Future<Either<Failure, SubscriptionDetailsEntity>> getSubscriptionDetails(
     int subscriptionId,
   );

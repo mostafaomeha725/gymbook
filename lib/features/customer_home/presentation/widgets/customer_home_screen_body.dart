@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
-import 'package:gymbook/core/theme/styles.dart';
-import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/home/presentation/widgets/appbar_home_widget.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_card.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_details_screen_body.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_pagination_widget.dart';
-import 'package:gymbook/features/home/presentation/widgets/show_only_open_gym_card.dart';
+import 'package:gymbook/features/customer_home/presentation/cubits/nearby_branches_cubit/nearby_branches_cubit.dart';
+import 'package:gymbook/features/customer_home/presentation/models/saved_location.dart';
+import 'package:gymbook/features/customer_home/presentation/services/customer_home_location_actions.dart';
+import 'package:gymbook/features/customer_home/presentation/services/home_location_preferences.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/appbar_home_widget.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/gym_details_screen_body.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/nearby_gyms_section.dart';
 
 class CustomerHomeScreenBody extends StatefulWidget {
   const CustomerHomeScreenBody({super.key});
@@ -18,9 +19,113 @@ class CustomerHomeScreenBody extends StatefulWidget {
 }
 
 class _CustomerHomeScreenBodyState extends State<CustomerHomeScreenBody> {
-  int _currentSelectedPage = 1;
+  String _locationLabel = 'Tap to choose location';
+  bool _showOnlyOpenGyms = false;
+  List<SavedLocation> _savedLocations = const [];
+  String? _selectedLocationId;
+  final HomeLocationPreferences _locationPreferences =
+      HomeLocationPreferences();
+  final CustomerHomeLocationActions _locationActions =
+      CustomerHomeLocationActions();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _restoreLocationsAndLoad();
+    });
+  }
+
+  String _fallbackLocationLabel(double latitude, double longitude) =>
+      'Lat ${latitude.toStringAsFixed(4)}, Lng ${longitude.toStringAsFixed(4)}';
+
+  Future<void> _restoreLocationsAndLoad() async {
+    final cubit = context.read<NearbyBranchesCubit>();
+    final locationPrefsState = await _locationPreferences.load();
+
+    SavedLocation? selected;
+    if (locationPrefsState.selectedLocationId != null) {
+      for (final location in locationPrefsState.savedLocations) {
+        if (location.id == locationPrefsState.selectedLocationId) {
+          selected = location;
+          break;
+        }
+      }
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _savedLocations = locationPrefsState.savedLocations;
+      _selectedLocationId = selected?.id;
+      if (selected != null) {
+        _locationLabel = selected!.label;
+      }
+    });
+
+    if (selected != null) {
+      await cubit.setLocation(
+        latitude: selected.latitude,
+        longitude: selected.longitude,
+      );
+      return;
+    }
+
+    await cubit.loadNearby();
+  }
+
+  Future<void> _applyLocation({
+    required double latitude,
+    required double longitude,
+    String? resolvedAddress,
+  }) async {
+    final location = SavedLocation(
+      id: SavedLocation.buildId(latitude, longitude),
+      label: (resolvedAddress != null && resolvedAddress.trim().isNotEmpty)
+          ? resolvedAddress.trim()
+          : _fallbackLocationLabel(latitude, longitude),
+      latitude: latitude,
+      longitude: longitude,
+    );
+
+    final updated = List<SavedLocation>.from(_savedLocations);
+    updated.removeWhere((item) => item.id == location.id);
+    updated.insert(0, location);
+    if (updated.length > HomeLocationPreferences.maxSavedLocations) {
+      updated.removeRange(
+        HomeLocationPreferences.maxSavedLocations,
+        updated.length,
+      );
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _savedLocations = updated;
+      _selectedLocationId = location.id;
+      _locationLabel = location.label;
+    });
+
+    await _locationPreferences.save(
+      savedLocations: updated,
+      selectedLocationId: location.id,
+    );
+    if (!mounted) return;
+    await context.read<NearbyBranchesCubit>().setLocation(
+      latitude: latitude,
+      longitude: longitude,
+    );
+  }
+
+  Future<void> _selectSavedLocation(SavedLocation location) {
+    return _applyLocation(
+      latitude: location.latitude,
+      longitude: location.longitude,
+      resolvedAddress: location.label,
+    );
+  }
 
   void _goToDetails({
+    required int branchId,
     required String gymName,
     required double rating,
     required int reviewsCount,
@@ -29,11 +134,37 @@ class _CustomerHomeScreenBodyState extends State<CustomerHomeScreenBody> {
     GoRouter.of(context).push(
       Routes.gymDetailsScreen,
       extra: GymDetailsArgs(
+        branchId: branchId,
         gymName: gymName,
         rating: rating,
         reviewsCount: reviewsCount,
         type: type,
       ),
+    );
+  }
+
+  Future<void> _openLocationPicker() async {
+    await _locationActions.openLocationPicker(
+      context: context,
+      savedLocations: _savedLocations,
+      selectedLocationId: _selectedLocationId,
+      onSelectSaved: _selectSavedLocation,
+      onUseCurrentLocation: _useCurrentLocation,
+      onChooseFromMap: _useMapLocation,
+    );
+  }
+
+  Future<void> _useCurrentLocation() {
+    return _locationActions.useCurrentLocation(
+      context: context,
+      onLocationResolved: _applyLocation,
+    );
+  }
+
+  Future<void> _useMapLocation() {
+    return _locationActions.useMapLocation(
+      context: context,
+      onLocationResolved: _applyLocation,
     );
   }
 
@@ -44,101 +175,35 @@ class _CustomerHomeScreenBodyState extends State<CustomerHomeScreenBody> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            const AppbarHomeWidget(userName: 'Ahmed', location: 'Cairo, Egypt'),
+            AppbarHomeWidget(
+              userName: 'Ahmed',
+              location: _locationLabel,
+              onLocationTap: _openLocationPicker,
+              onSearchChanged: (value) {
+                context.read<NearbyBranchesCubit>().loadNearby(search: value);
+              },
+            ),
 
-            SizedBox(height: 16.h),
-            const ShowOnlyOpenGymsCard(),
+            // SizedBox(height: 16.h),
+            // ShowOnlyOpenGymsCard(
+            //   initialValue: _showOnlyOpenGyms,
+            //   onChanged: (value) {
+            //     setState(() {
+            //       _showOnlyOpenGyms = value;
+            //     });
+            //   },
+            // ),
             SizedBox(height: 24.h),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppText('Nearby Gyms', style: font20w700),
-                  AppText(
-                    '6 gyms found',
-                    style: font14w400.copyWith(color: const Color(0xff4A5565)),
-                  ),
-                ],
+            NearbyGymsSection(
+              showOnlyOpenGyms: _showOnlyOpenGyms,
+              onGymTap: (gym) => _goToDetails(
+                branchId: gym.id,
+                gymName: gym.name,
+                rating: gym.averageRating,
+                reviewsCount: gym.totalRatings,
+                type: gym.branchTypeName,
               ),
-            ),
-
-            SizedBox(height: 16.h),
-
-            /// ===== Gyms =====
-            GymCard(
-              gymName: 'PowerHouse Gym',
-              imageUrl: 'https://example.com/gym1.jpg',
-              type: 'Mixed',
-              rating: 4.8,
-              reviewsCount: 234,
-              isOpen: true,
-              distance: '1.2 km',
-              onTap: () => _goToDetails(
-                gymName: 'PowerHouse Gym',
-                rating: 4.8,
-                reviewsCount: 234,
-                type: 'Mixed',
-              ),
-            ),
-
-            GymCard(
-              gymName: 'Elite Fitness Center',
-              imageUrl: 'https://example.com/gym2.jpg',
-              type: 'male',
-              rating: 4.6,
-              reviewsCount: 189,
-              isOpen: true,
-              distance: '2.5 km',
-              onTap: () => _goToDetails(
-                gymName: 'Elite Fitness Center',
-                rating: 4.6,
-                reviewsCount: 189,
-                type: 'male',
-              ),
-            ),
-
-            GymCard(
-              gymName: 'FitZone Studio',
-              imageUrl: 'https://example.com/gym3.jpg',
-              type: 'female',
-              rating: 4.9,
-              reviewsCount: 312,
-              isOpen: true,
-              distance: '3.1 km',
-              onTap: () => _goToDetails(
-                gymName: 'FitZone Studio',
-                rating: 4.9,
-                reviewsCount: 312,
-                type: 'female',
-              ),
-            ),
-
-            GymCard(
-              gymName: 'Body Balance Gym',
-              imageUrl: 'https://example.com/gym4.jpg',
-              type: 'Mixed',
-              rating: 4.7,
-              reviewsCount: 156,
-              isOpen: false,
-              distance: '4.3 km',
-              onTap: () => _goToDetails(
-                gymName: 'Body Balance Gym',
-                rating: 4.7,
-                reviewsCount: 156,
-                type: 'Mixed',
-              ),
-            ),
-
-            GymPaginationWidget(
-              totalPages: 3,
-              currentPage: _currentSelectedPage,
-              onPageChanged: (page) {
-                setState(() {
-                  _currentSelectedPage = page;
-                });
-              },
             ),
 
             SizedBox(height: 132.h),

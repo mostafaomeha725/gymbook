@@ -91,6 +91,32 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   }
 
   @override
+  Future<Either<Failure, void>> freezeSubscription({
+    required int subscriptionId,
+  }) async {
+    try {
+      await remoteDataSource.freezeSubscription(subscriptionId: subscriptionId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> unfreezeSubscription({
+    required int subscriptionId,
+  }) async {
+    try {
+      await remoteDataSource.unfreezeSubscription(
+        subscriptionId: subscriptionId,
+      );
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, SubscriptionDetailsEntity>> getSubscriptionDetails(
     int subscriptionId,
   ) async {

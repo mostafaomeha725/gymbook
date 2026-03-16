@@ -44,7 +44,7 @@ class SubscriptionPlanCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               AppText(
-                '${plan.price} EGP',
+                '${plan.price.toStringAsFixed(plan.price % 1 == 0 ? 0 : 2)} EGP',
                 style: font32w700.copyWith(color: Colors.white),
               ),
             ],
@@ -77,7 +77,7 @@ class SubscriptionPlanCard extends StatelessWidget {
 
 class PlanModel {
   final String title;
-  final int price;
+  final double price;
   final String duration;
 
   const PlanModel({

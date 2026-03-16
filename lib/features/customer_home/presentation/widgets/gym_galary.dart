@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_asset.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/home/presentation/widgets/more_image_grid.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/more_image_grid.dart';
 
 class GymGallery extends StatelessWidget {
   final String selectedImage;

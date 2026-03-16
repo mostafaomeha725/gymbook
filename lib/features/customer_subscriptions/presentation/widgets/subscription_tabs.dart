@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/customer_subscriptions/presentation/widgets/subscriptions_screen_body.dart';
 
 class SubscriptionTabs extends StatelessWidget {
   final SubscriptionTab selectedTab;
@@ -16,6 +16,15 @@ class SubscriptionTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tabs = <MapEntry<SubscriptionTab, String>>[
+      const MapEntry(SubscriptionTab.all, 'All'),
+      const MapEntry(SubscriptionTab.active, 'Active'),
+      const MapEntry(SubscriptionTab.expired, 'Expired'),
+      const MapEntry(SubscriptionTab.frozen, 'Frozen'),
+      const MapEntry(SubscriptionTab.cancelled, 'Cancelled'),
+      const MapEntry(SubscriptionTab.scheduled, 'Scheduled'),
+    ];
+
     return Container(
       height: 42.h,
       padding: EdgeInsets.all(4.w),
@@ -30,24 +39,21 @@ class SubscriptionTabs extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged(SubscriptionTab.active),
-              child: _buildTab("Active", selectedTab == SubscriptionTab.active),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged(SubscriptionTab.expired),
-              child: _buildTab(
-                "Expired",
-                selectedTab == SubscriptionTab.expired,
-              ),
-            ),
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: tabs
+              .map(
+                (tab) => Padding(
+                  padding: EdgeInsetsDirectional.only(end: 4.w),
+                  child: GestureDetector(
+                    onTap: () => onChanged(tab.key),
+                    child: _buildTab(tab.value, selectedTab == tab.key),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
       ),
     );
   }
@@ -55,6 +61,7 @@ class SubscriptionTabs extends StatelessWidget {
   Widget _buildTab(String text, bool selected) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
+      padding: EdgeInsets.symmetric(horizontal: 14.w),
       decoration: BoxDecoration(
         color: selected ? Colors.blue : Colors.transparent,
         borderRadius: BorderRadius.circular(25.r),

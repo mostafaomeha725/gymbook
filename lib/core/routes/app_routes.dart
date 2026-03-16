@@ -23,10 +23,10 @@ import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/register_screen.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/screens/subscriptions_details_screen.dart';
-import 'package:gymbook/features/home/presentation/screens/full_image_viewer_screen.dart';
-import 'package:gymbook/features/home/presentation/screens/gym_details_screen.dart';
-import 'package:gymbook/features/home/presentation/widgets/full_image_viewer_args.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_details_screen_body.dart';
+import 'package:gymbook/features/customer_home/presentation/screens/full_image_viewer_screen.dart';
+import 'package:gymbook/features/customer_home/presentation/screens/gym_details_screen.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/full_image_viewer_args.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/gym_details_screen_body.dart';
 
 import 'package:gymbook/features/settings/presentation/screens/edit_profile_screen.dart';
 
@@ -144,7 +144,15 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: Routes.subscriptionsDetailsScreen,
-        builder: (context, state) => const SubscriptionsDetailsScreen(),
+        builder: (context, state) {
+          final args =
+              state.extra as CustomerSubscriptionDetailsArgs? ??
+              const CustomerSubscriptionDetailsArgs(
+                subscriptionId: 0,
+                status: 1,
+              );
+          return SubscriptionsDetailsScreen(args: args);
+        },
       ),
       GoRoute(
         path: Routes.addBranchOneScreen,

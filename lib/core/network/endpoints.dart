@@ -76,6 +76,19 @@ class EndPoints {
   static String cancelSubscription(int subscriptionId) =>
       'Owner/Subscriptions/$subscriptionId/cancel';
 
+  static String freezeSubscription(int subscriptionId) =>
+      'Subscriptions/$subscriptionId/freeze';
+
+  static String unfreezeSubscription(int subscriptionId) =>
+      'Subscriptions/$subscriptionId/Unfreeze';
+
   static String getSubscriptionDetails(int subscriptionId) =>
       'Subscriptions/$subscriptionId';
+
+  static String getMySubscriptionDetails(int subscriptionId) =>
+      'users/me/subscriptions/$subscriptionId';
+
+  static const String getMySubscriptions = 'users/me/subscriptions';
+
+  static const String getNearbyBranches = 'Branches/public';
 }

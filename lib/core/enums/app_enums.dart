@@ -4,7 +4,7 @@ enum OtpSource { customer, business }
 
 enum GymType { menOnly, womenOnly, mixed }
 
-enum SubscriptionTab { active, expired }
+enum SubscriptionTab { all, active, expired, frozen, cancelled, scheduled }
 
 enum RequestState { init, loading, success, error }
 

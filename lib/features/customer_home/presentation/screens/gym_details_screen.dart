@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_details_screen_body.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/gym_details_screen_body.dart';
 
 class GymDetailsScreen extends StatelessWidget {
   final GymDetailsArgs args;

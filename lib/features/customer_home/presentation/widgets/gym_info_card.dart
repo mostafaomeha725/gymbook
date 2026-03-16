@@ -11,6 +11,7 @@ class GymInfoCard extends StatelessWidget {
   final double rating;
   final int reviewsCount;
   final String type; // mixed | men | women
+  final VoidCallback onDirectionsTap;
 
   const GymInfoCard({
     super.key,
@@ -19,6 +20,7 @@ class GymInfoCard extends StatelessWidget {
     required this.rating,
     required this.reviewsCount,
     required this.type,
+    required this.onDirectionsTap,
   });
 
   /// لون النوع
@@ -141,9 +143,7 @@ class GymInfoCard extends StatelessWidget {
                   text: 'Directions',
                   borderColor: const Color(0XFF0EA5E9),
                   icon: Icons.location_on_outlined,
-                  onTap: () {
-                    // Directions action
-                  },
+                  onTap: onDirectionsTap,
                   textSize: 14.sp,
                   textColor: const Color(0XFF0EA5E9),
                 ),

@@ -3,16 +3,20 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_search.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/home/presentation/widgets/notification_icon.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/notification_icon.dart';
 
 class AppbarHomeWidget extends StatefulWidget {
   final String userName;
   final String location;
+  final ValueChanged<String>? onSearchChanged;
+  final VoidCallback? onLocationTap;
 
   const AppbarHomeWidget({
     super.key,
     required this.userName,
     required this.location,
+    this.onSearchChanged,
+    this.onLocationTap,
   });
 
   @override
@@ -54,32 +58,50 @@ class _AppbarHomeWidgetState extends State<AppbarHomeWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppText(
-                      'Hi, ${widget.userName}',
-                      style: font20w700.copyWith(color: Colors.white),
-                    ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          color: Colors.white,
-                          size: 16.sp,
-                        ),
-                        SizedBox(width: 4.w),
-                        AppText(
-                          widget.location,
-                          style: font14w500.copyWith(
-                            // ignore: deprecated_member_use
-                            color: Colors.white.withOpacity(0.9),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppText(
+                        'Hi, ${widget.userName}',
+                        style: font20w700.copyWith(color: Colors.white),
+                      ),
+                      SizedBox(height: 4.h),
+                      InkWell(
+                        onTap: widget.onLocationTap,
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 2.h),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                color: Colors.white,
+                                size: 16.sp,
+                              ),
+                              SizedBox(width: 4.w),
+                              Flexible(
+                                child: AppText(
+                                  widget.location,
+                                  maxLines: 3,
+                                  style: font14w500.copyWith(
+                                    // ignore: deprecated_member_use
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 4.w),
+                              Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: Colors.white,
+                                size: 16.sp,
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
                 const NotificationIcon(),
               ],
@@ -90,6 +112,7 @@ class _AppbarHomeWidgetState extends State<AppbarHomeWidget> {
             CustomSearch(
               controller: searchController,
               hintText: "Find gyms near you...",
+              onChanged: widget.onSearchChanged,
             ),
 
             SizedBox(height: 24.h),

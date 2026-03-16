@@ -5,8 +5,8 @@ import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branches_list_view.dart';
-import 'package:gymbook/features/home/presentation/widgets/appbar_admin_home_widget.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_pagination_widget.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/appbar_admin_home_widget.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
 class AdminHomeScreenBody extends StatelessWidget {
   const AdminHomeScreenBody({super.key});

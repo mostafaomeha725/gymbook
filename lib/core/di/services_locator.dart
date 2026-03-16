@@ -14,6 +14,7 @@ import 'package:gymbook/features/admin_home/domain/repositories/subscription_rep
 import 'package:gymbook/features/admin_home/domain/usecases/add_member_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/add_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/cancel_subscription_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/freeze_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_subscription_details_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_subscriptions_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/create_branch_usecase.dart';
@@ -30,10 +31,12 @@ import 'package:gymbook/features/admin_home/domain/usecases/update_package_statu
 import 'package:gymbook/features/admin_home/domain/usecases/update_package_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/update_working_hours_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/upload_branch_image_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/unfreeze_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/add_member_cubit/add_member_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/add_subscription_cubit/add_subscription_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_subscriptions_list_cubit/branch_subscriptions_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/cancel_subscription_cubit/cancel_subscription_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/freeze_subscription_cubit/freeze_subscription_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/subscription_details_cubit/subscription_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
@@ -51,6 +54,11 @@ import 'package:gymbook/features/auth/domain/usecases/login_with_google_usecase.
 import 'package:gymbook/features/auth/domain/usecases/register_usecase.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
+import 'package:gymbook/features/customer_home/data/datasources/nearby_branches_remote_datasource.dart';
+import 'package:gymbook/features/customer_home/data/repositories/nearby_branches_repository_impl.dart';
+import 'package:gymbook/features/customer_home/domain/repositories/nearby_branches_repository.dart';
+import 'package:gymbook/features/customer_home/domain/usecases/get_nearby_branches_usecase.dart';
+import 'package:gymbook/features/customer_home/presentation/cubits/nearby_branches_cubit/nearby_branches_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
@@ -64,7 +72,7 @@ class ServiceLocator {
     /// Features
     _initAuth();
     _initAdmin();
-    // _initHome();
+    _initCustomerHome();
   }
 
   /// =============================
@@ -268,14 +276,53 @@ class ServiceLocator {
     if (!sl.isRegistered<CancelSubscriptionUseCase>()) {
       sl.registerLazySingleton(() => CancelSubscriptionUseCase(sl()));
     }
+    if (!sl.isRegistered<FreezeSubscriptionUseCase>()) {
+      sl.registerLazySingleton(() => FreezeSubscriptionUseCase(sl()));
+    }
+    if (!sl.isRegistered<UnfreezeSubscriptionUseCase>()) {
+      sl.registerLazySingleton(() => UnfreezeSubscriptionUseCase(sl()));
+    }
     if (!sl.isRegistered<CancelSubscriptionCubit>()) {
       sl.registerFactory(() => CancelSubscriptionCubit(sl()));
+    }
+    if (!sl.isRegistered<FreezeSubscriptionCubit>()) {
+      sl.registerFactory(
+        () => FreezeSubscriptionCubit(
+          freezeSubscriptionUseCase: sl(),
+          unfreezeSubscriptionUseCase: sl(),
+        ),
+      );
     }
     if (!sl.isRegistered<GetSubscriptionDetailsUseCase>()) {
       sl.registerLazySingleton(() => GetSubscriptionDetailsUseCase(sl()));
     }
     if (!sl.isRegistered<SubscriptionDetailsCubit>()) {
       sl.registerFactory(() => SubscriptionDetailsCubit(sl()));
+    }
+  }
+
+  /// =============================
+  /// CUSTOMER HOME FEATURE
+  /// =============================
+  void _initCustomerHome() {
+    if (!sl.isRegistered<NearbyBranchesRemoteDataSource>()) {
+      sl.registerLazySingleton<NearbyBranchesRemoteDataSource>(
+        () => NearbyBranchesRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<NearbyBranchesRepository>()) {
+      sl.registerLazySingleton<NearbyBranchesRepository>(
+        () => NearbyBranchesRepositoryImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<GetNearbyBranchesUseCase>()) {
+      sl.registerLazySingleton(() => GetNearbyBranchesUseCase(sl()));
+    }
+
+    if (!sl.isRegistered<NearbyBranchesCubit>()) {
+      sl.registerFactory(() => NearbyBranchesCubit(sl()));
     }
   }
 

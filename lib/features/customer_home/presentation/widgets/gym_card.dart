@@ -102,7 +102,7 @@ class GymCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TagBadge(tag: isOpen ? 'Open Now' : 'Closed'),
+                      TagBadge(tag: isOpen ? 'Active' : 'Inactive'),
                       Row(
                         children: [
                           Icon(

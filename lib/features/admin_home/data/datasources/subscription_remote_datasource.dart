@@ -32,6 +32,10 @@ abstract class SubscriptionRemoteDataSource {
 
   Future<void> cancelSubscription({required int subscriptionId});
 
+  Future<void> freezeSubscription({required int subscriptionId});
+
+  Future<void> unfreezeSubscription({required int subscriptionId});
+
   Future<SubscriptionDetailsModel> getSubscriptionDetails(int subscriptionId);
 }
 
@@ -113,6 +117,24 @@ class SubscriptionRemoteDataSourceImpl implements SubscriptionRemoteDataSource {
   Future<void> cancelSubscription({required int subscriptionId}) async {
     final response = await networkService.patchData(
       endPoint: EndPoints.cancelSubscription(subscriptionId),
+      data: {},
+    );
+    response.fold((failure) => throw ServerException(failure), (_) => null);
+  }
+
+  @override
+  Future<void> freezeSubscription({required int subscriptionId}) async {
+    final response = await networkService.patchData(
+      endPoint: EndPoints.freezeSubscription(subscriptionId),
+      data: {},
+    );
+    response.fold((failure) => throw ServerException(failure), (_) => null);
+  }
+
+  @override
+  Future<void> unfreezeSubscription({required int subscriptionId}) async {
+    final response = await networkService.patchData(
+      endPoint: EndPoints.unfreezeSubscription(subscriptionId),
       data: {},
     );
     response.fold((failure) => throw ServerException(failure), (_) => null);

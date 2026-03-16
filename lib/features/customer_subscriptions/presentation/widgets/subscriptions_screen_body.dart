@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/di/services_locator.dart';
+import 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab;
+import 'package:gymbook/core/network/endpoints.dart';
+import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
+import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/widgets/subscription_list_view.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/widgets/subscription_tabs.dart';
-export 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab;
-import 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab;
 
 class SubscriptionsScreenBody extends StatefulWidget {
   const SubscriptionsScreenBody({super.key});
@@ -16,69 +19,52 @@ class SubscriptionsScreenBody extends StatefulWidget {
 }
 
 class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
-  SubscriptionTab selectedTab = SubscriptionTab.active;
+  SubscriptionTab selectedTab = SubscriptionTab.all;
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<Map<String, dynamic>> _subscriptions = const [];
 
-  final List<Map<String, dynamic>> activeSubscriptions = [
-    {
-      "title": "PowerHouse Gym",
-      "plan": "Monthly Plan",
-      "used": 24,
-      "total": 30,
-      "daysLeft": 22,
-      "image": "https://images.unsplash.com/photo-1558611848-73f7eb4001a1",
-    },
-    {
-      "title": "FitZone Studio",
-      "plan": "Weekly Plan",
-      "used": 3,
-      "total": 8,
-      "daysLeft": 5,
-      "image": "https://images.unsplash.com/photo-1571902943202-507ec2618e8f",
-    },
-    {
-      "title": "Elite Fitness Center",
-      "plan": "3 Months Plan",
-      "used": 45,
-      "total": 90,
-      "daysLeft": 60,
-      "image": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61",
-    },
-    {
-      "title": "Elite Fitness Center",
-      "plan": "3 Months Plan",
-      "used": 45,
-      "total": 90,
-      "daysLeft": 60,
-      "image": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61",
-    },
-    {
-      "title": "Elite Fitness Center",
-      "plan": "3 Months Plan",
-      "used": 45,
-      "total": 90,
-      "daysLeft": 60,
-      "image": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadSubscriptions();
+  }
 
-  final List<Map<String, dynamic>> expiredSubscriptions = [
-    {
-      "title": "Elite Fitness Center",
-      "plan": "Monthly Plan",
-      "used": 30,
-      "total": 30,
-      "expiredDate": "Jan 15, 2026",
-      "image": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61",
-    },
-    {
-      "title": "Body Balance Gym",
-      "plan": "Monthly Plan",
-      "used": 28,
-      "total": 30,
-      "expiredDate": "Dec 20, 2025",
-      "image": "https://images.unsplash.com/photo-1558611848-73f7eb4001a1",
-    },
-  ];
+  Future<void> _loadSubscriptions() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final networkService = sl<NetworkService>();
+    final response = await networkService.getData(
+      endPoint: EndPoints.getMySubscriptions,
+      queryParameters: {'PageNumber': 1, 'PageSize': 50},
+    );
+
+    if (!mounted) return;
+
+    response.fold(
+      (failure) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = failure.message;
+        });
+      },
+      (data) {
+        final map = data as Map<String, dynamic>;
+        final list = (map['data'] as List<dynamic>? ?? const [])
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+
+        setState(() {
+          _isLoading = false;
+          _subscriptions = list;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +96,29 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
           SizedBox(height: 32.h),
 
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: SubscriptionListView(
-                selectedTab: selectedTab,
-                activeSubscriptions: activeSubscriptions,
-                expiredSubscriptions: expiredSubscriptions,
-              ),
-            ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage != null
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppText(_errorMessage!),
+                        SizedBox(height: 12.h),
+                        ElevatedButton(
+                          onPressed: _loadSubscriptions,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: SubscriptionListView(
+                      selectedTab: selectedTab,
+                      subscriptions: _subscriptions,
+                    ),
+                  ),
           ),
         ],
       ),

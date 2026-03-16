@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/widgets/app_asset.dart';
-import 'package:gymbook/features/home/presentation/widgets/appbar_icon_back.dart';
-import 'package:gymbook/features/home/presentation/widgets/arrow_button.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_galary.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/appbar_icon_back.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/arrow_button.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/gym_galary.dart';
 
 class FullImageViewerScreenBody extends StatefulWidget {
   final List<String> images;

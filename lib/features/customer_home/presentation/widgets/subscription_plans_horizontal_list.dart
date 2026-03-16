@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gymbook/features/home/presentation/widgets/subscription_plan_card.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/subscription_plan_card.dart';
 
 class SubscriptionPlansHorizontalList extends StatelessWidget {
-  const SubscriptionPlansHorizontalList({super.key});
+  final List<PlanModel> plans;
+
+  const SubscriptionPlansHorizontalList({super.key, required this.plans});
 
   @override
   Widget build(BuildContext context) {
-    List plans = const [
-      PlanModel(title: 'Monthly', price: 500, duration: '30 days'),
-      PlanModel(title: 'Weekly', price: 150, duration: '7 days'),
-      PlanModel(title: 'Monthly', price: 500, duration: '30 days'),
-    ];
+    final effectivePlans = plans.isEmpty
+        ? const [
+            PlanModel(title: 'No plans available', price: 0, duration: '-'),
+          ]
+        : plans;
 
     return SizedBox(
       height: 210.h,
@@ -19,10 +21,10 @@ class SubscriptionPlansHorizontalList extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 24.w),
         itemBuilder: (context, index) {
-          return SubscriptionPlanCard(plan: plans[index]);
+          return SubscriptionPlanCard(plan: effectivePlans[index]);
         },
         separatorBuilder: (_, __) => SizedBox(width: 16.w),
-        itemCount: plans.length,
+        itemCount: effectivePlans.length,
       ),
     );
   }

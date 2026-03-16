@@ -12,7 +12,7 @@ import 'package:gymbook/features/admin_home/presentation/cubits/branch_subscript
 import 'package:gymbook/features/admin_home/presentation/widgets/admin_subscription_card.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_buttom.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/custom_segmented_tabs.dart';
-import 'package:gymbook/features/home/presentation/widgets/gym_pagination_widget.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
 class AdminManageSubscriptionsScreenBody extends StatefulWidget {
   final int branchId;

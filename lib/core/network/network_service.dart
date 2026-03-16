@@ -338,7 +338,11 @@ class NetworkService {
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         return Right(response.data);
       } else {
-        return Left(Failure(response.data['message']));
+        final message = _extractErrorMessage(
+          response.data,
+          fallback: 'Error ${response.statusCode}',
+        );
+        return Left(Failure(message));
       }
     } on SocketException {
       return const Left(Failure("No Internet Connection"));
@@ -346,7 +350,11 @@ class NetworkService {
       return const Left(Failure("Format Exception"));
     } on DioException catch (e) {
       if (e.type == DioExceptionType.badResponse) {
-        return Left(Failure(e.response!.data['message']));
+        final message = _extractErrorMessage(
+          e.response?.data,
+          fallback: e.message ?? 'Bad response',
+        );
+        return Left(Failure(message));
         // return Left(_l)(e.message);
       } else if (e.type == DioExceptionType.connectionTimeout) {
         // safePrint('check your connection');

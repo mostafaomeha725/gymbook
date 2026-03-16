@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/home/presentation/widgets/amenity_item.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/amenity_item.dart';
 
 class AmenitiesCard extends StatelessWidget {
   const AmenitiesCard({super.key});

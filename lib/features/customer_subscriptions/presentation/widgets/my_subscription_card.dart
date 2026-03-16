@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_image.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/home/presentation/widgets/status_badge.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/status_badge.dart';
 
 class MySubscriptionCard extends StatelessWidget {
   final String image;
@@ -14,6 +14,7 @@ class MySubscriptionCard extends StatelessWidget {
   final int? daysLeft;
   final String? expiredDate;
   final bool isExpired;
+  final int status;
   final void Function()? onTap;
 
   const MySubscriptionCard({
@@ -26,12 +27,46 @@ class MySubscriptionCard extends StatelessWidget {
     this.daysLeft,
     this.expiredDate,
     this.isExpired = false,
+    this.status = 1,
     this.onTap,
   });
 
+  Color _getStatusColor() {
+    switch (status) {
+      case 0:
+        return const Color(0xFFF59E0B);
+      case 1:
+        return Colors.green;
+      case 2:
+        return Colors.orange;
+      case 3:
+      case 4:
+        return Colors.red;
+      default:
+        return const Color(0xff64748B);
+    }
+  }
+
+  Color _getStatusBgColor() {
+    switch (status) {
+      case 0:
+        return const Color(0xFFF59E0B).withOpacity(.15);
+      case 1:
+        return Colors.green.withOpacity(.15);
+      case 2:
+        return Colors.orange.withOpacity(.15);
+      case 3:
+      case 4:
+        return Colors.red.withOpacity(.12);
+      default:
+        return const Color(0xffE2E8F0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double progress = sessionsUsed / sessionsTotal;
+    final safeSessionsTotal = sessionsTotal <= 0 ? 1 : sessionsTotal;
+    final progress = (sessionsUsed / safeSessionsTotal).clamp(0.0, 1.0);
 
     return GestureDetector(
       onTap: onTap,
@@ -113,12 +148,20 @@ class MySubscriptionCard extends StatelessWidget {
                 if (!isExpired && daysLeft != null)
                   StatusBadge(
                     text: "$daysLeft days left",
-                    color: Colors.green,
-                    bgColor: Colors.green.withOpacity(.15),
+                    color: _getStatusColor(),
+                    bgColor: _getStatusBgColor(),
                   ),
                 if (isExpired && expiredDate != null)
                   StatusBadge(
-                    text: "Expired $expiredDate",
+                    text: expiredDate!.trim().isEmpty
+                        ? "Expired"
+                        : "Expired $expiredDate",
+                    color: Colors.grey,
+                    bgColor: Colors.grey.withOpacity(.2),
+                  ),
+                if (isExpired && expiredDate == null)
+                  StatusBadge(
+                    text: "Expired",
                     color: Colors.grey,
                     bgColor: Colors.grey.withOpacity(.2),
                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/home/presentation/widgets/full_image_viewer_args.dart';
-import 'package:gymbook/features/home/presentation/widgets/full_image_viewer_screen_body.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/full_image_viewer_args.dart';
+import 'package:gymbook/features/customer_home/presentation/widgets/full_image_viewer_screen_body.dart';
 
 class FullImageViewerScreen extends StatelessWidget {
   final FullImageViewerArgs args;

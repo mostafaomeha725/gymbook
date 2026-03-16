@@ -4,21 +4,14 @@ import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 
 class OpeningHoursCard extends StatelessWidget {
-  const OpeningHoursCard({super.key});
+  final List<WorkingHourViewModel> hours;
+
+  const OpeningHoursCard({super.key, required this.hours});
 
   @override
   Widget build(BuildContext context) {
-    final hours = [
-      ('Monday', '6:00 AM - 11:00 PM'),
-      ('Tuesday', '6:00 AM - 11:00 PM'),
-      ('Wednesday', '6:00 AM - 11:00 PM'),
-      ('Thursday', '6:00 AM - 11:00 PM'),
-      ('Friday', '6:00 AM - 11:00 PM'),
-      ('Saturday', '8:00 AM - 10:00 PM'),
-      ('Sunday', '8:00 AM - 10:00 PM'),
-    ];
-
-    const activeDay = 'Sunday';
+    final now = DateTime.now();
+    final activeDayIndex = now.weekday % 7;
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -61,7 +54,7 @@ class OpeningHoursCard extends StatelessWidget {
 
           /// Days
           ...hours.map((item) {
-            final isActive = item.$1 == activeDay;
+            final isActive = item.dayIndex == activeDayIndex;
 
             return Container(
               margin: EdgeInsets.only(bottom: 8.h),
@@ -75,7 +68,7 @@ class OpeningHoursCard extends StatelessWidget {
                 children: [
                   /// Day
                   AppText(
-                    item.$1,
+                    item.dayName,
                     style: (isActive ? font14w700 : font14w500).copyWith(
                       color: isActive
                           ? const Color(0xff0EA5E9)
@@ -85,7 +78,7 @@ class OpeningHoursCard extends StatelessWidget {
 
                   /// Time
                   AppText(
-                    item.$2,
+                    item.hoursLabel,
                     style: (isActive ? font14w700 : font14w500).copyWith(
                       color: isActive
                           ? const Color(0xff0EA5E9)
@@ -100,4 +93,16 @@ class OpeningHoursCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class WorkingHourViewModel {
+  final String dayName;
+  final String hoursLabel;
+  final int dayIndex;
+
+  const WorkingHourViewModel({
+    required this.dayName,
+    required this.hoursLabel,
+    required this.dayIndex,
+  });
 }
