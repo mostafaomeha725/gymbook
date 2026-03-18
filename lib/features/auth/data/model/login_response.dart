@@ -83,6 +83,7 @@ class LoginUser {
   final String firstName;
   final String lastName;
   final String fullName;
+  final String secretKey;
   final AppUserRole role;
 
   LoginUser({
@@ -91,6 +92,7 @@ class LoginUser {
     required this.firstName,
     required this.lastName,
     required this.fullName,
+    required this.secretKey,
     required this.role,
   });
 
@@ -103,6 +105,7 @@ class LoginUser {
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
       fullName: json['fullName'] ?? '',
+      secretKey: (json['secretKey'] ?? '').toString(),
       role: parseAppUserRole(json['userType'] ?? json['role']),
     );
   }
@@ -114,6 +117,7 @@ class LoginUser {
       'firstName': firstName,
       'lastName': lastName,
       'fullName': fullName,
+      'secretKey': secretKey,
       'role': role == AppUserRole.admin ? 1 : 0,
     };
   }

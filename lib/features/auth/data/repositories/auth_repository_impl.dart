@@ -83,6 +83,8 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> _saveSession(LoginResponse response) async {
     await storage.saveUserToken(response.accessToken);
     await storage.saveUserRole(response.user.role == AppUserRole.admin);
+    await storage.saveUserId(response.user.id);
+    await storage.saveUserSecretKey(response.user.secretKey);
     networkService.addToken(response.accessToken);
   }
 

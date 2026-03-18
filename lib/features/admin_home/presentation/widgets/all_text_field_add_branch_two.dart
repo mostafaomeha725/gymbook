@@ -11,6 +11,8 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/governorate_dropdown.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/governorates_cubit/governorates_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/governorates_cubit/governorates_state.dart';
 import 'package:gymbook/features/auth/presentation/widgets/location_on_map_card.dart';
 
 class AllTextFieldAddBranchTwo extends StatefulWidget {
@@ -27,6 +29,7 @@ class AllTextFieldAddBranchTwo extends StatefulWidget {
 class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
   final TextEditingController addresscontroller = TextEditingController();
   String? selectedGovernorate;
+  int? selectedGovernorateId;
   double? selectedLatitude;
   double? selectedLongitude;
 
@@ -37,6 +40,7 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
     if (branch != null) {
       addresscontroller.text = branch.address ?? '';
       selectedGovernorate = branch.governorate?.name;
+      selectedGovernorateId = branch.governorate?.id;
     }
   }
 
@@ -49,15 +53,27 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
   void _submit() {
     context.read<BranchLocationCubit>().submitLocationDetails(
       branchId: widget.branchId,
-      governorateName: selectedGovernorate,
+      governorateId: selectedGovernorateId,
       address: addresscontroller.text,
       latitude: selectedLatitude,
       longitude: selectedLongitude,
     );
   }
 
+  List<GovernorateDropdownItem> _governorateItemsFromState(
+    GovernoratesState state,
+  ) {
+    if (state is GovernoratesLoaded) {
+      return state.governorates
+          .map((item) => GovernorateDropdownItem(id: item.id, name: item.name))
+          .toList();
+    }
+    return const [];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final governoratesState = context.watch<GovernoratesCubit>().state;
     return BlocListener<BranchLocationCubit, BranchLocationState>(
       listener: (context, state) {
         if (state is BranchLocationSuccess) {
@@ -84,10 +100,18 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
               labelText: 'Select Governorate',
               initialValue: selectedGovernorate,
               borderColor: const Color(0xffE5E7EB),
+              isLoading: governoratesState is GovernoratesLoading,
+              governorates: _governorateItemsFromState(governoratesState),
+              onMenuOpen: () {
+                context.read<GovernoratesCubit>().getAllGovernorates();
+              },
               onChanged: (value) {
                 setState(() {
                   selectedGovernorate = value;
                 });
+              },
+              onChangedId: (value) {
+                selectedGovernorateId = value;
               },
             ),
             SizedBox(height: 16.h),

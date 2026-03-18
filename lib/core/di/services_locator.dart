@@ -3,12 +3,15 @@ import 'package:get_it/get_it.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/features/admin_home/data/datasources/branch_remote_datasource.dart';
+import 'package:gymbook/features/admin_home/data/datasources/governorates_remote_datasource.dart';
 import 'package:gymbook/features/admin_home/data/datasources/package_remote_datasource.dart';
 import 'package:gymbook/features/admin_home/data/datasources/subscription_remote_datasource.dart';
 import 'package:gymbook/features/admin_home/data/repositories/branch_repository_impl.dart';
+import 'package:gymbook/features/admin_home/data/repositories/governorates_repository_impl.dart';
 import 'package:gymbook/features/admin_home/data/repositories/package_repository_impl.dart';
 import 'package:gymbook/features/admin_home/data/repositories/subscription_repository_impl.dart';
 import 'package:gymbook/features/admin_home/domain/repositories/branch_repository.dart';
+import 'package:gymbook/features/admin_home/domain/repositories/governorates_repository.dart';
 import 'package:gymbook/features/admin_home/domain/repositories/package_repository.dart';
 import 'package:gymbook/features/admin_home/domain/repositories/subscription_repository.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/add_member_usecase.dart';
@@ -16,6 +19,7 @@ import 'package:gymbook/features/admin_home/domain/usecases/add_subscription_use
 import 'package:gymbook/features/admin_home/domain/usecases/cancel_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/freeze_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_subscription_details_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_governorates_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_subscriptions_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/create_branch_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/create_package_usecase.dart';
@@ -37,6 +41,7 @@ import 'package:gymbook/features/admin_home/presentation/cubits/add_subscription
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_subscriptions_list_cubit/branch_subscriptions_list_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/cancel_subscription_cubit/cancel_subscription_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/freeze_subscription_cubit/freeze_subscription_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/governorates_cubit/governorates_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/subscription_details_cubit/subscription_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
@@ -54,11 +59,22 @@ import 'package:gymbook/features/auth/domain/usecases/login_with_google_usecase.
 import 'package:gymbook/features/auth/domain/usecases/register_usecase.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/data/datasources/admin_me_remote_datasource.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/data/datasources/checkin_remote_datasource.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/data/repositories/admin_me_repository_impl.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/data/repositories/checkin_repository_impl.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/domain/repositories/admin_me_repository.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/domain/repositories/checkin_repository.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/domain/usecases/add_checkin_usecase.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/domain/usecases/get_admin_my_branches_usecase.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/presentation/cubits/admin_my_branches_cubit/admin_my_branches_cubit.dart';
+import 'package:gymbook/features/admin_scanner_qrcode/presentation/cubits/admin_qr_scanner_cubit/admin_qr_scanner_cubit.dart';
 import 'package:gymbook/features/customer_home/data/datasources/nearby_branches_remote_datasource.dart';
 import 'package:gymbook/features/customer_home/data/repositories/nearby_branches_repository_impl.dart';
 import 'package:gymbook/features/customer_home/domain/repositories/nearby_branches_repository.dart';
 import 'package:gymbook/features/customer_home/domain/usecases/get_nearby_branches_usecase.dart';
 import 'package:gymbook/features/customer_home/presentation/cubits/nearby_branches_cubit/nearby_branches_cubit.dart';
+import 'package:gymbook/features/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
@@ -73,6 +89,7 @@ class ServiceLocator {
     _initAuth();
     _initAdmin();
     _initCustomerHome();
+    _initCustomerQrCode();
   }
 
   /// =============================
@@ -141,6 +158,11 @@ class ServiceLocator {
   /// =============================
   void _initAdmin() {
     // DataSource
+    if (!sl.isRegistered<AdminMeRemoteDataSource>()) {
+      sl.registerLazySingleton<AdminMeRemoteDataSource>(
+        () => AdminMeRemoteDataSourceImpl(sl()),
+      );
+    }
     if (!sl.isRegistered<BranchRemoteDataSource>()) {
       sl.registerLazySingleton<BranchRemoteDataSource>(
         () => BranchRemoteDataSourceImpl(sl()),
@@ -151,13 +173,28 @@ class ServiceLocator {
         () => PackageRemoteDataSourceImpl(sl()),
       );
     }
+    if (!sl.isRegistered<GovernoratesRemoteDataSource>()) {
+      sl.registerLazySingleton<GovernoratesRemoteDataSource>(
+        () => GovernoratesRemoteDataSourceImpl(sl()),
+      );
+    }
     if (!sl.isRegistered<SubscriptionRemoteDataSource>()) {
       sl.registerLazySingleton<SubscriptionRemoteDataSource>(
         () => SubscriptionRemoteDataSourceImpl(sl()),
       );
     }
+    if (!sl.isRegistered<CheckInRemoteDataSource>()) {
+      sl.registerLazySingleton<CheckInRemoteDataSource>(
+        () => CheckInRemoteDataSourceImpl(sl()),
+      );
+    }
 
     // Repository
+    if (!sl.isRegistered<AdminMeRepository>()) {
+      sl.registerLazySingleton<AdminMeRepository>(
+        () => AdminMeRepositoryImpl(sl()),
+      );
+    }
     if (!sl.isRegistered<BranchRepository>()) {
       sl.registerLazySingleton<BranchRepository>(
         () => BranchRepositoryImpl(sl()),
@@ -168,13 +205,26 @@ class ServiceLocator {
         () => PackageRepositoryImpl(sl()),
       );
     }
+    if (!sl.isRegistered<GovernoratesRepository>()) {
+      sl.registerLazySingleton<GovernoratesRepository>(
+        () => GovernoratesRepositoryImpl(sl()),
+      );
+    }
     if (!sl.isRegistered<SubscriptionRepository>()) {
       sl.registerLazySingleton<SubscriptionRepository>(
         () => SubscriptionRepositoryImpl(sl()),
       );
     }
+    if (!sl.isRegistered<CheckInRepository>()) {
+      sl.registerLazySingleton<CheckInRepository>(
+        () => CheckInRepositoryImpl(sl()),
+      );
+    }
 
     // Use Cases
+    if (!sl.isRegistered<GetAdminMyBranchesUseCase>()) {
+      sl.registerLazySingleton(() => GetAdminMyBranchesUseCase(sl()));
+    }
     if (!sl.isRegistered<CreateBranchUseCase>()) {
       sl.registerLazySingleton(() => CreateBranchUseCase(sl()));
     }
@@ -226,8 +276,17 @@ class ServiceLocator {
     if (!sl.isRegistered<GetBranchSubscriptionsUseCase>()) {
       sl.registerLazySingleton(() => GetBranchSubscriptionsUseCase(sl()));
     }
+    if (!sl.isRegistered<GetGovernoratesUseCase>()) {
+      sl.registerLazySingleton(() => GetGovernoratesUseCase(sl()));
+    }
+    if (!sl.isRegistered<AddCheckInUseCase>()) {
+      sl.registerLazySingleton(() => AddCheckInUseCase(sl()));
+    }
 
     // Cubits
+    if (!sl.isRegistered<AdminMyBranchesCubit>()) {
+      sl.registerFactory(() => AdminMyBranchesCubit(sl()));
+    }
     if (!sl.isRegistered<CreateBranchCubit>()) {
       sl.registerFactory(
         () => CreateBranchCubit(
@@ -299,6 +358,12 @@ class ServiceLocator {
     if (!sl.isRegistered<SubscriptionDetailsCubit>()) {
       sl.registerFactory(() => SubscriptionDetailsCubit(sl()));
     }
+    if (!sl.isRegistered<GovernoratesCubit>()) {
+      sl.registerFactory(() => GovernoratesCubit(sl()));
+    }
+    if (!sl.isRegistered<AdminQrScannerCubit>()) {
+      sl.registerFactory(() => AdminQrScannerCubit(sl()));
+    }
   }
 
   /// =============================
@@ -323,6 +388,12 @@ class ServiceLocator {
 
     if (!sl.isRegistered<NearbyBranchesCubit>()) {
       sl.registerFactory(() => NearbyBranchesCubit(sl()));
+    }
+  }
+
+  void _initCustomerQrCode() {
+    if (!sl.isRegistered<EntryQrcodeCubit>()) {
+      sl.registerFactory(() => EntryQrcodeCubit(preferencesStorage: sl()));
     }
   }
 

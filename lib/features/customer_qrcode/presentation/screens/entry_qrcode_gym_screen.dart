@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gymbook/core/di/services_locator.dart';
+import 'package:gymbook/features/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
 import 'package:gymbook/features/customer_qrcode/presentation/screens/widgets/entry_qrcode_gym_screen_body.dart';
 
 class EntryQrcodeGymScreen extends StatelessWidget {
@@ -6,6 +9,9 @@ class EntryQrcodeGymScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EntryQrcodeGymScreenBody();
+    return BlocProvider(
+      create: (_) => sl<EntryQrcodeCubit>()..initialize(),
+      child: const EntryQrcodeGymScreenBody(),
+    );
   }
 }

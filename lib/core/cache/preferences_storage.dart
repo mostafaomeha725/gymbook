@@ -61,6 +61,30 @@ class PreferencesStorage {
     await _preferences.remove(PreferencesKeys.userIsAdmin.name);
   }
 
+  Future<void> saveUserSecretKey(String secretKey) async {
+    await _preferences.setString(PreferencesKeys.userSecretKey.name, secretKey);
+  }
+
+  String? getUserSecretKey() {
+    return _preferences.getString(PreferencesKeys.userSecretKey.name);
+  }
+
+  Future<void> deleteUserSecretKey() async {
+    await _preferences.remove(PreferencesKeys.userSecretKey.name);
+  }
+
+  Future<void> saveUserId(int userId) async {
+    await _preferences.setInt(PreferencesKeys.userId.name, userId);
+  }
+
+  int? getUserId() {
+    return _preferences.getInt(PreferencesKeys.userId.name);
+  }
+
+  Future<void> deleteUserId() async {
+    await _preferences.remove(PreferencesKeys.userId.name);
+  }
+
   /// ================= LANGUAGE =================
   String getCurrentLanguage() {
     return _preferences.getString(PreferencesKeys.currentLanguage.name) ?? "en";

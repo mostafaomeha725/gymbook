@@ -6,7 +6,11 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 
 class GovernorateDropdown extends StatefulWidget {
   final String? initialValue;
+  final List<GovernorateDropdownItem> governorates;
+  final bool isLoading;
+  final VoidCallback? onMenuOpen;
   final void Function(String?)? onChanged;
+  final void Function(int?)? onChangedId;
   final String? hintText;
   final String? labelText;
   final Color? borderColor;
@@ -16,7 +20,11 @@ class GovernorateDropdown extends StatefulWidget {
   const GovernorateDropdown({
     super.key,
     this.initialValue,
+    this.governorates = const [],
+    this.isLoading = false,
+    this.onMenuOpen,
     this.onChanged,
+    this.onChangedId,
     this.hintText,
     this.labelText,
     this.borderColor,
@@ -31,41 +39,20 @@ class GovernorateDropdown extends StatefulWidget {
 class _GovernorateDropdownState extends State<GovernorateDropdown> {
   late String? selectedGovernorate;
 
-  final List<String> governorates = [
-    'Cairo',
-    'Alexandria',
-    'Giza',
-    'Qalyubia',
-    'Helwan',
-    'Suez',
-    'Port Said',
-    'Ismalia',
-    'Damietta',
-    'Dakahlia',
-    'Mansoura',
-    'Kafr El-Sheikh',
-    'Gharbia',
-    'Monufia',
-    'Beheira',
-    'Matruh',
-    'North Sinai',
-    'South Sinai',
-    'Fayoum',
-    'Beni Suef',
-    'Minya',
-    'Assiut',
-    'Sohag',
-    'Qena',
-    'Luxor',
-    'Aswan',
-    'New Valley',
-    'Red Sea',
-  ];
-
   @override
   void initState() {
     super.initState();
     selectedGovernorate = widget.initialValue;
+  }
+
+  int? _selectedGovernorateId() {
+    if (selectedGovernorate == null) return null;
+    for (final governorate in widget.governorates) {
+      if (governorate.name == selectedGovernorate) {
+        return governorate.id;
+      }
+    }
+    return null;
   }
 
   @override
@@ -83,24 +70,34 @@ class _GovernorateDropdownState extends State<GovernorateDropdown> {
         DropdownButtonHideUnderline(
           child: DropdownButton2<String>(
             isExpanded: true,
+            onMenuStateChange: (isOpen) {
+              if (isOpen) {
+                widget.onMenuOpen?.call();
+              }
+            },
             hint: AppText(
-              widget.hintText ?? 'Choose governorate',
+              widget.isLoading
+                  ? 'Loading governorates...'
+                  : widget.hintText ?? 'Choose governorate',
               alignment: AlignmentDirectional.centerStart,
               style: font14w500.copyWith(color: const Color(0xff9CA3AF)),
             ),
             value: selectedGovernorate,
-            onChanged: (String? value) {
-              setState(() {
-                selectedGovernorate = value;
-              });
-              widget.onChanged?.call(value);
-            },
-            items: governorates
+            onChanged: widget.isLoading
+                ? null
+                : (String? value) {
+                    setState(() {
+                      selectedGovernorate = value;
+                    });
+                    widget.onChanged?.call(value);
+                    widget.onChangedId?.call(_selectedGovernorateId());
+                  },
+            items: widget.governorates
                 .map(
                   (item) => DropdownMenuItem<String>(
-                    value: item,
+                    value: item.name,
                     child: AppText(
-                      item,
+                      item.name,
                       style: font14w500,
                       alignment: AlignmentDirectional.centerStart,
                     ),
@@ -142,4 +139,11 @@ class _GovernorateDropdownState extends State<GovernorateDropdown> {
       ],
     );
   }
+}
+
+class GovernorateDropdownItem {
+  final int id;
+  final String name;
+
+  const GovernorateDropdownItem({required this.id, required this.name});
 }

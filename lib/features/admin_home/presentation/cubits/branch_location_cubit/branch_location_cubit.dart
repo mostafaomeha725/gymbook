@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:gymbook/core/constants/strings.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/update_branch_location_usecase.dart';
 
@@ -11,14 +10,9 @@ class BranchLocationCubit extends Cubit<BranchLocationState> {
 
   final UpdateBranchLocationUseCase updateBranchLocationUseCase;
 
-  int? getGovernorateId(String? governorateName) {
-    if (governorateName == null) return null;
-    return AppStrings.governorateIds[governorateName];
-  }
-
   Future<bool> submitLocationDetails({
     required int branchId,
-    required String? governorateName,
+    required int? governorateId,
     required String address,
     required double? latitude,
     required double? longitude,
@@ -30,7 +24,6 @@ class BranchLocationCubit extends Cubit<BranchLocationState> {
       return false;
     }
 
-    final governorateId = getGovernorateId(governorateName);
     if (governorateId == null) {
       const message = 'Please select a governorate';
       showError(message);

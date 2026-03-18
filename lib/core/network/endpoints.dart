@@ -21,6 +21,7 @@ class EndPoints {
 
   /// Profile endpoints
   static const String profile = 'profile';
+  static const String getCurrentUser = 'Users/me';
 
   /// Owner endpoints
   static const String createBranch = 'Owner/Branches';
@@ -91,4 +92,8 @@ class EndPoints {
   static const String getMySubscriptions = 'users/me/subscriptions';
 
   static const String getNearbyBranches = 'Branches/public';
+
+  static const String getGovernorates = 'Governorates';
+
+  static const String addCheckIn = 'CheckIns';
 }

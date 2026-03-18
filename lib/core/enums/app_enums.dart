@@ -19,6 +19,8 @@ enum PreferencesKeys {
   phone,
   userToken,
   userIsAdmin,
+  userSecretKey,
+  userId,
 }
 
 enum AppUserRole { customer, admin }
