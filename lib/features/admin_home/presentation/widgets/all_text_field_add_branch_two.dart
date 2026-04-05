@@ -10,16 +10,25 @@ import 'package:gymbook/core/widgets/custom_snack_bar.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/governorate_dropdown.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_setup_details_entity.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/governorates_cubit/governorates_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/governorates_cubit/governorates_state.dart';
 import 'package:gymbook/features/auth/presentation/widgets/location_on_map_card.dart';
 
+part 'all_text_field_add_branch_two_actions.dart';
+
 class AllTextFieldAddBranchTwo extends StatefulWidget {
   final int branchId;
   final BranchScreenArgs? args;
+  final BranchSetupDetailsEntity? setupDetails;
 
-  const AllTextFieldAddBranchTwo({super.key, this.branchId = 0, this.args});
+  const AllTextFieldAddBranchTwo({
+    super.key,
+    this.branchId = 0,
+    this.args,
+    this.setupDetails,
+  });
 
   @override
   State<AllTextFieldAddBranchTwo> createState() =>
@@ -36,11 +45,22 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
   @override
   void initState() {
     super.initState();
-    final branch = widget.args?.branch;
-    if (branch != null) {
-      addresscontroller.text = branch.address ?? '';
-      selectedGovernorate = branch.governorate?.name;
-      selectedGovernorateId = branch.governorate?.id;
+    _applyFromBranchArgs();
+
+    final setupDetails = widget.setupDetails;
+    if (setupDetails != null) {
+      _applyFromSetupDetails(setupDetails);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AllTextFieldAddBranchTwo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.setupDetails != widget.setupDetails &&
+        widget.setupDetails != null) {
+      _applyFromSetupDetails(widget.setupDetails!);
+      setState(() {});
     }
   }
 
@@ -48,27 +68,6 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
   void dispose() {
     addresscontroller.dispose();
     super.dispose();
-  }
-
-  void _submit() {
-    context.read<BranchLocationCubit>().submitLocationDetails(
-      branchId: widget.branchId,
-      governorateId: selectedGovernorateId,
-      address: addresscontroller.text,
-      latitude: selectedLatitude,
-      longitude: selectedLongitude,
-    );
-  }
-
-  List<GovernorateDropdownItem> _governorateItemsFromState(
-    GovernoratesState state,
-  ) {
-    if (state is GovernoratesLoaded) {
-      return state.governorates
-          .map((item) => GovernorateDropdownItem(id: item.id, name: item.name))
-          .toList();
-    }
-    return const [];
   }
 
   @override
@@ -117,6 +116,9 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
             SizedBox(height: 16.h),
             LocationOnMapCard(
               borderColor: const Color(0xff0EA5E9),
+              initialLatitude: selectedLatitude,
+              initialLongitude: selectedLongitude,
+              initialAddress: addresscontroller.text.trim(),
               onAddressSelected: (address) {
                 addresscontroller.text = address;
               },

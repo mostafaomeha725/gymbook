@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/core/di/services_locator.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/add_branch_three_screen_body.dart';
 
@@ -16,8 +17,20 @@ class AddBranchThreeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<BranchWorkingHoursCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => sl<BranchWorkingHoursCubit>()),
+        BlocProvider(
+          create: (_) {
+            final cubit = sl<BranchSetupCubit>();
+            cubit.setEditModeData(isEdit: isEditMode);
+            if (isEditMode && branchId > 0) {
+              cubit.fetchBranchDetails(branchId);
+            }
+            return cubit;
+          },
+        ),
+      ],
       child: Scaffold(
         body: AddBranchThreeScreenBody(
           branchId: branchId,

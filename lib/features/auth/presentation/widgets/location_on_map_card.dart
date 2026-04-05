@@ -12,12 +12,18 @@ class LocationOnMapCard extends StatefulWidget {
   final Color? borderColor;
   final void Function(String address)? onAddressSelected;
   final void Function(double latitude, double longitude)? onLocationSelected;
+  final double? initialLatitude;
+  final double? initialLongitude;
+  final String? initialAddress;
 
   const LocationOnMapCard({
     super.key,
     this.borderColor,
     this.onAddressSelected,
     this.onLocationSelected,
+    this.initialLatitude,
+    this.initialLongitude,
+    this.initialAddress,
   });
 
   @override
@@ -28,6 +34,17 @@ class _LocationOnMapCardState extends State<LocationOnMapCard> {
   LatLng? _selectedLocation;
   String? _address; // متغير جديد لحفظ العنوان
   bool _isFetchingAddress = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialLatitude = widget.initialLatitude;
+    final initialLongitude = widget.initialLongitude;
+    if (initialLatitude != null && initialLongitude != null) {
+      _selectedLocation = LatLng(initialLatitude, initialLongitude);
+      _address = widget.initialAddress;
+    }
+  }
 
   Future<void> _openMapPicker() async {
     final result = await Navigator.push(

@@ -21,6 +21,26 @@ class TimePickerField extends StatefulWidget {
 }
 
 class _TimePickerFieldState extends State<TimePickerField> {
+  TimeOfDay _parseControllerTime(String value) {
+    final parts = value.split(':');
+    if (parts.length < 2) {
+      return TimeOfDay.now();
+    }
+
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+
+    if (hour == null || minute == null) {
+      return TimeOfDay.now();
+    }
+
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      return TimeOfDay.now();
+    }
+
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
   String _formatToApiTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
@@ -28,9 +48,12 @@ class _TimePickerFieldState extends State<TimePickerField> {
   }
 
   Future<void> _selectTime() async {
+    final currentValue = widget.controller.text.trim();
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: currentValue.isEmpty
+          ? TimeOfDay.now()
+          : _parseControllerTime(currentValue),
     );
 
     if (picked != null) {

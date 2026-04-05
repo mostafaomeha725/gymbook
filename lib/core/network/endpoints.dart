@@ -43,6 +43,9 @@ class EndPoints {
 
   static String getBranchDetails(int branchId) => 'Branches/$branchId';
 
+  static String getBranchSetupDetails(int branchId) =>
+      'Owner/Branches/$branchId/setup-details';
+
   static String createPackage(int branchId) =>
       'Owner/Branches/$branchId/packages';
 
@@ -60,6 +63,9 @@ class EndPoints {
 
   static String addBranchImage(int branchId) =>
       'Owner/Branches/$branchId/images';
+
+  static String activateBranchImages(int branchId) =>
+      'Owner/Branches/$branchId/images/activate';
 
   static String updateBranchImage(int branchId, int imageId) =>
       'Owner/Branches/$branchId/images/$imageId';

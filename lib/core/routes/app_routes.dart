@@ -213,17 +213,24 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.addBranchFourScreen,
         builder: (context, state) {
+          final args = state.extra as BranchScreenArgs?;
           final branchId =
-              int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0;
+              args?.branchId ??
+              (int.tryParse(state.uri.queryParameters['branchId'] ?? '') ?? 0);
           final isEditMode =
-              state.uri.queryParameters['isEditMode']?.toLowerCase() == 'true';
-          final imageId = int.tryParse(
-            state.uri.queryParameters['imageId'] ?? '',
-          );
+              args?.isEditMode ??
+              (state.uri.queryParameters['isEditMode']?.toLowerCase() ==
+                  'true');
+          final imageId =
+              args?.branch?.logoImageId ??
+              int.tryParse(state.uri.queryParameters['imageId'] ?? '');
+          final logoUrl =
+              args?.branch?.logo ?? state.uri.queryParameters['logoUrl'];
           return AddBranchFourScreen(
             branchId: branchId,
             isEditMode: isEditMode,
             imageId: imageId,
+            logoUrl: logoUrl,
           );
         },
       ),

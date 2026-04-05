@@ -67,7 +67,12 @@ class EditBranchDetailsScreenBody extends StatelessWidget {
         title: 'Edit Photos',
         subtitle: 'Update branch gallery and images',
         onTap: () => GoRouter.of(context).push(
-          '${Routes.addBranchFourScreen}?branchId=${branch.id}&isEditMode=true&imageId=${branch.logoImageId ?? ''}',
+          Routes.addBranchFourScreen,
+          extra: BranchScreenArgs(
+            branchId: branch.id,
+            isEditMode: true,
+            branch: branch,
+          ),
         ),
       ),
     ];

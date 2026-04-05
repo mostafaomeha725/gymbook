@@ -4,10 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
+import 'package:gymbook/features/admin_home/data/datasources/branch_remote_image_api.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_details_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_setup_details_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_statistics_model.dart';
 import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
+import 'package:gymbook/features/admin_home/data/models/uploaded_branch_image_model.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_statistics_entity.dart';
 
 abstract class BranchRemoteDataSource {
@@ -52,15 +55,24 @@ abstract class BranchRemoteDataSource {
 
   Future<BranchDetailsResponse> getBranchDetails(int branchId);
 
-  Future<String> uploadBranchImage({
+  Future<BranchSetupDetailsResponse> getBranchSetupDetails(int branchId);
+
+  Future<UploadedBranchImageModel> uploadBranchImage({
     required int branchId,
     required File imageFile,
+    int? imageType,
+    int? displayOrder,
   });
 
-  Future<String> updateBranchImage({
+  Future<UploadedBranchImageModel> updateBranchImage({
     required int branchId,
     required int imageId,
     required File imageFile,
+  });
+
+  Future<void> activateBranchImages({
+    required int branchId,
+    required List<int> imageIds,
   });
 
   Future<BranchStatisticsModel> getBranchStatistics({
@@ -71,8 +83,11 @@ abstract class BranchRemoteDataSource {
 
 class BranchRemoteDataSourceImpl implements BranchRemoteDataSource {
   final NetworkService networkService;
+  late final BranchRemoteImageApi _imageApi;
 
-  BranchRemoteDataSourceImpl(this.networkService);
+  BranchRemoteDataSourceImpl(this.networkService) {
+    _imageApi = BranchRemoteImageApi(networkService);
+  }
 
   @override
   Future<CreateBranchResponse> createBranch({
@@ -195,70 +210,54 @@ class BranchRemoteDataSourceImpl implements BranchRemoteDataSource {
   }
 
   @override
-  Future<String> uploadBranchImage({
-    required int branchId,
-    required File imageFile,
-  }) async {
-    final fileName = imageFile.path.split(Platform.pathSeparator).last;
-    final formData = FormData.fromMap({
-      'ImageFile': await MultipartFile.fromFile(
-        imageFile.path,
-        filename: fileName,
-      ),
-    });
-    final response = await networkService.uploadFile(
-      endPoint: EndPoints.addBranchImage(branchId),
-      formData: formData,
+  Future<BranchSetupDetailsResponse> getBranchSetupDetails(int branchId) async {
+    final response = await networkService.getData(
+      endPoint: EndPoints.getBranchSetupDetails(branchId),
     );
-    return response.fold((failure) => throw ServerException(failure.message), (
-      data,
-    ) {
-      if (data is Map<String, dynamic>) {
-        return (data['imageUrl'] ?? '').toString();
-      }
-      return '';
-    });
+    return response.fold(
+      (failure) => throw ServerException(failure.message),
+      (data) =>
+          BranchSetupDetailsResponse.fromJson(data as Map<String, dynamic>),
+    );
   }
 
   @override
-  Future<String> updateBranchImage({
+  Future<UploadedBranchImageModel> uploadBranchImage({
+    required int branchId,
+    required File imageFile,
+    int? imageType,
+    int? displayOrder,
+  }) async {
+    return _imageApi.uploadBranchImage(
+      branchId: branchId,
+      imageFile: imageFile,
+      imageType: imageType,
+      displayOrder: displayOrder,
+    );
+  }
+
+  @override
+  Future<UploadedBranchImageModel> updateBranchImage({
     required int branchId,
     required int imageId,
     required File imageFile,
   }) async {
-    final fileName = imageFile.path.split(Platform.pathSeparator).last;
-    final formData = FormData.fromMap({
-      'ImageFile': await MultipartFile.fromFile(
-        imageFile.path,
-        filename: fileName,
-      ),
-    });
-    try {
-      final response = await networkService.dio.patch(
-        EndPoints.updateBranchImage(branchId, imageId),
-        data: formData,
-      );
-      if (response.statusCode != null &&
-          response.statusCode! >= 200 &&
-          response.statusCode! <= 299) {
-        final data = response.data;
-        if (data is Map<String, dynamic>) {
-          return (data['imageUrl'] ?? '').toString();
-        }
-        return '';
-      }
-      final data = response.data;
-      if (data is Map<String, dynamic> && data['message'] != null) {
-        throw ServerException(data['message'].toString());
-      }
-      throw ServerException('Error ${response.statusCode}');
-    } on DioException catch (error) {
-      final handled = networkService.handleDioExceoptions(error);
-      return handled.fold(
-        (failure) => throw ServerException(failure.message),
-        (_) => throw ServerException(error.message ?? 'Request failed'),
-      );
-    }
+    return _imageApi.updateBranchImage(
+      branchId: branchId,
+      imageId: imageId,
+      imageFile: imageFile,
+    );
+  }
+
+  @override
+  Future<void> activateBranchImages({
+    required int branchId,
+    required List<int> imageIds,
+  }) async {
+    await _imageApi.activateBranchImages(
+      branchId: branchId,
+      imageIds: imageIds,
+    );
   }
 
   @override

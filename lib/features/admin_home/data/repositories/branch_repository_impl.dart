@@ -6,13 +6,17 @@ import 'package:gymbook/core/error/failure.dart';
 import 'package:gymbook/features/admin_home/data/datasources/branch_remote_datasource.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_details_model.dart';
 import 'package:gymbook/features/admin_home/data/models/branch_list_model.dart';
+import 'package:gymbook/features/admin_home/data/models/branch_setup_details_model.dart';
 import 'package:gymbook/features/admin_home/data/models/create_branch_model.dart';
+import 'package:gymbook/features/admin_home/data/models/uploaded_branch_image_model.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_list_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/branch_setup_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_statistics_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/created_branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/governorate_entity.dart';
+import 'package:gymbook/features/admin_home/domain/entities/uploaded_branch_image_entity.dart';
 import 'package:gymbook/features/admin_home/domain/repositories/branch_repository.dart';
 
 class BranchRepositoryImpl implements BranchRepository {
@@ -147,34 +151,66 @@ class BranchRepositoryImpl implements BranchRepository {
   }
 
   @override
-  Future<Either<Failure, String>> uploadBranchImage({
-    required int branchId,
-    required File imageFile,
-  }) async {
+  Future<Either<Failure, BranchSetupDetailsEntity>> getBranchSetupDetails(
+    int branchId,
+  ) async {
     try {
-      final url = await remoteDataSource.uploadBranchImage(
-        branchId: branchId,
-        imageFile: imageFile,
-      );
-      return Right(url);
+      final model = await remoteDataSource.getBranchSetupDetails(branchId);
+      return Right(_mapBranchSetupDetails(model));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }
   }
 
   @override
-  Future<Either<Failure, String>> updateBranchImage({
+  Future<Either<Failure, UploadedBranchImageEntity>> uploadBranchImage({
+    required int branchId,
+    required File imageFile,
+    int? imageType,
+    int? displayOrder,
+  }) async {
+    try {
+      final model = await remoteDataSource.uploadBranchImage(
+        branchId: branchId,
+        imageFile: imageFile,
+        imageType: imageType,
+        displayOrder: displayOrder,
+      );
+      return Right(_mapUploadedImage(model));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UploadedBranchImageEntity>> updateBranchImage({
     required int branchId,
     required int imageId,
     required File imageFile,
   }) async {
     try {
-      final url = await remoteDataSource.updateBranchImage(
+      final model = await remoteDataSource.updateBranchImage(
         branchId: branchId,
         imageId: imageId,
         imageFile: imageFile,
       );
-      return Right(url);
+      return Right(_mapUploadedImage(model));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> activateBranchImages({
+    required int branchId,
+    required List<int> imageIds,
+  }) async {
+    try {
+      await remoteDataSource.activateBranchImages(
+        branchId: branchId,
+        imageIds: imageIds,
+      );
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }
@@ -267,5 +303,55 @@ class BranchRepositoryImpl implements BranchRepository {
       activePackagesCount: m.activePackagesCount,
       activeSubscriptionsCount: m.activeSubscriptionsCount,
     );
+  }
+
+  BranchSetupDetailsEntity _mapBranchSetupDetails(
+    BranchSetupDetailsResponse model,
+  ) {
+    return BranchSetupDetailsEntity(
+      businessDetails: BranchSetupBusinessDetailsEntity(
+        name: model.businessDetails.name,
+        email: model.businessDetails.email,
+        phoneNumber: model.businessDetails.phoneNumber,
+        branchType: model.businessDetails.branchType,
+      ),
+      location: BranchSetupLocationEntity(
+        governorate: model.location.governorate == null
+            ? null
+            : BranchSetupGovernorateEntity(
+                id: model.location.governorate!.id,
+                name: model.location.governorate!.name,
+              ),
+        address: model.location.address,
+        coordinates: BranchSetupCoordinatesEntity(
+          latitude: model.location.coordinates.latitude,
+          longitude: model.location.coordinates.longitude,
+        ),
+      ),
+      workingHours: model.workingHours
+          .map(
+            (item) => BranchSetupWorkingHourEntity(
+              day: item.day,
+              openTime: item.openTime,
+              closeTime: item.closeTime,
+              isClosed: item.isClosed,
+            ),
+          )
+          .toList(),
+      images: model.images
+          .map(
+            (item) => BranchSetupImageEntity(
+              id: item.id,
+              type: item.type,
+              url: item.url,
+              displayOrder: item.displayOrder,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  UploadedBranchImageEntity _mapUploadedImage(UploadedBranchImageModel model) {
+    return model.toEntity();
   }
 }

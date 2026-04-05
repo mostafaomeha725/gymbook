@@ -15,6 +15,7 @@ import 'package:gymbook/features/admin_home/domain/repositories/governorates_rep
 import 'package:gymbook/features/admin_home/domain/repositories/package_repository.dart';
 import 'package:gymbook/features/admin_home/domain/repositories/subscription_repository.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/add_member_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/activate_branch_images_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/add_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/cancel_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/freeze_subscription_usecase.dart';
@@ -27,6 +28,7 @@ import 'package:gymbook/features/admin_home/domain/usecases/delete_package_useca
 import 'package:gymbook/features/admin_home/domain/usecases/edit_branch_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_details_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_packages_usecase.dart';
+import 'package:gymbook/features/admin_home/domain/usecases/get_branch_setup_details_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branch_statistics_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/get_branches_usecase.dart';
 import 'package:gymbook/features/admin_home/domain/usecases/update_branch_location_usecase.dart';
@@ -38,7 +40,9 @@ import 'package:gymbook/features/admin_home/domain/usecases/upload_branch_image_
 import 'package:gymbook/features/admin_home/domain/usecases/unfreeze_subscription_usecase.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/add_member_cubit/add_member_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/add_subscription_cubit/add_subscription_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_images_cubit/branch_images_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_subscriptions_list_cubit/branch_subscriptions_list_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/cancel_subscription_cubit/cancel_subscription_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/freeze_subscription_cubit/freeze_subscription_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/governorates_cubit/governorates_cubit.dart';
@@ -281,6 +285,9 @@ class ServiceLocator {
     if (!sl.isRegistered<GetBranchDetailsUseCase>()) {
       sl.registerLazySingleton(() => GetBranchDetailsUseCase(sl()));
     }
+    if (!sl.isRegistered<GetBranchSetupDetailsUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchSetupDetailsUseCase(sl()));
+    }
     if (!sl.isRegistered<UpdateWorkingHoursUseCase>()) {
       sl.registerLazySingleton(() => UpdateWorkingHoursUseCase(sl()));
     }
@@ -307,6 +314,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<UploadBranchImageUseCase>()) {
       sl.registerLazySingleton(() => UploadBranchImageUseCase(sl()));
+    }
+    if (!sl.isRegistered<ActivateBranchImagesUseCase>()) {
+      sl.registerLazySingleton(() => ActivateBranchImagesUseCase(sl()));
     }
     if (!sl.isRegistered<GetBranchStatisticsUseCase>()) {
       sl.registerLazySingleton(() => GetBranchStatisticsUseCase(sl()));
@@ -363,6 +373,17 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<BranchDetailsCubit>()) {
       sl.registerFactory(() => BranchDetailsCubit(sl()));
+    }
+    if (!sl.isRegistered<BranchSetupCubit>()) {
+      sl.registerFactory(() => BranchSetupCubit(sl()));
+    }
+    if (!sl.isRegistered<BranchImagesCubit>()) {
+      sl.registerFactory(
+        () => BranchImagesCubit(
+          uploadBranchImageUseCase: sl(),
+          activateBranchImagesUseCase: sl(),
+        ),
+      );
     }
     if (!sl.isRegistered<BranchStatisticsCubit>()) {
       sl.registerFactory(() => BranchStatisticsCubit(sl()));
