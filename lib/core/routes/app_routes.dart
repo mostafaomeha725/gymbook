@@ -21,6 +21,8 @@ import 'package:gymbook/features/auth/presentation/screens/join_us_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/login_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/register_screen.dart';
+import 'package:gymbook/features/auth/presentation/screens/forget_password_screen.dart';
+import 'package:gymbook/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/screens/subscriptions_details_screen.dart';
 import 'package:gymbook/features/customer_home/presentation/screens/full_image_viewer_screen.dart';
@@ -59,6 +61,8 @@ GoRouter createRouter() {
 
       if (isLoggedIn &&
           (state.matchedLocation == Routes.loginScreen ||
+              state.matchedLocation == Routes.forgetPasswordScreen ||
+              state.matchedLocation == Routes.resetPasswordScreen ||
               state.matchedLocation == Routes.registerScreen ||
               state.matchedLocation == Routes.joinusScreen)) {
         return Routes.mainNavigationScreen;
@@ -66,6 +70,8 @@ GoRouter createRouter() {
 
       if (!isLoggedIn &&
           state.matchedLocation != Routes.loginScreen &&
+          state.matchedLocation != Routes.forgetPasswordScreen &&
+          state.matchedLocation != Routes.resetPasswordScreen &&
           state.matchedLocation != Routes.registerScreen &&
           state.matchedLocation != Routes.joinusScreen &&
           state.matchedLocation != Routes.otpScreen) {
@@ -88,6 +94,20 @@ GoRouter createRouter() {
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
+        path: Routes.forgetPasswordScreen,
+        builder: (context, state) => const ForgetPasswordScreen(),
+      ),
+      GoRoute(
+        path: Routes.resetPasswordScreen,
+        builder: (context, state) {
+          final args = state.extra is ResetPasswordScreenArgs
+              ? state.extra as ResetPasswordScreenArgs
+              : const ResetPasswordScreenArgs(email: '', code: '');
+
+          return ResetPasswordScreen(args: args);
+        },
+      ),
+      GoRoute(
         path: Routes.registerScreen,
         builder: (context, state) {
           final type = state.extra as RegisterType;
@@ -98,11 +118,17 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.otpScreen,
         builder: (context, state) {
-          final source = state.extra as OtpSource;
+          final extra = state.extra;
+          final OtpScreenArgs args = extra is OtpScreenArgs
+              ? extra
+              : OtpScreenArgs(
+                  source: extra is OtpSource ? extra : OtpSource.customer,
+                );
 
           return OtpScreen(
-            totalSteps: source == OtpSource.customer ? 2 : 3,
-            source: source,
+            totalSteps: args.source == OtpSource.customer ? 2 : 3,
+            source: args.source,
+            email: args.email,
           );
         },
       ),

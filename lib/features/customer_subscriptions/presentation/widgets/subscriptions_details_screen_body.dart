@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/constants/app_assets.dart';
-import 'package:gymbook/core/network/endpoints.dart';
-import 'package:gymbook/core/network/network_service.dart';
-import 'package:gymbook/features/customer_subscriptions/data/models/customer_subscription_details_model.dart';
+import 'package:gymbook/features/customer_subscriptions/domain/entities/customer_subscription_details_entity.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/cubits/customer_subscription_details_cubit/customer_subscription_details_cubit.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/cubits/customer_subscription_details_cubit/customer_subscription_details_state.dart';
 import 'package:gymbook/features/customer_subscriptions/presentation/screens/subscriptions_details_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -26,30 +27,23 @@ class SubscriptionsDetailsScreenBody extends StatefulWidget {
 
 class _SubscriptionsDetailsScreenBodyState
     extends State<SubscriptionsDetailsScreenBody> {
-  late Future<CustomerSubscriptionDetailsModel> _detailsFuture;
+  late final CustomerSubscriptionDetailsCubit _detailsCubit;
   int? _statusOverride;
 
   @override
   void initState() {
     super.initState();
-    _detailsFuture = _loadDetails();
+    _detailsCubit = sl<CustomerSubscriptionDetailsCubit>()
+      ..loadDetails(subscriptionId: widget.args.subscriptionId);
   }
 
-  Future<CustomerSubscriptionDetailsModel> _loadDetails() async {
-    final networkService = sl<NetworkService>();
-    final response = await networkService.getData(
-      endPoint: EndPoints.getMySubscriptionDetails(widget.args.subscriptionId),
-    );
-
-    return response.fold(
-      (failure) => throw Exception(failure.message),
-      (data) => CustomerSubscriptionDetailsModel.fromJson(
-        data as Map<String, dynamic>,
-      ),
-    );
+  @override
+  void dispose() {
+    _detailsCubit.close();
+    super.dispose();
   }
 
-  bool _hasValidCoordinates(CustomerSubscriptionDetailsModel details) {
+  bool _hasValidCoordinates(CustomerSubscriptionDetailsEntity details) {
     if (details.latitude == null || details.longitude == null) return false;
     final latitude = details.latitude!;
     final longitude = details.longitude!;
@@ -60,7 +54,9 @@ class _SubscriptionsDetailsScreenBodyState
         longitude <= 180;
   }
 
-  Future<void> _openGoogleMaps(CustomerSubscriptionDetailsModel details) async {
+  Future<void> _openGoogleMaps(
+    CustomerSubscriptionDetailsEntity details,
+  ) async {
     if (!_hasValidCoordinates(details)) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,91 +89,103 @@ class _SubscriptionsDetailsScreenBodyState
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<CustomerSubscriptionDetailsModel>(
-      future: _detailsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return BlocProvider.value(
+      value: _detailsCubit,
+      child:
+          BlocBuilder<
+            CustomerSubscriptionDetailsCubit,
+            CustomerSubscriptionDetailsState
+          >(
+            builder: (context, state) {
+              if (state is CustomerSubscriptionDetailsLoading ||
+                  state is CustomerSubscriptionDetailsInitial) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-        if (snapshot.hasError) {
-          return Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    snapshot.error.toString().replaceFirst('Exception: ', ''),
-                    textAlign: TextAlign.center,
+              if (state is CustomerSubscriptionDetailsFailure) {
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(state.message, textAlign: TextAlign.center),
+                        SizedBox(height: 12.h),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _statusOverride = null;
+                            });
+                            context
+                                .read<CustomerSubscriptionDetailsCubit>()
+                                .loadDetails(
+                                  subscriptionId: widget.args.subscriptionId,
+                                );
+                          },
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 12.h),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _statusOverride = null;
-                        _detailsFuture = _loadDetails();
-                      });
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
+                );
+              }
 
-        final details = snapshot.data;
-        if (details == null) {
-          return const SizedBox.shrink();
-        }
+              if (state is! CustomerSubscriptionDetailsSuccess) {
+                return const SizedBox.shrink();
+              }
 
-        final images = details.images
-            .map((item) => item.url)
-            .where((url) => url.trim().isNotEmpty)
-            .toList();
-        final displayImages = images.isEmpty
-            ? <String>[Assets.gym3, Assets.gym2, Assets.gym3]
-            : images;
+              final details = state.details;
 
-        final currentStatus = _statusOverride ?? details.subscriptionStatus;
+              final images = details.images
+                  .map((item) => item.url)
+                  .where((url) => url.trim().isNotEmpty)
+                  .toList();
+              final displayImages = images.isEmpty
+                  ? <String>[Assets.gym3, Assets.gym2, Assets.gym3]
+                  : images;
 
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              ImageGymDetails(images: displayImages),
-              SizedBox(height: 16.h),
-              SubscriptionsInfoCard(
-                gymName: details.branchName,
-                address: details.address,
-                status: currentStatus,
-                onViewOnMapTap: () => _openGoogleMaps(details),
-              ),
-              SizedBox(height: 16.h),
-              SubscriptionsDetailsInfoCard(
-                subscriptionId: details.subscriptionId,
-                status: currentStatus,
-                packageName: details.packageName,
-                price: details.price,
-                activationDate: details.activationDate,
-                endDate: details.endDate,
-                checkInsCount: details.checkInsCount,
-                durationInDays: details.durationInDays,
-                onStatusChanged: (newStatus) {
-                  setState(() {
-                    _statusOverride = newStatus;
-                  });
-                },
-              ),
-              SizedBox(height: 16.h),
-              const AttendanceHistoryCard(),
-              SizedBox(height: 16.h),
-              const RatingCard(),
-              SizedBox(height: 64.h),
-            ],
+              final currentStatus =
+                  _statusOverride ?? details.subscriptionStatus;
+
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ImageGymDetails(images: displayImages),
+                    SizedBox(height: 16.h),
+                    SubscriptionsInfoCard(
+                      gymName: details.branchName,
+                      address: details.address,
+                      status: currentStatus,
+                      onViewOnMapTap: () => _openGoogleMaps(details),
+                    ),
+                    SizedBox(height: 16.h),
+                    SubscriptionsDetailsInfoCard(
+                      subscriptionId: details.subscriptionId,
+                      status: currentStatus,
+                      packageName: details.packageName,
+                      price: details.price,
+                      activationDate: details.activationDate,
+                      endDate: details.endDate,
+                      checkInsCount: details.checkInsCount,
+                      durationInDays: details.durationInDays,
+                      onStatusChanged: (newStatus) {
+                        setState(() {
+                          _statusOverride = newStatus;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 16.h),
+                    AttendanceHistoryCard(
+                      subscriptionId: details.subscriptionId,
+                    ),
+                    SizedBox(height: 16.h),
+                    const RatingCard(),
+                    SizedBox(height: 64.h),
+                  ],
+                ),
+              );
+            },
           ),
-        );
-      },
     );
   }
 }

@@ -1,6 +1,8 @@
 class Routes {
   static const joinusScreen = '/join';
   static const loginScreen = '/login';
+  static const forgetPasswordScreen = '/forget-password';
+  static const resetPasswordScreen = '/reset-password';
   static const registerScreen = '/register';
   static const registerCustomerScreen = '/registercustomer';
   static const registerBussinessScreen = '/registerbussiness';

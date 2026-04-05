@@ -6,6 +6,7 @@ import 'package:gymbook/core/constants/app_assets.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
+import 'package:gymbook/core/utils/validators.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
@@ -98,11 +99,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                 },
                 validator: (value) {
                   if (!_formSubmitted) return null;
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter your email';
-                  }
-
-                  return null;
+                  return Validators.email(
+                    value,
+                    invalidMessage: 'Please enter a valid email',
+                  );
                 },
               ),
               SizedBox(height: 16.h),
@@ -131,11 +131,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                       setState(() => obscurePassword = !obscurePassword),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-
-                  return null;
+                  return Validators.password(value);
                 },
               ),
               SizedBox(height: 24.h),
@@ -158,10 +154,14 @@ class _LoginWidgetState extends State<LoginWidget> {
                 ),
               ),
               SizedBox(height: 18.h),
-              AppText(
-                'Forgot Password?',
-                alignment: AlignmentDirectional.center,
-                style: font14w500.copyWith(color: const Color(0xff0EA5E9)),
+              GestureDetector(
+                onTap: () =>
+                    GoRouter.of(context).push(Routes.forgetPasswordScreen),
+                child: AppText(
+                  'Forgot Password?',
+                  alignment: AlignmentDirectional.center,
+                  style: font14w500.copyWith(color: const Color(0xff0EA5E9)),
+                ),
               ),
               SizedBox(height: 24.h),
               const DividerWidget(),

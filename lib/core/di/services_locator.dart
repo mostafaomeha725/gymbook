@@ -56,9 +56,17 @@ import 'package:gymbook/features/auth/data/repositories/auth_repository_impl.dar
 import 'package:gymbook/features/auth/domain/repositories/auth_repository.dart';
 import 'package:gymbook/features/auth/domain/usecases/login_usecase.dart';
 import 'package:gymbook/features/auth/domain/usecases/login_with_google_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/resend_confirmation_email_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:gymbook/features/auth/domain/usecases/register_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/send_reset_password_email_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/validate_reset_password_code_usecase.dart';
+import 'package:gymbook/features/auth/presentation/cubits/forget_password_cubit/forget_password_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/resend_confirmation_email_cubit/resend_confirmation_email_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/reset_password_cubit/reset_password_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/validate_reset_password_code_cubit/validate_reset_password_code_cubit.dart';
 import 'package:gymbook/features/admin_scanner_qrcode/data/datasources/admin_me_remote_datasource.dart';
 import 'package:gymbook/features/admin_scanner_qrcode/data/datasources/checkin_remote_datasource.dart';
 import 'package:gymbook/features/admin_scanner_qrcode/data/repositories/admin_me_repository_impl.dart';
@@ -74,6 +82,17 @@ import 'package:gymbook/features/customer_home/data/repositories/nearby_branches
 import 'package:gymbook/features/customer_home/domain/repositories/nearby_branches_repository.dart';
 import 'package:gymbook/features/customer_home/domain/usecases/get_nearby_branches_usecase.dart';
 import 'package:gymbook/features/customer_home/presentation/cubits/nearby_branches_cubit/nearby_branches_cubit.dart';
+import 'package:gymbook/features/customer_subscriptions/data/datasources/subscription_attendance_history_remote_datasource.dart';
+import 'package:gymbook/features/customer_subscriptions/data/datasources/customer_subscription_details_remote_datasource.dart';
+import 'package:gymbook/features/customer_subscriptions/data/repositories/customer_subscription_details_repository_impl.dart';
+import 'package:gymbook/features/customer_subscriptions/data/repositories/subscription_attendance_history_repository_impl.dart';
+import 'package:gymbook/features/customer_subscriptions/domain/repositories/customer_subscription_details_repository.dart';
+import 'package:gymbook/features/customer_subscriptions/domain/repositories/subscription_attendance_history_repository.dart';
+import 'package:gymbook/features/customer_subscriptions/domain/usecases/build_attendance_weeks_usecase.dart';
+import 'package:gymbook/features/customer_subscriptions/domain/usecases/get_customer_subscription_details_usecase.dart';
+import 'package:gymbook/features/customer_subscriptions/domain/usecases/get_subscription_attendance_history_usecase.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/cubits/customer_subscription_details_cubit/customer_subscription_details_cubit.dart';
+import 'package:gymbook/features/customer_subscriptions/presentation/cubits/subscription_attendance_history_cubit/subscription_attendance_history_cubit.dart';
 import 'package:gymbook/features/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -89,6 +108,7 @@ class ServiceLocator {
     _initAuth();
     _initAdmin();
     _initCustomerHome();
+    _initCustomerSubscriptions();
     _initCustomerQrCode();
   }
 
@@ -141,6 +161,18 @@ class ServiceLocator {
     if (!sl.isRegistered<RegisterUseCase>()) {
       sl.registerLazySingleton(() => RegisterUseCase(sl()));
     }
+    if (!sl.isRegistered<SendResetPasswordEmailUseCase>()) {
+      sl.registerLazySingleton(() => SendResetPasswordEmailUseCase(sl()));
+    }
+    if (!sl.isRegistered<ValidateResetPasswordCodeUseCase>()) {
+      sl.registerLazySingleton(() => ValidateResetPasswordCodeUseCase(sl()));
+    }
+    if (!sl.isRegistered<ResendConfirmationEmailUseCase>()) {
+      sl.registerLazySingleton(() => ResendConfirmationEmailUseCase(sl()));
+    }
+    if (!sl.isRegistered<ResetPasswordUseCase>()) {
+      sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+    }
 
     // Cubits
     if (!sl.isRegistered<LoginCubit>()) {
@@ -150,6 +182,18 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<RegisterCubit>()) {
       sl.registerFactory(() => RegisterCubit(sl()));
+    }
+    if (!sl.isRegistered<ForgetPasswordCubit>()) {
+      sl.registerFactory(() => ForgetPasswordCubit(sl()));
+    }
+    if (!sl.isRegistered<ValidateResetPasswordCodeCubit>()) {
+      sl.registerFactory(() => ValidateResetPasswordCodeCubit(sl()));
+    }
+    if (!sl.isRegistered<ResendConfirmationEmailCubit>()) {
+      sl.registerFactory(() => ResendConfirmationEmailCubit(sl()));
+    }
+    if (!sl.isRegistered<ResetPasswordCubit>()) {
+      sl.registerFactory(() => ResetPasswordCubit(sl()));
     }
   }
 
@@ -388,6 +432,56 @@ class ServiceLocator {
 
     if (!sl.isRegistered<NearbyBranchesCubit>()) {
       sl.registerFactory(() => NearbyBranchesCubit(sl()));
+    }
+  }
+
+  void _initCustomerSubscriptions() {
+    if (!sl.isRegistered<CustomerSubscriptionDetailsRemoteDataSource>()) {
+      sl.registerLazySingleton<CustomerSubscriptionDetailsRemoteDataSource>(
+        () => CustomerSubscriptionDetailsRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<CustomerSubscriptionDetailsRepository>()) {
+      sl.registerLazySingleton<CustomerSubscriptionDetailsRepository>(
+        () => CustomerSubscriptionDetailsRepositoryImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<GetCustomerSubscriptionDetailsUseCase>()) {
+      sl.registerLazySingleton(
+        () => GetCustomerSubscriptionDetailsUseCase(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<CustomerSubscriptionDetailsCubit>()) {
+      sl.registerFactory(() => CustomerSubscriptionDetailsCubit(sl()));
+    }
+
+    if (!sl.isRegistered<SubscriptionAttendanceHistoryRemoteDataSource>()) {
+      sl.registerLazySingleton<SubscriptionAttendanceHistoryRemoteDataSource>(
+        () => SubscriptionAttendanceHistoryRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<SubscriptionAttendanceHistoryRepository>()) {
+      sl.registerLazySingleton<SubscriptionAttendanceHistoryRepository>(
+        () => SubscriptionAttendanceHistoryRepositoryImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<GetSubscriptionAttendanceHistoryUseCase>()) {
+      sl.registerLazySingleton(
+        () => GetSubscriptionAttendanceHistoryUseCase(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<BuildAttendanceWeeksUseCase>()) {
+      sl.registerLazySingleton(() => const BuildAttendanceWeeksUseCase());
+    }
+
+    if (!sl.isRegistered<SubscriptionAttendanceHistoryCubit>()) {
+      sl.registerFactory(() => SubscriptionAttendanceHistoryCubit(sl(), sl()));
     }
   }
 

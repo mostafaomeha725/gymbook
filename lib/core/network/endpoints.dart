@@ -15,9 +15,16 @@ class EndPoints {
 
   static const String resendOtp = 'auth/receive-otp';
 
-  static const String forgotPassword = 'auth/forgot-password';
+  static const String forgotPassword =
+      'Authentication/send-reset-password-email';
 
-  static const String resetPassword = 'auth/reset-password';
+  static const String validateResetPasswordCode =
+      'Authentication/validate-reset-password-code';
+
+  static const String resendConfirmationEmail =
+      'Authentication/resend-confirmation-email';
+
+  static const String resetPassword = 'Authentication/reset-password';
 
   /// Profile endpoints
   static const String profile = 'profile';
@@ -88,6 +95,9 @@ class EndPoints {
 
   static String getMySubscriptionDetails(int subscriptionId) =>
       'users/me/subscriptions/$subscriptionId';
+
+  static String getSubscriptionAttendanceHistory(int subscriptionId) =>
+      'Subscriptions/$subscriptionId/attendance-history';
 
   static const String getMySubscriptions = 'users/me/subscriptions';
 

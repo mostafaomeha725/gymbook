@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
+import 'package:gymbook/core/utils/validators.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
@@ -65,14 +66,6 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
     }
 
     return normalized;
-  }
-
-  bool _isValidEmail(String value) {
-    return RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(value);
-  }
-
-  bool _isValidPhoneNumber(String value) {
-    return RegExp(r'^\+[1-9]\d{8,14}$').hasMatch(value);
   }
 
   @override
@@ -216,7 +209,7 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
                   return;
                 }
 
-                if (!_isValidEmail(email)) {
+                if (!Validators.isValidSimpleEmail(email)) {
                   showError('Invalid email address format');
                   return;
                 }
@@ -226,7 +219,7 @@ class _AllTextFieldAddBranchOneState extends State<AllTextFieldAddBranchOne> {
                   return;
                 }
 
-                if (!_isValidPhoneNumber(phoneNumber)) {
+                if (!Validators.isValidInternationalPhoneNumber(phoneNumber)) {
                   showError(
                     'Phone number is not valid. Use format like +201012345678',
                   );

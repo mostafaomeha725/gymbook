@@ -1,4 +1,78 @@
 class Validators {
+  static String? requiredField(String? value, {required String fieldLabel}) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter $fieldLabel';
+    }
+    return null;
+  }
+
+  static String? email(
+    String? value, {
+    bool required = true,
+    String emptyMessage = 'Please enter your email',
+    String invalidMessage = 'Please enter a valid email',
+  }) {
+    final email = value?.trim() ?? '';
+
+    if (email.isEmpty) {
+      return required ? emptyMessage : null;
+    }
+
+    if (!isValidEmail(email)) {
+      return invalidMessage;
+    }
+
+    return null;
+  }
+
+  static String? password(
+    String? value, {
+    bool required = true,
+    int minLength = 1,
+    String emptyMessage = 'Please enter your password',
+    String? minLengthMessage,
+  }) {
+    final password = value?.trim() ?? '';
+
+    if (password.isEmpty) {
+      return required ? emptyMessage : null;
+    }
+
+    if (password.length < minLength) {
+      return minLengthMessage ??
+          'Password must be at least $minLength characters';
+    }
+
+    return null;
+  }
+
+  static String? confirmPassword(
+    String? value, {
+    required String originalPassword,
+    String emptyMessage = 'Please confirm your password',
+    String mismatchMessage = 'Passwords do not match',
+  }) {
+    final confirmPassword = value?.trim() ?? '';
+
+    if (confirmPassword.isEmpty) {
+      return emptyMessage;
+    }
+
+    if (confirmPassword != originalPassword.trim()) {
+      return mismatchMessage;
+    }
+
+    return null;
+  }
+
+  static bool isValidSimpleEmail(String value) {
+    return RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(value);
+  }
+
+  static bool isValidInternationalPhoneNumber(String value) {
+    return RegExp(r'^\+[1-9]\d{8,14}$').hasMatch(value);
+  }
+
   static bool isValidEmail(String email) {
     return RegExp(
       r'^[a-zA-Z]\w*([_.-]\w*)?@[a-zA-Z\d]+([.-][a-zA-Z\d]+)*\.[a-zA-Z]{2,}$',

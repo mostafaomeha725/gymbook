@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
+import 'package:gymbook/core/utils/validators.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
@@ -57,11 +58,6 @@ class _AllTextFieldRegisterCustomerState
     super.dispose();
   }
 
-  String? _required(String? v, String label) {
-    if (v == null || v.trim().isEmpty) return 'Please enter $label';
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<RegisterCubit, RegisterState>(
@@ -93,7 +89,8 @@ class _AllTextFieldRegisterCustomerState
                   child: Icon(Icons.person_outline, size: 22.sp),
                 ),
                 radius: 22.r,
-                validator: (v) => _required(v, 'your first name'),
+                validator: (v) =>
+                    Validators.requiredField(v, fieldLabel: 'your first name'),
               ),
 
               SizedBox(height: 16.h),
@@ -112,7 +109,8 @@ class _AllTextFieldRegisterCustomerState
                   child: Icon(Icons.person_outline, size: 22.sp),
                 ),
                 radius: 22.r,
-                validator: (v) => _required(v, 'your last name'),
+                validator: (v) =>
+                    Validators.requiredField(v, fieldLabel: 'your last name'),
               ),
 
               SizedBox(height: 16.h),
@@ -132,13 +130,7 @@ class _AllTextFieldRegisterCustomerState
                   child: Icon(Icons.email_outlined, size: 22.sp),
                 ),
                 radius: 22.r,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'Please enter your email';
-                  }
-
-                  return null;
-                },
+                validator: (v) => Validators.email(v),
               ),
 
               SizedBox(height: 16.h),
@@ -158,7 +150,10 @@ class _AllTextFieldRegisterCustomerState
                   child: Icon(Icons.phone_outlined, size: 22.sp),
                 ),
                 radius: 22.r,
-                validator: (v) => _required(v, 'your phone number'),
+                validator: (v) => Validators.requiredField(
+                  v,
+                  fieldLabel: 'your phone number',
+                ),
               ),
 
               SizedBox(height: 16.h),
@@ -187,11 +182,10 @@ class _AllTextFieldRegisterCustomerState
                   onPressed: () =>
                       setState(() => obscurePassword = !obscurePassword),
                 ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Please enter a password';
-
-                  return null;
-                },
+                validator: (v) => Validators.password(
+                  v,
+                  emptyMessage: 'Please enter a password',
+                ),
               ),
 
               SizedBox(height: 8.h),
@@ -225,13 +219,10 @@ class _AllTextFieldRegisterCustomerState
                     () => obscureConfirmPassword = !obscureConfirmPassword,
                   ),
                 ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) {
-                    return 'Please confirm your password';
-                  }
-
-                  return null;
-                },
+                validator: (v) => Validators.confirmPassword(
+                  v,
+                  originalPassword: passwordController.text,
+                ),
               ),
 
               SizedBox(height: 24.h),

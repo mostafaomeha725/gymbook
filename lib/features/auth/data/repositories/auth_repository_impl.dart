@@ -23,6 +23,66 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
+  Future<Either<Failure, void>> sendResetPasswordEmail({
+    required String email,
+  }) async {
+    try {
+      await remoteDataSource.sendResetPasswordEmail(email: email);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> resendConfirmationEmail({
+    required String email,
+  }) async {
+    try {
+      await remoteDataSource.resendConfirmationEmail(email: email);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> validateResetPasswordCode({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      final isValid = await remoteDataSource.validateResetPasswordCode(
+        email: email,
+        code: code,
+      );
+      return Right(isValid);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) async {
+    try {
+      await remoteDataSource.resetPassword(
+        email: email,
+        code: code,
+        newPassword: newPassword,
+        confirmNewPassword: confirmNewPassword,
+      );
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, LoginResultEntity>> login({
     required String email,
     required String password,

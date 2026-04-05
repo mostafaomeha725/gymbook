@@ -66,6 +66,7 @@ class AppbarAuthCard extends StatelessWidget {
                   style: font14w400.copyWith(
                     color: Colors.white.withOpacity(0.9),
                   ),
+                  maxLines: 2,
                 ),
               ),
 

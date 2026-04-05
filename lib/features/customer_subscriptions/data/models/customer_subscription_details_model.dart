@@ -1,3 +1,5 @@
+import 'package:gymbook/features/customer_subscriptions/domain/entities/customer_subscription_details_entity.dart';
+
 class CustomerSubscriptionDetailsModel {
   final String branchName;
   final String address;
@@ -54,6 +56,24 @@ class CustomerSubscriptionDetailsModel {
       packageName: (json['packageName'] ?? '').toString(),
     );
   }
+
+  CustomerSubscriptionDetailsEntity toEntity() {
+    return CustomerSubscriptionDetailsEntity(
+      branchName: branchName,
+      address: address,
+      latitude: latitude,
+      longitude: longitude,
+      images: images.map((item) => item.toEntity()).toList(),
+      subscriptionId: subscriptionId,
+      subscriptionStatus: subscriptionStatus,
+      price: price,
+      activationDate: activationDate,
+      endDate: endDate,
+      durationInDays: durationInDays,
+      checkInsCount: checkInsCount,
+      packageName: packageName,
+    );
+  }
 }
 
 class CustomerSubscriptionImageModel {
@@ -63,5 +83,9 @@ class CustomerSubscriptionImageModel {
 
   factory CustomerSubscriptionImageModel.fromJson(Map<String, dynamic> json) {
     return CustomerSubscriptionImageModel(url: (json['url'] ?? '').toString());
+  }
+
+  CustomerSubscriptionImageEntity toEntity() {
+    return CustomerSubscriptionImageEntity(url: url);
   }
 }

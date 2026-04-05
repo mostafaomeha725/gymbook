@@ -6,6 +6,22 @@ import 'package:gymbook/features/auth/data/model/login_response.dart';
 import 'package:gymbook/features/auth/data/model/register_response.dart';
 
 abstract class AuthRemoteDataSource {
+  Future<void> sendResetPasswordEmail({required String email});
+
+  Future<void> resendConfirmationEmail({required String email});
+
+  Future<bool> validateResetPasswordCode({
+    required String email,
+    required String code,
+  });
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+    required String confirmNewPassword,
+  });
+
   Future<LoginResponse> login({
     required String email,
     required String password,
@@ -28,6 +44,75 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final NetworkService networkService;
 
   AuthRemoteDataSourceImpl(this.networkService);
+
+  @override
+  Future<void> sendResetPasswordEmail({required String email}) async {
+    final result = await networkService.postData(
+      endPoint: EndPoints.forgotPassword,
+      data: {'email': email},
+    );
+
+    result.fold(
+      (failure) => throw ServerException(failure.message),
+      (_) => null,
+    );
+  }
+
+  @override
+  Future<void> resendConfirmationEmail({required String email}) async {
+    final result = await networkService.postData(
+      endPoint: EndPoints.resendConfirmationEmail,
+      data: {'email': email},
+    );
+
+    result.fold(
+      (failure) => throw ServerException(failure.message),
+      (_) => null,
+    );
+  }
+
+  @override
+  Future<bool> validateResetPasswordCode({
+    required String email,
+    required String code,
+  }) async {
+    final result = await networkService.postData(
+      endPoint: EndPoints.validateResetPasswordCode,
+      data: {'email': email, 'code': code},
+    );
+
+    return result.fold((failure) => throw ServerException(failure.message), (
+      data,
+    ) {
+      if (data is Map<String, dynamic>) {
+        return data['isValid'] == true;
+      }
+      throw const ServerException('Unexpected response format');
+    });
+  }
+
+  @override
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) async {
+    final result = await networkService.postData(
+      endPoint: EndPoints.resetPassword,
+      data: {
+        'email': email,
+        'code': code,
+        'newPassword': newPassword,
+        'confirmNewPassword': confirmNewPassword,
+      },
+    );
+
+    result.fold(
+      (failure) => throw ServerException(failure.message),
+      (_) => null,
+    );
+  }
 
   @override
   Future<LoginResponse> login({
