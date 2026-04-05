@@ -7,6 +7,7 @@ import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_statistics_entity.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_statistics_cubit/branch_statistics_cubit.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/all_current_status.dart';
 import 'package:gymbook/features/admin_home/presentation/widgets/branch_buttom.dart';
@@ -28,6 +29,7 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   int selectedTab = 0;
   late BranchEntity currentBranch;
   late BranchDetailsCubit _detailsCubit;
+  late BranchSetupCubit _setupCubit;
   late BranchStatisticsCubit _statisticsCubit;
 
   static const _timePeriods = [
@@ -44,6 +46,9 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
     currentBranch = widget.branch;
     _detailsCubit = sl<BranchDetailsCubit>()
       ..loadBranchDetails(currentBranch.id);
+    _setupCubit = sl<BranchSetupCubit>()
+      ..setEditModeData(isEdit: true)
+      ..fetchBranchDetails(currentBranch.id);
     _statisticsCubit = sl<BranchStatisticsCubit>()
       ..loadStatistics(
         branchId: currentBranch.id,
@@ -54,6 +59,7 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   @override
   void dispose() {
     _detailsCubit.close();
+    _setupCubit.close();
     _statisticsCubit.close();
     super.dispose();
   }
@@ -61,6 +67,7 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   void _refreshCurrentBranch() {
     if (!mounted) return;
     _detailsCubit.loadBranchDetails(currentBranch.id);
+    _setupCubit.fetchBranchDetails(currentBranch.id);
   }
 
   void _loadStatistics(int tabIndex) {
@@ -75,6 +82,7 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _detailsCubit),
+        BlocProvider.value(value: _setupCubit),
         BlocProvider.value(value: _statisticsCubit),
       ],
       child: SingleChildScrollView(

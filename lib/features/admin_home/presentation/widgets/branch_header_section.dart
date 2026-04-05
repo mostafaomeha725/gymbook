@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/di/services_locator.dart';
-import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/core/widgets/app_image.dart';
-import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/core/widgets/switch_open_gym.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin_home/domain/repositories/branch_repository.dart';
 import 'package:gymbook/features/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
-import 'package:gymbook/features/admin_home/presentation/widgets/tag_bage.dart';
+import 'package:gymbook/features/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
+import 'package:gymbook/features/admin_home/presentation/widgets/branch_header_section_content.dart';
+
+part 'branch_header_section_actions.dart';
 
 class BranchHeaderSection extends StatefulWidget {
   final BranchEntity branch;
@@ -24,11 +22,11 @@ class BranchHeaderSection extends StatefulWidget {
 }
 
 class _BranchHeaderSectionState extends State<BranchHeaderSection> {
-  /// true = Active (status 1), false = Inactive (status 2)
-  late bool isActive;
-
   static const String _placeholderImage =
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+
+  late bool isActive;
+  int _selectedGalleryIndex = 0;
 
   @override
   void initState() {
@@ -36,181 +34,69 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
     isActive = widget.branch.branchStatus == 1;
   }
 
-  Future<void> _updateStatus(bool value) async {
-    setState(() => isActive = value);
-
-    showLoading();
-    final result = await sl<BranchRepository>().updateBranchStatus(
-      branchId: widget.branch.id,
-      branchStatus: value ? 1 : 2,
-    );
-    hideLoading();
-
-    result.fold((failure) {
-      setState(() => isActive = !value); // revert
-      showError(failure.message);
-    }, (_) {});
+  void _updateState(VoidCallback changes) {
+    setState(changes);
   }
 
   @override
   Widget build(BuildContext context) {
     final branch = widget.branch;
+
     return BlocBuilder<BranchDetailsCubit, BranchDetailsState>(
-      builder: (context, state) {
-        final images = state is BranchDetailsSuccess
-            ? state.response.images
-            : null;
-        final logoUrl = images
-            ?.firstWhere(
-              (img) => img.type == 0,
-              orElse: () => BranchImageEntity(id: 0, type: 0, url: ''),
-            )
-            .url;
-        final marketplaceUrl = images
-            ?.firstWhere(
-              (img) => img.type == 1,
-              orElse: () => BranchImageEntity(id: 0, type: 1, url: ''),
-            )
-            .url;
+      builder: (context, detailsState) {
+        final detailsImages = detailsState is BranchDetailsSuccess
+            ? detailsState.response.images
+            : const <BranchImageEntity>[];
 
-        final coverUrl = (marketplaceUrl?.isNotEmpty == true)
-            ? marketplaceUrl!
-            : (logoUrl?.isNotEmpty == true ? logoUrl! : _placeholderImage);
-        final avatarUrl = (logoUrl?.isNotEmpty == true)
-            ? logoUrl!
-            : (branch.logo ?? 'https://randomuser.me/api/portraits/men/32.jpg');
+        return BlocBuilder<BranchSetupCubit, BranchSetupState>(
+          builder: (context, setupState) {
+            final setupLogo = _firstSetupUrl(setupState, 0);
+            final setupMarketplace = _firstSetupUrl(setupState, 1);
+            final detailsLogo = _firstDetailsUrl(detailsImages, 0);
+            final detailsMarketplace = _firstDetailsUrl(detailsImages, 1);
 
-        return Column(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                AppImage(
-                  imageUrl: coverUrl,
-                  height: 200.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+            final coverUrl = setupMarketplace.isNotEmpty
+                ? setupMarketplace
+                : detailsMarketplace.isNotEmpty
+                ? detailsMarketplace
+                : setupLogo.isNotEmpty
+                ? setupLogo
+                : detailsLogo.isNotEmpty
+                ? detailsLogo
+                : _placeholderImage;
 
-                Positioned(
-                  top: 28.h,
-                  left: 16.w,
-                  child: GestureDetector(
-                    onTap: () => GoRouter.of(context).pop(),
-                    child: const CircleAvatar(
-                      backgroundColor: Colors.black45,
-                      child: Icon(Icons.arrow_back, color: Colors.white),
-                    ),
-                  ),
-                ),
+            final avatarUrl = setupLogo.isNotEmpty
+                ? setupLogo
+                : detailsLogo.isNotEmpty
+                ? detailsLogo
+                : (branch.logo ??
+                      'https://randomuser.me/api/portraits/men/32.jpg');
 
-                Positioned(
-                  bottom: -40.h,
-                  left: 24.w,
-                  child: CircleAvatar(
-                    radius: 43.r,
-                    backgroundColor: Colors.white,
-                    child: CircleAvatar(
-                      radius: 40.r,
-                      backgroundImage: NetworkImage(avatarUrl),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            final galleryUrls = _setupGalleryUrls(setupState);
+            final selectedIndex = _resolveSelectedIndex(galleryUrls.length);
+            final displayedCoverUrl = galleryUrls.isNotEmpty
+                ? galleryUrls[selectedIndex]
+                : coverUrl;
 
-            SizedBox(height: 44.h),
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 22.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppText(
-                          branch.name ?? 'Branch #${branch.id}',
-                          style: font20w700.copyWith(
-                            color: const Color(0xff2C3E50),
-                          ),
-                        ),
-                        if (branch.governorate != null) ...[
-                          SizedBox(height: 4.h),
-                          AppText(
-                            branch.governorate!.name,
-                            style: font14w500.copyWith(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                        scale: 0.8.h,
-                        child: OpenGymSwitch(
-                          value: isActive,
-                          onChanged: _updateStatus,
-                        ),
-                      ),
-                      AppText(
-                        isActive ? 'Active' : 'Inactive',
-                        style: font14w500.copyWith(
-                          color: isActive
-                              ? const Color(0xFF16A34A)
-                              : Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 12.h),
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 22.w),
-              child: Row(
-                children: [
-                  TagBadge(tag: branch.branchTypeName),
-                  SizedBox(width: 8.w),
-                  TagBadge(tag: branch.branchStatusName),
-                  if (branch.subscriptionsCount > 0) ...[
-                    SizedBox(width: 8.w),
-                    TagBadge(tag: '${branch.subscriptionsCount} subs'),
-                  ],
-                ],
-              ),
-            ),
-
-            // if (branch.address != null && branch.address!.isNotEmpty) ...[
-            //   SizedBox(height: 8.h),
-            //   Padding(
-            //     padding: EdgeInsets.symmetric(horizontal: 22.w),
-            //     child: Row(
-            //       children: [
-            //         Icon(
-            //           Icons.location_on_outlined,
-            //           size: 14.sp,
-            //           color: Colors.grey[500],
-            //         ),
-            //         SizedBox(width: 4.w),
-            //         Expanded(
-            //           child: AppText(
-            //             branch.address!,
-            //             style: font14w500.copyWith(color: Colors.grey[500]),
-            //             maxLines: 2,
-            //             overflow: TextOverflow.ellipsis,
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-          ],
+            return BranchHeaderSectionContent(
+              branch: branch,
+              displayedCoverUrl: displayedCoverUrl,
+              avatarUrl: avatarUrl,
+              isActive: isActive,
+              onStatusChanged: _updateStatus,
+              onBackTap: () => GoRouter.of(context).pop(),
+              galleryUrls: galleryUrls,
+              selectedIndex: selectedIndex,
+              onPreviousTap: galleryUrls.length > 1
+                  ? () => _showPreviousImage(selectedIndex)
+                  : null,
+              onNextTap: galleryUrls.length > 1
+                  ? () => _showNextImage(selectedIndex, galleryUrls.length)
+                  : null,
+              onSelectImage: (index) =>
+                  _selectGalleryImage(index, galleryUrls.length),
+            );
+          },
         );
       },
     );

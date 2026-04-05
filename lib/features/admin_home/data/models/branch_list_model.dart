@@ -84,11 +84,18 @@ class BranchItem {
       latitude: _asDouble(coordinates?['latitude']),
       longitude: _asDouble(coordinates?['longitude']),
       branchType: json['branchType'] ?? 0,
-      logoImageId: _asLogoImageId(json['logo']),
-      logo: _asLogoUrl(json['logo']),
+      logoImageId: _asInt(json['logoImageId']) ?? _asLogoImageId(json['logo']),
+      logo: _asLogoUrl(json['logoUrl']) ?? _asLogoUrl(json['logo']),
       branchStatus: json['branchStatus'] ?? 0,
       subscriptionsCount: json['subscriptionsCount'] ?? 0,
     );
+  }
+
+  static int? _asInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
   }
 
   static double? _asDouble(dynamic value) {
@@ -99,13 +106,22 @@ class BranchItem {
 
   static String? _asLogoUrl(dynamic value) {
     if (value == null) return null;
-    if (value is String) return value;
+    if (value is String) {
+      final normalized = value.trim();
+      return normalized.isEmpty ? null : normalized;
+    }
     if (value is Map<String, dynamic>) {
       final imageUrl = value['imageUrl'];
-      if (imageUrl is String) return imageUrl;
+      if (imageUrl is String) {
+        final normalized = imageUrl.trim();
+        if (normalized.isNotEmpty) return normalized;
+      }
 
       final url = value['url'];
-      if (url is String) return url;
+      if (url is String) {
+        final normalized = url.trim();
+        if (normalized.isNotEmpty) return normalized;
+      }
     }
     return null;
   }
