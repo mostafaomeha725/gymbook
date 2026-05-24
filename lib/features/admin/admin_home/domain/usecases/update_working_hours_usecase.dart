@@ -1,0 +1,19 @@
+import 'package:dartz/dartz.dart';
+import 'package:gymbook/core/error/failure.dart';
+import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_repository.dart';
+
+class UpdateWorkingHoursUseCase {
+  final BranchRepository repository;
+
+  UpdateWorkingHoursUseCase(this.repository);
+
+  Future<Either<Failure, void>> call({
+    required int branchId,
+    required List<Map<String, dynamic>> workingHours,
+  }) {
+    return repository.updateBranchWorkingHours(
+      branchId: branchId,
+      workingHours: workingHours,
+    );
+  }
+}

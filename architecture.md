@@ -1,181 +1,298 @@
-# Flutter Project Architecture
+# Flutter Development Rules
 
-This project follows **Clean Architecture** with a **feature-first structure**.
-
-The goal is to keep the code:
-
-* scalable
-* maintainable
-* testable
+You are a senior Flutter engineer. Follow these rules STRICTLY.
 
 ---
 
-# Architecture Layers
+## 🚫 Forbidden
 
-The project is divided into three main layers:
+Never use:
 
-1. Presentation
-2. Domain
-3. Data
+- Text
+- ElevatedButton
+- TextButton
+- OutlinedButton
+- Image.asset
+- Image.network
+- TextFormField
+- ScaffoldMessenger
+- Navigator.push
+- Navigator.pop
+- MaterialPageRoute
+- setState for business logic
+- setState for shared state
 
-Dependency direction:
+---
+
+## ✅ Required
+
+Always use:
+
+- AppText
+- AppButton
+- AppImage
+- AppAsset
+- AppSVG
+- AppFormField
+- CustomSnackBar
+- CustomLoading
+- BounceIt
+
+---
+
+## ♻️ Reusability Rules
+
+Before creating anything new:
+
+- ALWAYS check `lib/core/widgets`
+- Reuse existing widgets first
+- If similar widget exists → extend it instead of duplicating it
+- Never duplicate UI logic
+
+---
+
+## 🧠 Core Widgets
+
+Always prefer existing widgets:
+
+- AppText
+- AppButton
+- AppAsset
+- AppImage
+- AppSVG
+- AppFormField
+- CustomSearch
+- CustomSnackBar
+- CustomLoading
+- BounceIt
+- CustomNavBar
+- CustomBottomNavBar
+- NavBarItem
+- GovernorateDropdown
+- SwitchOpen
+- AppbarSubscriptionWidget
+- BouncingSocialButton
+
+---
+
+# 🧰 Core Helpers
+
+ALL helpers must be inside:
+
+`lib/core/helpers/helpers.dart`
+
+---
+
+### Never:
+
+- create new helper files
+- duplicate helper logic
+- rewrite existing helper logic
+- place helper logic inside UI files
+
+---
+
+### Use helpers for:
+
+- image picking
+- file picking
+- sharing
+- timers
+- url launching
+- whatsapp
+- phone calls
+- emails
+- pdf handling
+- file handling
+- permissions
+- reusable formatting logic
+- date formatting
+- duration formatting
+- time formatting
+
+---
+
+# ⚙️ Core Utils
+
+Use ONLY from:
+
+`lib/core/utils`
+
+Available:
+
+- app_bloc_observer.dart
+- app_date_time.dart
+- easy_loading.dart
+- safe_print.dart
+- spacing.dart
+- url_launcher_util.dart
+- validators.dart
+
+---
+
+### Utils Rules
+
+- NEVER rewrite utils
+- NEVER duplicate formatting logic
+
+---
+
+# 🧱 Clean Architecture
+
+Must follow:
 
 presentation → domain → data
 
-Rules:
+---
 
-* UI must never communicate directly with the data layer.
-* Business logic exists only in the domain layer.
-* Each layer must have a single responsibility.
+### Rules
+
+- UI must NEVER access repositories directly
+- Cubits call UseCases ONLY
+- Business logic only in domain layer
+- No Flutter imports in domain layer
 
 ---
 
-# State Management
+# 🧠 State Management
 
-State management uses **Cubit** from `flutter_bloc`.
+Use ONLY:
 
-Each feature contains:
+- Cubit
+- Bloc
 
-* Cubit
-* State
+Allowed:
 
-Rules:
+- BlocBuilder
+- BlocListener
+- BlocConsumer
 
-* Cubits call **UseCases only**
-* Cubits must not call repositories directly
-* Business logic must not be inside UI
+Forbidden:
 
----
-
-# Dependency Injection
-
-The project uses a **Service Locator** pattern.
-
-All dependencies are registered in:
-
-lib/core/di/service_locator.dart
-
-Responsibilities:
-
-* register repositories
-* register use cases
-* register cubits
-* manage dependency lifecycle
+- setState for logic
+- business logic in UI
 
 ---
 
-# Folder Structure
+# 🧠 Cubit Rules
 
-lib/
+Move logic to Cubit when it contains:
 
-core/
-errors/
-utils/
-widgets/
-services/
-di/
-cache/
-constants/
-enums/
-extensions/
-theme/
-network/
-routes/
+- API calls
+- validation logic
+- filtering
+- calculations
+- state changes
+- feature logic
 
-
-features/
-feature_name/
-
-data/
-models/
-datasources/
-repositories/
-
-domain/
-entities/
-repositories/
-usecases/
-
-presentation/
-cubit/
-screens/
-widgets/
+Cubits must call UseCases only.
 
 ---
 
-# Domain Layer
+# 🧭 Navigation
+
+Use GoRouter ONLY:
+
+- context.push()
+- context.go()
+- context.pop()
+
+Forbidden:
+
+- Navigator
+- MaterialPageRoute
+
+---
+
+# 🧱 Screen Structure
+
+Each screen must have:
+
+## Screen File
+
+Contains ONLY:
+
+- Scaffold
+
+Example:
+
+`login_screen.dart`
+
+---
+
+## Body File
 
 Contains:
 
-* Entities
-* Repository interfaces
-* UseCases
+- full UI
 
-Rules:
+Example:
 
-* No Flutter imports
-* No framework dependencies
-* Pure business logic only
+`login_screen_body.dart`
 
 ---
 
-# Data Layer
+# 📂 File Splitting (CRITICAL)
 
-Contains:
+Maximum:
 
-* Models
-* DataSources
-* Repository implementations
+- 120 lines per file
 
-Responsibilities:
+If exceeded:
 
-* API calls
-* Local storage
-* Data mapping
-
-Models map to domain entities.
+1. Return folder structure FIRST
+2. Then generate files one by one
 
 ---
 
-# Presentation Layer
+# 🧩 Large UI Rules
 
-Contains:
+If UI becomes large:
 
-* Cubits
-* Screens
-* Widgets
+Create widgets folder and split into:
 
-Responsibilities:
-
-* UI rendering
-* State management
-* Calling use cases
-
-UI must remain simple and free of business logic.
+- header
+- form
+- section
+- card
+- list
+- dialog
 
 ---
 
-# Code Reuse
+# 🧩 Widget Rules
 
-Always reuse existing components before creating new ones.
+Forbidden:
 
-Check first:
+- private widgets in same file
+- `_WidgetName`
 
-* core/widgets
-* core/utils
-* shared services
-* existing helpers
-
-Avoid code duplication.
+Every widget must be in separate file.
 
 ---
 
-# Principles
+# 🚫 Widget Logic Separation (VERY IMPORTANT)
 
-This project follows:
+Never place functions inside widget files except `build()`.
 
-* Clean Architecture
-* SOLID principles
-* Separation of concerns
-* Reusable components
-* Scalable feature modules
+Forbidden inside widgets:
+
+- formatting functions
+- parsing functions
+- calculation functions
+- async functions
+- helper methods
+- mapper functions
+- reusable methods
+- API calls
+- validation logic
+- transformation logic
+
+---
+
+### Forbidden Examples
+
+```dart
+String _formatDate() {}
+String _formatTime() {}
+String _formatDuration() {}

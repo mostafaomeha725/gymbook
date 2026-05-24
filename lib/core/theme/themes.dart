@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import '/core/theme/light_colors.dart';
 
 ThemeData appTheme() => ThemeData(
-      useMaterial3: false,
-      primarySwatch: buildMaterialColor(AppLightColors.primary),
-      primaryColor: AppLightColors.primary,
-      hintColor: AppLightColors.hint,
-      brightness: Brightness.light,
-      // fontFamily: AppStrings.fontFamily,
-      scaffoldBackgroundColor: Colors.white,
-      buttonTheme: const ButtonThemeData(
-        buttonColor: AppLightColors.primary,
-        focusColor: AppLightColors.primary,
-      ),
-      textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: AppLightColors.primary, //thereby
-      ),
-    );
+  useMaterial3: false,
+  primarySwatch: buildMaterialColor(AppLightColors.primary),
+  primaryColor: AppLightColors.primary,
+  hintColor: AppLightColors.hint,
+  brightness: Brightness.light,
+  // fontFamily: AppStrings.fontFamily,
+  scaffoldBackgroundColor: Colors.white,
+  buttonTheme: const ButtonThemeData(
+    buttonColor: AppLightColors.primary,
+    focusColor: AppLightColors.primary,
+  ),
+  textSelectionTheme: const TextSelectionThemeData(
+    cursorColor: AppLightColors.primary, //thereby
+  ),
+);
 
 MaterialColor buildMaterialColor(Color color) {
   List strengths = <double>[.05];

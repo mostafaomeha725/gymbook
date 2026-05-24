@@ -8,15 +8,15 @@ import 'package:gymbook/core/theme/light_colors.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> clearPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
-}
+// Future<void> clearPrefs() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.clear();
+// }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear(); // يمسح كل البيانات
+  // final prefs = await SharedPreferences.getInstance();
+  // await prefs.clear(); // يمسح كل البيانات
   await ServiceLocator().init();
   configureEasyLoading();
 
