@@ -5,10 +5,18 @@ import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 
 class AppbarSubscriptionWidget extends StatelessWidget {
-  const AppbarSubscriptionWidget({super.key, required this.text, this.onBack});
+  const AppbarSubscriptionWidget({
+    super.key,
+    required this.text,
+    this.subtitle,
+    this.onBack,
+    this.showBackButton = true,
+  });
 
   final String text;
+  final String? subtitle;
   final VoidCallback? onBack;
+  final bool showBackButton;
 
   @override
   Widget build(BuildContext context) {
@@ -34,21 +42,36 @@ class AppbarSubscriptionWidget extends StatelessWidget {
 
             Row(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    if (onBack != null) {
-                      onBack!();
-                    } else {
-                      GoRouter.of(context).pop();
-                    }
-                  },
-                  child: const Icon(Icons.arrow_back, color: Colors.white),
-                ),
-                SizedBox(width: 16.w),
-
+                if (showBackButton) ...[
+                  GestureDetector(
+                    onTap: () {
+                      if (onBack != null) {
+                        onBack!();
+                      } else {
+                        GoRouter.of(context).pop();
+                      }
+                    },
+                    child: const Icon(Icons.arrow_back, color: Colors.white),
+                  ),
+                  SizedBox(width: 16.w),
+                ],
                 AppText(text, style: font20w700.copyWith(color: Colors.white)),
               ],
             ),
+            if (subtitle != null) ...[
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(left: showBackButton ? 40.w : 0),
+                child: AppText(
+                  subtitle!,
+                  style: font14w500.copyWith(
+                    color: Colors.white.withOpacity(
+                      0.9,
+                    ), // ignore: deprecated_member_use
+                  ),
+                ),
+              ),
+            ],
 
             SizedBox(height: 22.h),
           ],
