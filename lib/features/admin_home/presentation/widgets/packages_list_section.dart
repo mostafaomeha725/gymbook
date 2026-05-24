@@ -69,6 +69,7 @@ class PackagesListSection extends StatelessWidget {
               child: AppText(
                 'No active packages available',
                 style: font14w500.copyWith(color: Colors.grey.shade500),
+                alignment: AlignmentDirectional.center,
               ),
             ),
           );

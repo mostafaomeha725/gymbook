@@ -134,13 +134,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<LoginResponse> loginWithGoogle() async {
     final idToken = await GoogleSignInService.getIdToken();
 
-    if (idToken == null) throw const UserCancelledException();
-
     final result = await networkService.postData(
       endPoint: EndPoints.googleLogin,
       data: {'idToken': idToken},
     );
-
     return result.fold(
       (failure) => throw ServerException(failure.message),
       (data) => LoginResponse.fromJson(data),

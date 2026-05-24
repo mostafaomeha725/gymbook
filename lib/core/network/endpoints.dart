@@ -7,7 +7,7 @@ class EndPoints {
 
   static const String login = 'Authentication/login';
 
-  static const String googleLogin = 'Authentication/google-login';
+  static const String googleLogin = 'Authentication/google';
 
   static const String sendOtp = 'send-otp';
 

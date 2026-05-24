@@ -42,6 +42,7 @@ class LoginCubit extends Cubit<LoginState> {
 
     result.fold((failure) {
       if (failure is UserCancelledFailure) {
+        showInfo('Google sign-in was cancelled.');
         emit(LoginInitial());
         return;
       }

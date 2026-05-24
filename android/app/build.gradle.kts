@@ -1,8 +1,26 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+
+if (!keystorePropertiesFile.exists()) {
+    throw GradleException(
+        "Missing android/key.properties. Add signing credentials to use gymbook-release.keystore for all builds.",
+    )
+}
+
+keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+
+fun requiredKeystoreProperty(name: String): String {
+    return keystoreProperties.getProperty(name)?.takeIf { it.isNotBlank() }
+        ?: throw GradleException("Missing '$name' in android/key.properties")
 }
 
 android {
@@ -30,11 +48,24 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file(requiredKeystoreProperty("storeFile"))
+            storePassword = requiredKeystoreProperty("storePassword")
+            keyAlias = requiredKeystoreProperty("keyAlias")
+            keyPassword = requiredKeystoreProperty("keyPassword")
+        }
+    }
+
     buildTypes {
+        debug {
+            // السطر السحري: خلي الـ debug يستخدم توقيع الـ release
+            signingConfig = signingConfigs.getByName("release")
+        }
+
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            // ... إعدادات الـ proguard والـ shrinking ...
         }
     }
 }
