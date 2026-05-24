@@ -14,6 +14,9 @@ import 'package:gymbook/features/admin/admin_home/presentation/screens/add_new_p
 import 'package:gymbook/features/admin/admin_home/presentation/screens/admin_add_subscription_screen.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/admin_branch_screen.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/admin_manage_subscriptions_screen.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/screens/admin_branch_reviews_screen.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_reviews/branch_reviews_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/admin_subscription_details_screen.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/edit_branch_details_screen.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/manage_package_screen.dart';
@@ -253,6 +256,16 @@ GoRouter createRouter() {
         builder: (context, state) {
           final branchId = state.extra as int? ?? 0;
           return AdminManageSubscriptionsScreen(branchId: branchId);
+        },
+      ),
+      GoRoute(
+        path: Routes.adminBranchReviewsScreen,
+        builder: (context, state) {
+          final branchId = state.extra as int? ?? 0;
+          return BlocProvider(
+            create: (context) => BranchReviewsCubit(),
+            child: AdminBranchReviewsScreen(branchId: branchId),
+          );
         },
       ),
       GoRoute(

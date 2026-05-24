@@ -82,6 +82,9 @@ ALL helpers must be inside:
 `lib/core/helpers/helpers.dart`
 
 ---
+# AppText 
+
+AppText(text, style: font14w500.copyWith(color: Colors.grey)),
 
 ### Never:
 

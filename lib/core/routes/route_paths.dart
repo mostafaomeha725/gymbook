@@ -24,6 +24,7 @@ class Routes {
   static const addNewPackageScreen = '/add-new-package-screen';
   static const adminManageSubscriptionsScreen =
       '/admin-manage-subscriptions-screen';
+  static const adminBranchReviewsScreen = '/admin-branch-reviews-screen';
   static const adminSubscriptionDetailsScreen =
       '/admin-subscription-details-screen';
   static const adminAddSubscriptionScreen = '/admin-add-subscription-screen';

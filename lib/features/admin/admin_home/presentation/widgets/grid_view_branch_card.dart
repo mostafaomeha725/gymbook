@@ -66,14 +66,19 @@ class GridViewBranchCard extends StatelessWidget {
           },
         ),
 
-        const AdminBranchCard(
+        AdminBranchCard(
           hasStatus: true,
           title: 'Reviews ⭐ 4.5',
           subtitle: '89 reviews',
           icon: Icons.chat_bubble_outline,
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
           ),
+          onTap: () {
+            GoRouter.of(
+              context,
+            ).push(Routes.adminBranchReviewsScreen, extra: branchId);
+          },
         ),
       ],
     );

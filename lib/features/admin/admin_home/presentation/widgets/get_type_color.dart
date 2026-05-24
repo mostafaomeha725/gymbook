@@ -84,4 +84,19 @@ class GetTypeColor {
   Color getOnCardTextColor(String type) => Colors.white;
 
   Color getCircleOverlayColor(String type) => Colors.white.withOpacity(.15);
+  Color getAvatarColor(String? initials) {
+    if (initials == 'AM') return const Color(0xFFFFF7ED);
+    if (initials == 'SA') return const Color(0xFFF0FDF4);
+    if (initials == 'OH') return const Color(0xFFFDF4FF);
+    if (initials == 'KS') return const Color(0xFFF0FDF4);
+    return Colors.grey.shade100;
+  }
+
+  Color getTextColor(String? initials) {
+    if (initials == 'AM') return const Color(0xFFEA580C);
+    if (initials == 'SA') return const Color(0xFF16A34A);
+    if (initials == 'OH') return const Color(0xFF9333EA);
+    if (initials == 'KS') return const Color(0xFF16A34A);
+    return Colors.black;
+  }
 }
