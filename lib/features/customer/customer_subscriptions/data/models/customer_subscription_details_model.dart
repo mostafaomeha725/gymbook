@@ -1,6 +1,7 @@
 import 'package:gymbook/features/customer/customer_subscriptions/domain/entities/customer_subscription_details_entity.dart';
 
 class CustomerSubscriptionDetailsModel {
+  final int branchId;
   final String branchName;
   final String address;
   final double? latitude;
@@ -16,6 +17,7 @@ class CustomerSubscriptionDetailsModel {
   final String packageName;
 
   const CustomerSubscriptionDetailsModel({
+    required this.branchId,
     required this.branchName,
     required this.address,
     required this.latitude,
@@ -34,6 +36,7 @@ class CustomerSubscriptionDetailsModel {
   factory CustomerSubscriptionDetailsModel.fromJson(Map<String, dynamic> json) {
     final rawImages = json['images'] as List<dynamic>? ?? const [];
     return CustomerSubscriptionDetailsModel(
+      branchId: (json['branchId'] as num?)?.toInt() ?? 0,
       branchName: (json['branchName'] ?? '').toString(),
       address: (json['address'] ?? '').toString(),
       latitude: (json['latitude'] as num?)?.toDouble(),
@@ -59,6 +62,7 @@ class CustomerSubscriptionDetailsModel {
 
   CustomerSubscriptionDetailsEntity toEntity() {
     return CustomerSubscriptionDetailsEntity(
+      branchId: branchId,
       branchName: branchName,
       address: address,
       latitude: latitude,

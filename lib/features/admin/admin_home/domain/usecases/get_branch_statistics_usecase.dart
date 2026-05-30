@@ -12,6 +12,9 @@ class GetBranchStatisticsUseCase {
     required int branchId,
     required StatisticsTimePeriod timePeriod,
   }) {
+    if (branchId == 0) {
+      return repository.getAllBranchesStatistics(timePeriod: timePeriod);
+    }
     return repository.getBranchStatistics(
       branchId: branchId,
       timePeriod: timePeriod,

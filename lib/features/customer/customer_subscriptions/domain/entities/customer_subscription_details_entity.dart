@@ -1,4 +1,5 @@
 class CustomerSubscriptionDetailsEntity {
+  final int branchId;
   final String branchName;
   final String address;
   final double? latitude;
@@ -14,6 +15,7 @@ class CustomerSubscriptionDetailsEntity {
   final String packageName;
 
   const CustomerSubscriptionDetailsEntity({
+    required this.branchId,
     required this.branchName,
     required this.address,
     required this.latitude,

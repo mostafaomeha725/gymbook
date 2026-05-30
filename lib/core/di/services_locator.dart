@@ -30,6 +30,7 @@ import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_det
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_packages_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_setup_details_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_statistics_usecase.dart';
+import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_reviews_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branches_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/update_branch_location_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/update_branch_status_usecase.dart';
@@ -51,6 +52,7 @@ import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_det
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_location_cubit/branch_location_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_statistics_cubit/branch_statistics_cubit.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_reviews/branch_reviews_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/create_branch_cubit/create_branch_cubit.dart';
@@ -88,15 +90,20 @@ import 'package:gymbook/features/customer/customer_home/domain/usecases/get_near
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/nearby_branches_cubit/nearby_branches_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/subscription_attendance_history_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/customer_subscription_details_remote_datasource.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/add_review_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/repositories/customer_subscription_details_repository_impl.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/repositories/subscription_attendance_history_repository_impl.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/data/repositories/add_review_repository_impl.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/customer_subscription_details_repository.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/subscription_attendance_history_repository.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/add_review_repository.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/build_attendance_weeks_usecase.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/get_customer_subscription_details_usecase.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/get_subscription_attendance_history_usecase.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/add_review_usecase.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/customer_subscription_details_cubit/customer_subscription_details_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/subscription_attendance_history_cubit/subscription_attendance_history_cubit.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/add_review_cubit/add_review_cubit.dart';
 import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -321,6 +328,9 @@ class ServiceLocator {
     if (!sl.isRegistered<GetBranchStatisticsUseCase>()) {
       sl.registerLazySingleton(() => GetBranchStatisticsUseCase(sl()));
     }
+    if (!sl.isRegistered<GetBranchReviewsUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchReviewsUseCase(sl()));
+    }
     if (!sl.isRegistered<AddSubscriptionUseCase>()) {
       sl.registerLazySingleton(() => AddSubscriptionUseCase(sl()));
     }
@@ -387,6 +397,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<BranchStatisticsCubit>()) {
       sl.registerFactory(() => BranchStatisticsCubit(sl()));
+    }
+    if (!sl.isRegistered<BranchReviewsCubit>()) {
+      sl.registerFactory(() => BranchReviewsCubit(sl()));
     }
     if (!sl.isRegistered<AddSubscriptionCubit>()) {
       sl.registerFactory(() => AddSubscriptionCubit(sl()));
@@ -457,6 +470,28 @@ class ServiceLocator {
   }
 
   void _initCustomerSubscriptions() {
+    if (!sl.isRegistered<AddReviewRemoteDataSource>()) {
+      sl.registerLazySingleton<AddReviewRemoteDataSource>(
+        () => AddReviewRemoteDataSourceImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<AddReviewRepository>()) {
+      sl.registerLazySingleton<AddReviewRepository>(
+        () => AddReviewRepositoryImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<AddReviewUseCase>()) {
+      sl.registerLazySingleton(() => AddReviewUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdateReviewUseCase>()) {
+      sl.registerLazySingleton(() => UpdateReviewUseCase(sl()));
+    }
+    if (!sl.isRegistered<AddReviewCubit>()) {
+      sl.registerFactory(
+        () => AddReviewCubit(addReviewUseCase: sl(), updateReviewUseCase: sl()),
+      );
+    }
+
     if (!sl.isRegistered<CustomerSubscriptionDetailsRemoteDataSource>()) {
       sl.registerLazySingleton<CustomerSubscriptionDetailsRemoteDataSource>(
         () => CustomerSubscriptionDetailsRemoteDataSourceImpl(sl()),

@@ -59,7 +59,7 @@ class _CustomerHomeScreenBodyState extends State<CustomerHomeScreenBody> {
       _savedLocations = locationPrefsState.savedLocations;
       _selectedLocationId = selected?.id;
       if (selected != null) {
-        _locationLabel = selected!.label;
+        _locationLabel = selected.label;
       }
     });
 

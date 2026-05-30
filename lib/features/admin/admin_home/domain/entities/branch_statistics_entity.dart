@@ -1,9 +1,10 @@
 enum StatisticsTimePeriod {
   today(0),
   thisWeek(1),
-  thisMonth(2);
+  thisMonth(2),
+  all(null);
 
-  final int value;
+  final int? value;
   const StatisticsTimePeriod(this.value);
 }
 

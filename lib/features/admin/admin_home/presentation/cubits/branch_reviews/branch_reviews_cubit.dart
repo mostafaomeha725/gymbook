@@ -1,89 +1,87 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/review_entity.dart';
+import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_reviews_usecase.dart';
 
 part 'branch_reviews_state.dart';
 
 class BranchReviewsCubit extends Cubit<BranchReviewsState> {
-  BranchReviewsCubit() : super(BranchReviewsInitial());
+  final GetBranchReviewsUseCase _getBranchReviewsUseCase;
+
+  BranchReviewsCubit(this._getBranchReviewsUseCase) : super(BranchReviewsInitial());
 
   List<ReviewEntity> _allReviews = [];
   String _selectedRating = 'All';
   int _currentPage = 1;
-  final int _totalPages = 2; // For mock
+  int _totalPages = 1;
+  int _totalCount = 0;
+  double _averageRating = 0.0;
+  late int _currentBranchId;
 
-  void loadReviews(int branchId) {
-    emit(BranchReviewsLoading());
+  Future<void> loadReviews(int branchId, {bool isLoadMore = false}) async {
+    _currentBranchId = branchId;
+    if (!isLoadMore) {
+      emit(BranchReviewsLoading());
+      _currentPage = 1;
+    }
 
-    // Mock data based on the design
-    _allReviews = [
-      const ReviewEntity(
-        id: '1',
-        authorName: 'Ahmed Mohamed',
-        content:
-            'Excellent gym with modern equipment and very clean facilities. The staff is professional and helpful.',
-        rating: 5.0,
-        timeAgo: '2 days ago',
-        initials: 'AM',
-      ),
-      const ReviewEntity(
-        id: '2',
-        authorName: 'Sara Ali',
-        content:
-            'Great gym overall. Only suggestion is to add more cardio machines during peak hours.',
-        rating: 4.0,
-        timeAgo: '5 days ago',
-        initials: 'SA',
-      ),
-      const ReviewEntity(
-        id: '3',
-        authorName: 'Omar Hassan',
-        content:
-            'Best gym in the area! Love the variety of equipment and the atmosphere is very motivating.',
-        rating: 5.0,
-        timeAgo: '1 week ago',
-        initials: 'OH',
-      ),
-      const ReviewEntity(
-        id: '4',
-        authorName: 'Khaled Samir',
-        content:
-            'Good gym but can get very crowded during evening hours. Otherwise, no major complaints.',
-        rating: 3.0,
-        timeAgo: '2 weeks ago',
-        initials: 'KS',
-      ),
-    ];
+    double? ratingFilter;
+    if (_selectedRating != 'All') {
+      ratingFilter = double.tryParse(_selectedRating);
+    }
 
-    _emitLoaded();
+    final result = await _getBranchReviewsUseCase(
+      branchId: branchId,
+      pageNumber: _currentPage,
+      pageSize: 10,
+      rating: ratingFilter,
+    );
+
+    result.fold(
+      (failure) {
+        emit(BranchReviewsError(failure.message));
+      },
+      (entity) {
+        if (!isLoadMore) {
+          _allReviews = entity.data;
+        } else {
+          _allReviews.addAll(entity.data);
+        }
+        
+        _totalPages = entity.totalPages;
+        _totalCount = entity.totalCount;
+        
+        // Assuming averageRating might be calculated or fetched somewhere else,
+        // for now we'll calculate it from current items or mock it
+        if (_allReviews.isNotEmpty) {
+           _averageRating = _allReviews.map((e) => e.rating).reduce((a, b) => a + b) / _allReviews.length;
+        } else {
+          _averageRating = 0.0;
+        }
+
+        _emitLoaded();
+      },
+    );
   }
 
   void filterByRating(String rating) {
     _selectedRating = rating;
-    _emitLoaded();
+    loadReviews(_currentBranchId, isLoadMore: false);
   }
 
   void changePage(int page) {
     _currentPage = page;
-    _emitLoaded();
+    loadReviews(_currentBranchId, isLoadMore: false); // According to UI, might need full reload on page change, not append
   }
 
   void _emitLoaded() {
-    List<ReviewEntity> filtered = _allReviews;
-    if (_selectedRating != 'All') {
-      final ratingValue = double.tryParse(_selectedRating);
-      if (ratingValue != null) {
-        filtered = _allReviews.where((r) => r.rating == ratingValue).toList();
-      }
-    }
-
     emit(
       BranchReviewsLoaded(
-        reviews: filtered,
+        reviews: _allReviews,
         selectedRating: _selectedRating,
         currentPage: _currentPage,
         totalPages: _totalPages,
-        averageRating: 4.3,
-        totalCount: 7,
+        averageRating: double.parse(_averageRating.toStringAsFixed(1)),
+        totalCount: _totalCount,
       ),
     );
   }

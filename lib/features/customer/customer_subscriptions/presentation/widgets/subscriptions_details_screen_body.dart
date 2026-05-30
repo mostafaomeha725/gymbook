@@ -179,7 +179,7 @@ class _SubscriptionsDetailsScreenBodyState
                       subscriptionId: details.subscriptionId,
                     ),
                     SizedBox(height: 16.h),
-                    const RatingCard(),
+                    RatingCard(branchId: details.branchId),
                     SizedBox(height: 64.h),
                   ],
                 ),

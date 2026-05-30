@@ -17,6 +17,7 @@ import 'package:gymbook/features/admin/admin_home/domain/entities/branch_statist
 import 'package:gymbook/features/admin/admin_home/domain/entities/created_branch_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/governorate_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/uploaded_branch_image_entity.dart';
+import 'package:gymbook/features/admin/admin_home/domain/entities/branch_reviews_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_repository.dart';
 
 class BranchRepositoryImpl implements BranchRepository {
@@ -240,6 +241,28 @@ class BranchRepositoryImpl implements BranchRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, BranchStatisticsEntity>> getAllBranchesStatistics({
+    required StatisticsTimePeriod timePeriod,
+  }) async {
+    try {
+      final model = await remoteDataSource.getAllBranchesStatistics(
+        timePeriod: timePeriod,
+      );
+      return Right(
+        BranchStatisticsEntity(
+          branchId: model.branchId,
+          newSubscriptionsCount: model.newSubscriptionsCount,
+          expiredSubscriptionsCount: model.expiredSubscriptionsCount,
+          totalRevenue: model.totalRevenue,
+          checkInsCount: model.checkInsCount,
+        ),
+      );
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
   CreatedBranchEntity _mapCreatedBranch(CreateBranchResponse m) {
     return CreatedBranchEntity(
       id: m.id,
@@ -353,5 +376,25 @@ class BranchRepositoryImpl implements BranchRepository {
 
   UploadedBranchImageEntity _mapUploadedImage(UploadedBranchImageModel model) {
     return model.toEntity();
+  }
+
+  @override
+  Future<Either<Failure, BranchReviewsEntity>> getBranchReviews({
+    required int branchId,
+    int pageNumber = 1,
+    int pageSize = 10,
+    double? rating,
+  }) async {
+    try {
+      final model = await remoteDataSource.getBranchReviews(
+        branchId: branchId,
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        rating: rating,
+      );
+      return Right(model);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
   }
 }

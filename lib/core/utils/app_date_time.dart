@@ -1,10 +1,7 @@
-import 'package:intl/date_symbol_data_file.dart';
 import 'package:intl/intl.dart';
 
 class AppDateTime {
   static String utcToLocalTime(String timestamp) {
-    initializeDateFormatting("en", "");
-
     final dateTime = DateTime.parse(timestamp);
 
     final localTime = dateTime.toUtc().toLocal();
@@ -13,8 +10,6 @@ class AppDateTime {
   }
 
   static String utcToLocalDateOnly(String timestamp) {
-    initializeDateFormatting("en", "");
-
     final dateTime = DateTime.parse(timestamp);
 
     final localTime = dateTime.toUtc().toLocal();
@@ -23,7 +18,6 @@ class AppDateTime {
   }
 
   static String timestampToFormatted(String timestamp) {
-    initializeDateFormatting("en", "");
     return DateFormat(
       "yyyy-MM-dd HH:mm a",
       "en",

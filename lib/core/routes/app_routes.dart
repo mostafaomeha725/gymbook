@@ -263,7 +263,7 @@ GoRouter createRouter() {
         builder: (context, state) {
           final branchId = state.extra as int? ?? 0;
           return BlocProvider(
-            create: (context) => BranchReviewsCubit(),
+            create: (context) => BranchReviewsCubit(sl()),
             child: AdminBranchReviewsScreen(branchId: branchId),
           );
         },

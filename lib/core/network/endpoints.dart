@@ -76,8 +76,17 @@ class EndPoints {
   static String updateBranchStatus(int branchId) =>
       'Owner/Branches/$branchId/status';
 
+  static String getBranchReviews(int branchId) => 'Branches/$branchId/reviews';
+
+  static String addBranchReview(int branchId) => 'Branches/$branchId/reviews';
+
+  static String updateBranchReview(int branchId, int reviewId) =>
+      'Branches/$branchId/reviews/$reviewId';
+
   static String getBranchStatistics(int branchId) =>
       'Owner/Branches/$branchId/statistics';
+
+  static const String getAllBranchesStatistics = 'Owner/Branches/statistics';
 
   static String addSubscription(int branchId) =>
       'Owner/branches/$branchId/subscriptions';

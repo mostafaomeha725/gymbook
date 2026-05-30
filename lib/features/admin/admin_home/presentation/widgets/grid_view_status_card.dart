@@ -5,7 +5,9 @@ import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_sta
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/status_card.dart';
 
 class GridViewStatusCard extends StatelessWidget {
-  const GridViewStatusCard({super.key});
+  final bool showCheckIns;
+
+  const GridViewStatusCard({super.key, this.showCheckIns = true});
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +41,13 @@ class GridViewStatusCard extends StatelessWidget {
               subtitle: 'Revenue (EGP)',
               iconColor: const Color(0xFF10B981),
             ),
-            StatusCard(
-              icon: Icons.check_circle_outline,
-              title: isLoading ? '...' : '${stats?.checkInsCount ?? 0}',
-              subtitle: 'Check-ins Count',
-              iconColor: const Color(0xFF0EA5E9),
-            ),
+            if (showCheckIns)
+              StatusCard(
+                icon: Icons.check_circle_outline,
+                title: isLoading ? '...' : '${stats?.checkInsCount ?? 0}',
+                subtitle: 'Check-ins Count',
+                iconColor: const Color(0xFF0EA5E9),
+              ),
             StatusCard(
               icon: Icons.event_busy_outlined,
               title: isLoading

@@ -8,6 +8,7 @@ import 'package:gymbook/features/admin/admin_home/domain/entities/branch_setup_d
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_statistics_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/created_branch_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/uploaded_branch_image_entity.dart';
+import 'package:gymbook/features/admin/admin_home/domain/entities/branch_reviews_entity.dart';
 
 abstract class BranchRepository {
   Future<Either<Failure, CreatedBranchEntity>> createBranch({
@@ -76,5 +77,16 @@ abstract class BranchRepository {
   Future<Either<Failure, BranchStatisticsEntity>> getBranchStatistics({
     required int branchId,
     required StatisticsTimePeriod timePeriod,
+  });
+
+  Future<Either<Failure, BranchStatisticsEntity>> getAllBranchesStatistics({
+    required StatisticsTimePeriod timePeriod,
+  });
+
+  Future<Either<Failure, BranchReviewsEntity>> getBranchReviews({
+    required int branchId,
+    int pageNumber = 1,
+    int pageSize = 10,
+    double? rating,
   });
 }

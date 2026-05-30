@@ -63,7 +63,7 @@ class _AdminPerformanceScreenBodyState
             titleBuilder: (tab) => "Period Metrics ($tab)",
           ),
           SizedBox(height: 16.h),
-          const GridViewStatusCard(),
+          const GridViewStatusCard(showCheckIns: false),
           SizedBox(height: 24.h),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 22.w),

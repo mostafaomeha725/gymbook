@@ -12,6 +12,7 @@ import 'package:gymbook/features/admin/admin_home/data/models/branch_statistics_
 import 'package:gymbook/features/admin/admin_home/data/models/create_branch_model.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/uploaded_branch_image_model.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_statistics_entity.dart';
+import 'package:gymbook/features/admin/admin_home/data/models/branch_reviews_model.dart';
 
 abstract class BranchRemoteDataSource {
   Future<CreateBranchResponse> createBranch({
@@ -78,6 +79,17 @@ abstract class BranchRemoteDataSource {
   Future<BranchStatisticsModel> getBranchStatistics({
     required int branchId,
     required StatisticsTimePeriod timePeriod,
+  });
+
+  Future<BranchStatisticsModel> getAllBranchesStatistics({
+    required StatisticsTimePeriod timePeriod,
+  });
+
+  Future<BranchReviewsModel> getBranchReviews({
+    required int branchId,
+    int pageNumber = 1,
+    int pageSize = 10,
+    double? rating,
   });
 }
 
@@ -268,7 +280,9 @@ class BranchRemoteDataSourceImpl implements BranchRemoteDataSource {
     try {
       final response = await networkService.dio.request(
         EndPoints.getBranchStatistics(branchId),
-        data: {'timePeriod': timePeriod.value},
+        queryParameters: timePeriod.value != null
+            ? {'timePeriod': timePeriod.value}
+            : null,
         options: Options(method: 'GET', contentType: Headers.jsonContentType),
       );
 
@@ -282,6 +296,75 @@ class BranchRemoteDataSourceImpl implements BranchRemoteDataSource {
           : data;
 
       return BranchStatisticsModel.fromJson(statisticsJson);
+    } on DioException catch (error) {
+      final handled = networkService.handleDioExceoptions(error);
+      return handled.fold(
+        (failure) => throw ServerException(failure.message),
+        (_) => throw ServerException(error.message ?? 'Request failed'),
+      );
+    }
+  }
+
+  @override
+  Future<BranchStatisticsModel> getAllBranchesStatistics({
+    required StatisticsTimePeriod timePeriod,
+  }) async {
+    try {
+      final response = await networkService.dio.request(
+        EndPoints.getAllBranchesStatistics,
+        queryParameters: timePeriod.value != null
+            ? {'timePeriod': timePeriod.value}
+            : null,
+        options: Options(method: 'GET', contentType: Headers.jsonContentType),
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw ServerException('Invalid statistics response format');
+      }
+
+      final statisticsJson = data['data'] is Map<String, dynamic>
+          ? data['data'] as Map<String, dynamic>
+          : data;
+
+      return BranchStatisticsModel.fromJson(statisticsJson);
+    } on DioException catch (error) {
+      final handled = networkService.handleDioExceoptions(error);
+      return handled.fold(
+        (failure) => throw ServerException(failure.message),
+        (_) => throw ServerException(error.message ?? 'Request failed'),
+      );
+    }
+  }
+
+  @override
+  Future<BranchReviewsModel> getBranchReviews({
+    required int branchId,
+    int pageNumber = 1,
+    int pageSize = 10,
+    double? rating,
+  }) async {
+    try {
+      final queryParams = {
+        'pageNumber': pageNumber,
+        'pageSize': pageSize,
+      };
+      if (rating != null) {
+        queryParams['rating'] = rating.toInt();
+      }
+
+      final response = await networkService.dio.request(
+        EndPoints.getBranchReviews(branchId),
+        queryParameters: queryParams,
+        options: Options(method: 'GET', contentType: Headers.jsonContentType),
+      );
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw ServerException('Invalid reviews response format');
+      }
+
+      return BranchReviewsModel.fromJson(data);
     } on DioException catch (error) {
       final handled = networkService.handleDioExceoptions(error);
       return handled.fold(

@@ -36,9 +36,10 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
     StatisticsTimePeriod.today,
     StatisticsTimePeriod.thisWeek,
     StatisticsTimePeriod.thisMonth,
+    StatisticsTimePeriod.all,
   ];
 
-  final tabs = const ["Today", "This Week", "This Month"];
+  final tabs = const ["Today", "This Week", "This Month", "All"];
 
   @override
   void initState() {
