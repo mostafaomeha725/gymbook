@@ -4,14 +4,13 @@ import 'package:gymbook/features/admin/admin_home/presentation/widgets/employee_
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/employee_card_avatar.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/employee_card_details.dart';
 
-class EmployeeCard extends StatefulWidget {
+class EmployeeCard extends StatelessWidget {
   final String name;
   final String role;
   final String phone;
   final String initials;
   final bool? status;
   final VoidCallback? onEdit;
-  final ValueChanged<bool>? onToggleStatus;
 
   const EmployeeCard({
     super.key,
@@ -21,39 +20,12 @@ class EmployeeCard extends StatefulWidget {
     required this.initials,
     this.status,
     this.onEdit,
-    this.onToggleStatus,
   });
 
   @override
-  State<EmployeeCard> createState() => _EmployeeCardState();
-}
-
-class _EmployeeCardState extends State<EmployeeCard> {
-  late bool _isActive;
-
-  @override
-  void initState() {
-    super.initState();
-    _isActive = widget.status ?? true;
-  }
-
-  @override
-  void didUpdateWidget(covariant EmployeeCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.status != oldWidget.status && widget.status != null) {
-      _isActive = widget.status!;
-    }
-  }
-
-  void _toggleStatus(bool value) {
-    setState(() {
-      _isActive = value;
-    });
-    widget.onToggleStatus?.call(value);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final isActive = status ?? true;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -76,7 +48,7 @@ class _EmployeeCardState extends State<EmployeeCard> {
             child: Container(
               width: 4.w,
               decoration: BoxDecoration(
-                color: (widget.status == null || _isActive)
+                color: isActive
                     ? const Color(0xFF10B981)
                     : const Color(0xFFEF4444),
                 borderRadius: BorderRadius.only(
@@ -91,20 +63,19 @@ class _EmployeeCardState extends State<EmployeeCard> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                EmployeeCardAvatar(initials: widget.initials),
+                EmployeeCardAvatar(initials: initials),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: EmployeeCardDetails(
-                    name: widget.name,
-                    role: widget.role,
-                    phone: widget.phone,
+                    name: name,
+                    role: role,
+                    phone: phone,
                   ),
                 ),
                 EmployeeCardActions(
-                  onEdit: widget.onEdit,
-                  hasStatus: widget.status != null,
-                  isActive: _isActive,
-                  onToggleStatus: _toggleStatus,
+                  onEdit: onEdit,
+                  hasStatus: status != null,
+                  isActive: isActive,
                 ),
               ],
             ),

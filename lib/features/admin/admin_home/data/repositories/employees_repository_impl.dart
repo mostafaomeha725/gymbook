@@ -34,4 +34,28 @@ class EmployeesRepositoryImpl implements EmployeesRepository {
       return const Left(ServerFailure(message: 'An unexpected error occurred'));
     }
   }
+
+  @override
+  Future<Either<Failure, EmployeeModel>> addEmployee(Map<String, dynamic> body) async {
+    try {
+      final response = await remoteDataSource.addEmployee(body);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return const Left(ServerFailure(message: 'An unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EmployeeModel>> updateEmployee(int employeeId, Map<String, dynamic> body) async {
+    try {
+      final response = await remoteDataSource.updateEmployee(employeeId, body);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return const Left(ServerFailure(message: 'An unexpected error occurred'));
+    }
+  }
 }

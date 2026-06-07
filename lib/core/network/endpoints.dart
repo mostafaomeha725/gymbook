@@ -126,4 +126,7 @@ class EndPoints {
 
   static String getBranchEmployees(int branchId) =>
       'Owner/Branches/$branchId/employees';
+
+  static const String addEmployee = 'Employees';
+  static String updateEmployee(int employeeId) => 'Employees/$employeeId';
 }

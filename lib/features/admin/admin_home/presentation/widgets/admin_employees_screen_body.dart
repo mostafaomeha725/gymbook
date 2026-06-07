@@ -28,14 +28,17 @@ class AdminEmployeesScreenBody extends StatelessWidget {
         BranchButtom(
           text: 'Add New Employee',
           icon: Icons.add,
-          onTap: () {
-            GoRouter.of(context).push(
+          onTap: () async {
+            await GoRouter.of(context).push(
               Routes.addEditEmployeeScreen,
               extra: AddEditEmployeeScreenArgs(
                 branchId: branchId,
                 isEditMode: false,
               ),
             );
+            if (context.mounted) {
+              context.read<BranchEmployeesCubit>().getBranchEmployees(branchId);
+            }
           },
         ),
         SizedBox(height: 24.h),
@@ -78,17 +81,18 @@ class AdminEmployeesScreenBody extends StatelessWidget {
                         phone: employee.phone,
                         initials: employee.firstName.isNotEmpty ? employee.firstName.substring(0, 1).toUpperCase() : 'E',
                         status: employee.isActive,
-                        onEdit: () {
-                          GoRouter.of(context).push(
+                        onEdit: () async {
+                          await GoRouter.of(context).push(
                             Routes.addEditEmployeeScreen,
                             extra: AddEditEmployeeScreenArgs(
                               branchId: branchId,
                               isEditMode: true,
+                              employee: employee,
                             ),
                           );
-                        },
-                        onToggleStatus: (val) {
-                          // TODO: Toggle status logic
+                          if (context.mounted) {
+                            context.read<BranchEmployeesCubit>().getBranchEmployees(branchId);
+                          }
                         },
                       );
                     },

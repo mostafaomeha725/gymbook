@@ -17,6 +17,9 @@ import 'package:gymbook/features/admin/admin_home/domain/usecases/get_roles_usec
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/roles_cubit/roles_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_employees_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_employees_cubit/branch_employees_cubit.dart';
+import 'package:gymbook/features/admin/admin_home/domain/usecases/add_employee_usecase.dart';
+import 'package:gymbook/features/admin/admin_home/domain/usecases/update_employee_usecase.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/add_edit_employee_cubit/add_edit_employee_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_repository.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/governorates_repository.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/package_repository.dart';
@@ -369,6 +372,12 @@ class ServiceLocator {
     if (!sl.isRegistered<GetBranchEmployeesUseCase>()) {
       sl.registerLazySingleton(() => GetBranchEmployeesUseCase(sl()));
     }
+    if (!sl.isRegistered<AddEmployeeUseCase>()) {
+      sl.registerLazySingleton(() => AddEmployeeUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdateEmployeeUseCase>()) {
+      sl.registerLazySingleton(() => UpdateEmployeeUseCase(sl()));
+    }
 
     // Cubits
     if (!sl.isRegistered<AdminMyBranchesCubit>()) {
@@ -470,6 +479,14 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<BranchEmployeesCubit>()) {
       sl.registerFactory(() => BranchEmployeesCubit(getBranchEmployeesUseCase: sl()));
+    }
+    if (!sl.isRegistered<AddEditEmployeeCubit>()) {
+      sl.registerFactory(
+        () => AddEditEmployeeCubit(
+          addEmployeeUseCase: sl(),
+          updateEmployeeUseCase: sl(),
+        ),
+      );
     }
   }
 
