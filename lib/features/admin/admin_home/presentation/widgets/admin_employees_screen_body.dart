@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/models/add_edit_employee_screen_args.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_buttom.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/employee_card.dart';
 
@@ -18,7 +21,19 @@ class AdminEmployeesScreenBody extends StatelessWidget {
           child: const AppbarSubscriptionWidget(text: 'Employees'),
         ),
         SizedBox(height: 24.h),
-        BranchButtom(text: 'Add New Employee', icon: Icons.add, onTap: () {}),
+        BranchButtom(
+          text: 'Add New Employee',
+          icon: Icons.add,
+          onTap: () {
+            GoRouter.of(context).push(
+              Routes.addEditEmployeeScreen,
+              extra: AddEditEmployeeScreenArgs(
+                branchId: branchId,
+                isEditMode: false,
+              ),
+            );
+          },
+        ),
         SizedBox(height: 24.h),
         Expanded(
           child: ListView(
@@ -31,7 +46,13 @@ class AdminEmployeesScreenBody extends StatelessWidget {
                 initials: 'AH',
                 status: true,
                 onEdit: () {
-                  // TODO: handle edit
+                  GoRouter.of(context).push(
+                    Routes.addEditEmployeeScreen,
+                    extra: AddEditEmployeeScreenArgs(
+                      branchId: branchId,
+                      isEditMode: true,
+                    ),
+                  );
                 },
               ),
               SizedBox(height: 12.h),

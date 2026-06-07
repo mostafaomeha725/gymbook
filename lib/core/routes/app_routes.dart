@@ -19,6 +19,8 @@ import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_rev
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/admin_subscription_details_screen.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/admin_employees_screen.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/screens/add_edit_employee_screen.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/models/add_edit_employee_screen_args.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/edit_branch_details_screen.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/screens/manage_package_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/join_us_screen.dart';
@@ -297,6 +299,14 @@ GoRouter createRouter() {
           final branchId = state.extra as int?;
           if (branchId == null) return const SizedBox.shrink();
           return AdminEmployeesScreen(branchId: branchId);
+        },
+      ),
+      GoRoute(
+        path: Routes.addEditEmployeeScreen,
+        builder: (context, state) {
+          final args = state.extra as AddEditEmployeeScreenArgs?;
+          if (args == null) return const SizedBox.shrink();
+          return AddEditEmployeeScreen(args: args);
         },
       ),
       GoRoute(
