@@ -55,14 +55,16 @@ class GridViewBranchCard extends StatelessWidget {
 
         AdminBranchCard(
           hasStatus: true,
-          title: 'Hours',
-          subtitle: 'Set schedule',
-          icon: Icons.access_time,
+          title: 'Employees',
+          subtitle: 'Manage staff',
+          icon: Icons.people_outline,
           gradient: const LinearGradient(
             colors: [Color(0xFFA78BFA), Color(0xFF7C3AED)],
           ),
           onTap: () {
-            GoRouter.of(context).push(Routes.addBranchThreeScreen);
+            GoRouter.of(
+              context,
+            ).push(Routes.adminEmployeesScreen, extra: branchId);
           },
         ),
 

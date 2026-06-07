@@ -7,18 +7,17 @@ import 'package:gymbook/core/routes/app_routes.dart';
 import 'package:gymbook/core/theme/light_colors.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> clearPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
-}
+// Future<void> clearPrefs() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.clear();
+// }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('en', null);
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear(); // يمسح كل البيانات
+  // final prefs = await SharedPreferences.getInstance();
+  // await prefs.clear(); // يمسح كل البيانات
   await ServiceLocator().init();
   configureEasyLoading();
 

@@ -29,5 +29,6 @@ class Routes {
       '/admin-subscription-details-screen';
   static const adminAddSubscriptionScreen = '/admin-add-subscription-screen';
   static const adminBranchScreen = '/admin-branch-screen';
+  static const adminEmployeesScreen = '/admin-employees-screen';
   static const editBranchDetailsScreen = '/edit-branch-details-screen';
 }
