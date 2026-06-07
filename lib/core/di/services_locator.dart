@@ -15,6 +15,8 @@ import 'package:gymbook/features/admin/admin_home/data/repositories/employees_re
 import 'package:gymbook/features/admin/admin_home/domain/repositories/employees_repository.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_roles_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/roles_cubit/roles_cubit.dart';
+import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_employees_usecase.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_employees_cubit/branch_employees_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_repository.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/governorates_repository.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/package_repository.dart';
@@ -364,6 +366,9 @@ class ServiceLocator {
     if (!sl.isRegistered<GetRolesUseCase>()) {
       sl.registerLazySingleton(() => GetRolesUseCase(sl()));
     }
+    if (!sl.isRegistered<GetBranchEmployeesUseCase>()) {
+      sl.registerLazySingleton(() => GetBranchEmployeesUseCase(sl()));
+    }
 
     // Cubits
     if (!sl.isRegistered<AdminMyBranchesCubit>()) {
@@ -462,6 +467,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<RolesCubit>()) {
       sl.registerFactory(() => RolesCubit(getRolesUseCase: sl()));
+    }
+    if (!sl.isRegistered<BranchEmployeesCubit>()) {
+      sl.registerFactory(() => BranchEmployeesCubit(getBranchEmployeesUseCase: sl()));
     }
   }
 

@@ -123,4 +123,7 @@ class EndPoints {
   static const String addCheckIn = 'CheckIns';
 
   static const String getRoles = 'employees/roles';
+
+  static String getBranchEmployees(int branchId) =>
+      'Owner/Branches/$branchId/employees';
 }
