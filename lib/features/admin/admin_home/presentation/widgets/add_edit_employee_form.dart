@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/roles_cubit/roles_cubit.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/roles_cubit/roles_state.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/models/add_edit_employee_screen_args.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/add_edit_employee_buttons.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/widgets/role_dropdown.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/labeled_form_field.dart';
 
 class AddEditEmployeeForm extends StatefulWidget {
@@ -105,14 +109,23 @@ class _AddEditEmployeeFormState extends State<AddEditEmployeeForm> {
           SizedBox(height: 16.h),
           LabeledFormField(
             label: 'Role',
-            input: AppFormField(
-              controller: _roleController,
-              hintText: 'Choose a role...',
-              readOnly: true,
-              prefixIcon: const Icon(Icons.shield_outlined, size: 20),
-              suffixIcon: const Icon(Icons.keyboard_arrow_down, size: 20),
-              onTap: () {
-                // TODO: Show Roles BottomSheet or Dropdown
+            input: BlocBuilder<RolesCubit, RolesState>(
+              builder: (context, state) {
+                return RoleDropdown(
+                  hintText: 'Choose a role...',
+                  isLoading: state is RolesLoading,
+                  roles: state is RolesLoaded ? state.roles : [],
+                  initialValue: _roleController.text.isNotEmpty
+                      ? _roleController.text
+                      : null,
+                  onChanged: (role) {
+                    if (role != null) {
+                      _roleController.text = role.name;
+                    } else {
+                      _roleController.clear();
+                    }
+                  },
+                );
               },
             ),
           ),

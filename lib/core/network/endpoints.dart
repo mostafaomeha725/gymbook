@@ -121,4 +121,6 @@ class EndPoints {
   static const String getGovernorates = 'Governorates';
 
   static const String addCheckIn = 'CheckIns';
+
+  static const String getRoles = 'employees/roles';
 }

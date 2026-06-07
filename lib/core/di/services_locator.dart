@@ -10,6 +10,11 @@ import 'package:gymbook/features/admin/admin_home/data/repositories/branch_repos
 import 'package:gymbook/features/admin/admin_home/data/repositories/governorates_repository_impl.dart';
 import 'package:gymbook/features/admin/admin_home/data/repositories/package_repository_impl.dart';
 import 'package:gymbook/features/admin/admin_home/data/repositories/subscription_repository_impl.dart';
+import 'package:gymbook/features/admin/admin_home/data/datasources/employees_remote_datasource.dart';
+import 'package:gymbook/features/admin/admin_home/data/repositories/employees_repository_impl.dart';
+import 'package:gymbook/features/admin/admin_home/domain/repositories/employees_repository.dart';
+import 'package:gymbook/features/admin/admin_home/domain/usecases/get_roles_usecase.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/roles_cubit/roles_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_repository.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/governorates_repository.dart';
 import 'package:gymbook/features/admin/admin_home/domain/repositories/package_repository.dart';
@@ -243,6 +248,11 @@ class ServiceLocator {
         () => CheckInRemoteDataSourceImpl(sl()),
       );
     }
+    if (!sl.isRegistered<EmployeesRemoteDataSource>()) {
+      sl.registerLazySingleton<EmployeesRemoteDataSource>(
+        () => EmployeesRemoteDataSourceImpl(sl()),
+      );
+    }
 
     // Repository
     if (!sl.isRegistered<AdminMeRepository>()) {
@@ -273,6 +283,11 @@ class ServiceLocator {
     if (!sl.isRegistered<CheckInRepository>()) {
       sl.registerLazySingleton<CheckInRepository>(
         () => CheckInRepositoryImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<EmployeesRepository>()) {
+      sl.registerLazySingleton<EmployeesRepository>(
+        () => EmployeesRepositoryImpl(sl()),
       );
     }
 
@@ -345,6 +360,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<AddCheckInUseCase>()) {
       sl.registerLazySingleton(() => AddCheckInUseCase(sl()));
+    }
+    if (!sl.isRegistered<GetRolesUseCase>()) {
+      sl.registerLazySingleton(() => GetRolesUseCase(sl()));
     }
 
     // Cubits
@@ -441,6 +459,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<AdminQrScannerCubit>()) {
       sl.registerFactory(() => AdminQrScannerCubit(sl()));
+    }
+    if (!sl.isRegistered<RolesCubit>()) {
+      sl.registerFactory(() => RolesCubit(getRolesUseCase: sl()));
     }
   }
 
