@@ -2,6 +2,7 @@ import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
+import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_entity.dart';
@@ -50,9 +51,9 @@ final CustomGoRouterObserver customGoRouterObserver = CustomGoRouterObserver();
 String _getInitialLocation() {
   final storage = sl<PreferencesStorage>();
   final token = storage.getUserToken();
+  final isEmailConfirmed = storage.isUserEmailConfirmed();
   return token != null && token.isNotEmpty
-      ? Routes.mainNavigationScreen
-      // ? Routes.editBranchDetailsScreen
+      ? (isEmailConfirmed ? Routes.mainNavigationScreen : Routes.otpScreen)
       : Routes.loginScreen;
 }
 
@@ -65,12 +66,22 @@ GoRouter createRouter() {
       final storage = sl<PreferencesStorage>();
       final token = storage.getUserToken();
       final isLoggedIn = token != null && token.isNotEmpty;
+      final isEmailConfirmed = storage.isUserEmailConfirmed();
+
+      if (isLoggedIn && !isEmailConfirmed) {
+        if (state.matchedLocation != Routes.otpScreen &&
+            state.matchedLocation != Routes.loginScreen) {
+          return Routes.otpScreen;
+        }
+      }
 
       if (isLoggedIn &&
+          isEmailConfirmed &&
           (state.matchedLocation == Routes.loginScreen ||
               state.matchedLocation == Routes.forgetPasswordScreen ||
               state.matchedLocation == Routes.resetPasswordScreen ||
               state.matchedLocation == Routes.registerScreen ||
+              state.matchedLocation == Routes.otpScreen ||
               state.matchedLocation == Routes.joinusScreen)) {
         return Routes.mainNavigationScreen;
       }
@@ -126,15 +137,24 @@ GoRouter createRouter() {
         path: Routes.otpScreen,
         builder: (context, state) {
           final extra = state.extra;
+          
+          final storage = sl<PreferencesStorage>();
+          final savedEmail = storage.getString(key: PreferencesKeys.email);
+          final userType = storage.getUserType() ?? 4;
+          final fallbackSource = userType == 2 ? OtpSource.business : OtpSource.customer;
+
           final OtpScreenArgs args = extra is OtpScreenArgs
               ? extra
               : OtpScreenArgs(
-                  source: extra is OtpSource ? extra : OtpSource.customer,
+                  source: fallbackSource,
+                  purpose: OtpPurpose.confirmEmail,
+                  email: savedEmail,
                 );
 
           return OtpScreen(
-            totalSteps: args.source == OtpSource.customer ? 2 : 3,
+            totalSteps: args.purpose == OtpPurpose.resetPassword ? 3 : 2,
             source: args.source,
+            purpose: args.purpose,
             email: args.email,
           );
         },

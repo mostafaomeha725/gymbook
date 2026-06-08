@@ -85,7 +85,17 @@ class PreferencesStorage {
     await _preferences.remove(PreferencesKeys.userId.name);
   }
 
-  /// ================= ROLE AND BRANCH INFO =================
+  Future<void> saveUserEmailConfirmed(bool confirmed) async {
+    await putBoolean(key: PreferencesKeys.isEmailConfirmed, value: confirmed);
+  }
+
+  bool isUserEmailConfirmed() {
+    return getBoolean(
+      key: PreferencesKeys.isEmailConfirmed,
+      defaultValue: true,
+    );
+  }
+
   Future<void> saveUserType(int userType) async {
     await _preferences.setInt(PreferencesKeys.userType.name, userType);
   }

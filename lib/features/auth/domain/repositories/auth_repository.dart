@@ -10,6 +10,11 @@ abstract class AuthRepository {
     required String email,
   });
 
+  Future<Either<Failure, void>> confirmEmail({
+    required String email,
+    required String code,
+  });
+
   Future<Either<Failure, bool>> validateResetPasswordCode({
     required String email,
     required String code,
@@ -44,4 +49,8 @@ abstract class AuthRepository {
     required String phoneNumber,
     required bool isOwner,
   });
+
+  Future<void> confirmPendingSession();
+  
+  void clearPendingSession();
 }

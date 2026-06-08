@@ -10,6 +10,8 @@ abstract class AuthRemoteDataSource {
 
   Future<void> resendConfirmationEmail({required String email});
 
+  Future<void> confirmEmail({required String email, required String code});
+
   Future<bool> validateResetPasswordCode({
     required String email,
     required String code,
@@ -69,6 +71,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final result = await networkService.postData(
       endPoint: EndPoints.resendConfirmationEmail,
       data: {'email': email},
+    );
+
+    result.fold(
+      (failure) => throw ServerException(failure.message),
+      (_) => null,
+    );
+  }
+
+  @override
+  Future<void> confirmEmail({required String email, required String code}) async {
+    final result = await networkService.postData(
+      endPoint: EndPoints.confirmEmail,
+      data: {'email': email, 'code': code},
     );
 
     result.fold(

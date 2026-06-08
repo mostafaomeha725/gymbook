@@ -59,6 +59,10 @@ class NetworkService {
     dio.options.headers['Authorization'] = "Bearer $token";
   }
 
+  void removeToken() {
+    dio.options.headers.remove('Authorization');
+  }
+
   Future<Either<Failure, dynamic>> postData({
     required String endPoint,
     Map<String, dynamic>? data,

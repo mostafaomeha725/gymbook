@@ -24,6 +24,8 @@ class EndPoints {
   static const String resendConfirmationEmail =
       'Authentication/resend-confirmation-email';
 
+  static const String confirmEmail = 'Authentication/confirm-email';
+
   static const String resetPassword = 'Authentication/reset-password';
 
   static const String changePassword = 'Authentication/change-password';

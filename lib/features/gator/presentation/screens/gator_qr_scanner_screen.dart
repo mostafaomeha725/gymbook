@@ -15,10 +15,7 @@ class GatorQrScannerScreen extends StatelessWidget {
     final branchId = roleService.getBranchId();
 
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => sl<AdminQrScannerCubit>()),
-        // We don't need AdminMyBranchesCubit here because the branch is fixed
-      ],
+      providers: [BlocProvider(create: (_) => sl<AdminQrScannerCubit>())],
       child: AdminQrScannerBody(
         branchName: branchName,
         fixedBranchId: branchId,

@@ -11,6 +11,7 @@ import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/widgets/divider_widget.dart';
 
@@ -42,10 +43,23 @@ class _LoginWidgetState extends State<LoginWidget> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           hideLoading();
-          GoRouter.of(context).pushReplacement(
-            Routes.mainNavigationScreen,
-            extra: state.loginResult.user.isAdmin,
-          );
+          if (!state.loginResult.user.emailConfirmed) {
+            GoRouter.of(context).push(
+              Routes.otpScreen,
+              extra: OtpScreenArgs(
+                source: state.loginResult.user.userType == 2
+                    ? OtpSource.business
+                    : OtpSource.customer,
+                purpose: OtpPurpose.confirmEmail,
+                email: emailController.text.trim(),
+              ),
+            );
+          } else {
+            GoRouter.of(context).pushReplacement(
+              Routes.mainNavigationScreen,
+              extra: state.loginResult.user.isAdmin,
+            );
+          }
         }
       },
       child: Container(

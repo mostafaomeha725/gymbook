@@ -77,12 +77,14 @@ import 'package:gymbook/features/auth/domain/usecases/reset_password_usecase.dar
 import 'package:gymbook/features/auth/domain/usecases/register_usecase.dart';
 import 'package:gymbook/features/auth/domain/usecases/send_reset_password_email_usecase.dart';
 import 'package:gymbook/features/auth/domain/usecases/validate_reset_password_code_usecase.dart';
+import 'package:gymbook/features/auth/domain/usecases/confirm_email_usecase.dart';
 import 'package:gymbook/features/auth/presentation/cubits/forget_password_cubit/forget_password_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/resend_confirmation_email_cubit/resend_confirmation_email_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/reset_password_cubit/reset_password_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/validate_reset_password_code_cubit/validate_reset_password_code_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/confirm_email_cubit/confirm_email_cubit.dart';
 import 'package:gymbook/features/auth/domain/usecases/change_password_usecase.dart';
 import 'package:gymbook/features/auth/presentation/cubits/change_password_cubit/change_password_cubit.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/data/datasources/admin_me_remote_datasource.dart';
@@ -201,6 +203,9 @@ class ServiceLocator {
     if (!sl.isRegistered<ChangePasswordUseCase>()) {
       sl.registerLazySingleton(() => ChangePasswordUseCase(sl()));
     }
+    if (!sl.isRegistered<ConfirmEmailUseCase>()) {
+      sl.registerLazySingleton(() => ConfirmEmailUseCase(sl()));
+    }
 
     // Cubits
     if (!sl.isRegistered<LoginCubit>()) {
@@ -225,6 +230,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<ChangePasswordCubit>()) {
       sl.registerFactory(() => ChangePasswordCubit(changePasswordUseCase: sl()));
+    }
+    if (!sl.isRegistered<ConfirmEmailCubit>()) {
+      sl.registerFactory(() => ConfirmEmailCubit(sl()));
     }
   }
 

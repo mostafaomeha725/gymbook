@@ -15,6 +15,8 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final PreferencesStorage storage;
   final NetworkService networkService;
+  
+  LoginResponse? _pendingLoginResponse;
 
   AuthRepositoryImpl({
     required this.remoteDataSource,
@@ -40,6 +42,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       await remoteDataSource.resendConfirmationEmail(email: email);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> confirmEmail({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      await remoteDataSource.confirmEmail(email: email, code: code);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -110,7 +125,11 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         password: password,
       );
-      await _saveSession(response);
+      if (response.user.emailConfirmed) {
+        await _saveSession(response);
+      } else {
+        _pendingLoginResponse = response;
+      }
       return Right(_mapToLoginResult(response));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -121,7 +140,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, LoginResultEntity>> loginWithGoogle() async {
     try {
       final response = await remoteDataSource.loginWithGoogle();
-      await _saveSession(response);
+      if (response.user.emailConfirmed) {
+        await _saveSession(response);
+      } else {
+        _pendingLoginResponse = response;
+      }
       return Right(_mapToLoginResult(response));
     } on UserCancelledException {
       return const Left(UserCancelledFailure());
@@ -166,6 +189,8 @@ class AuthRepositoryImpl implements AuthRepository {
     );
     await storage.saveUserId(response.user.id);
     await storage.saveUserSecretKey(response.user.secretKey);
+    await storage.saveUserEmailConfirmed(response.user.emailConfirmed);
+    await storage.putString(key: PreferencesKeys.email, value: response.user.email);
 
     // Save extended role details
     await storage.saveUserType(response.user.userType);
@@ -192,6 +217,7 @@ class AuthRepositoryImpl implements AuthRepository {
         branchId: response.user.worksAtBranch?.branchId,
         branchName: response.user.worksAtBranch?.branchName,
         role: response.user.role,
+        emailConfirmed: response.user.emailConfirmed,
       ),
     );
   }
@@ -205,6 +231,22 @@ class AuthRepositoryImpl implements AuthRepository {
       fullName: response.fullName,
       userType: parseAppUserRole(response.role) == AppUserRole.owner ? 2 : 4,
       role: parseAppUserRole(response.role),
+      emailConfirmed: response.emailConfirmed,
     );
+  }
+
+  @override
+  Future<void> confirmPendingSession() async {
+    if (_pendingLoginResponse != null) {
+      await _saveSession(_pendingLoginResponse!);
+      _pendingLoginResponse = null;
+    }
+  }
+
+  @override
+  void clearPendingSession() {
+    _pendingLoginResponse = null;
+    storage.deleteUserToken();
+    networkService.removeToken();
   }
 }

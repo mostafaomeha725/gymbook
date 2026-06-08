@@ -6,9 +6,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/cache/preferences_storage.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/auth/domain/repositories/auth_repository.dart';
+import 'package:gymbook/features/auth/presentation/cubits/confirm_email_cubit/confirm_email_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/confirm_email_cubit/confirm_email_state.dart';
 import 'package:gymbook/features/auth/presentation/cubits/resend_confirmation_email_cubit/resend_confirmation_email_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/validate_reset_password_code_cubit/validate_reset_password_code_cubit.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
@@ -22,11 +27,13 @@ class OtpScreenBody extends StatefulWidget {
     super.key,
     required this.totalSteps,
     required this.source,
+    required this.purpose,
     this.email,
   });
 
   final int totalSteps;
   final OtpSource source;
+  final OtpPurpose purpose;
   final String? email;
 
   @override
@@ -38,6 +45,7 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
   bool canResend = false;
   Timer? _timer;
   String _otpCode = '';
+  bool _isVerified = false;
 
   @override
   void initState() {
@@ -67,11 +75,18 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
   @override
   void dispose() {
     _timer?.cancel();
+    if (widget.purpose == OtpPurpose.confirmEmail && !_isVerified) {
+      sl<AuthRepository>().clearPendingSession();
+    }
     super.dispose();
   }
 
   bool get _canValidateResetCode =>
-      widget.source == OtpSource.customer &&
+      widget.purpose == OtpPurpose.resetPassword &&
+      (widget.email?.trim().isNotEmpty ?? false);
+
+  bool get _canConfirmEmail =>
+      widget.purpose == OtpPurpose.confirmEmail &&
       (widget.email?.trim().isNotEmpty ?? false);
 
   void _onResendPressed() {
@@ -85,11 +100,44 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
   }
 
   void _onVerifyPressed() {
+    if (_otpCode.length != 6) {
+      showError('Please enter the 6-digit verification code.');
+      return;
+    }
+
     if (_canValidateResetCode) {
       context.read<ValidateResetPasswordCodeCubit>().validateResetPasswordCode(
         email: widget.email!.trim(),
         code: _otpCode,
       );
+      return;
+    }
+
+    if (_canConfirmEmail) {
+      context.read<ConfirmEmailCubit>().confirmEmail(
+        email: widget.email!.trim(),
+        code: _otpCode,
+      );
+      return;
+    }
+
+    _navigateOnSuccess();
+  }
+
+  void _navigateOnSuccess() async {
+    if (widget.purpose == OtpPurpose.confirmEmail) {
+      _isVerified = true;
+      await sl<AuthRepository>().confirmPendingSession();
+      sl<PreferencesStorage>().saveUserEmailConfirmed(true);
+      showSuccess('Email confirmed successfully!');
+      
+      if (widget.source == OtpSource.customer) {
+        if (!mounted) return;
+        GoRouter.of(context).go(Routes.mainNavigationScreen);
+      } else {
+        if (!mounted) return;
+        GoRouter.of(context).go(Routes.mainNavigationScreen);
+      }
       return;
     }
 
@@ -122,6 +170,18 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
               }
 
               GoRouter.of(context).pushReplacement(Routes.mainNavigationScreen);
+            }
+          },
+        ),
+        BlocListener<
+          ConfirmEmailCubit,
+          ConfirmEmailState
+        >(
+          listener: (context, state) {
+            if (state is ConfirmEmailFailure) {
+              showError(state.message);
+            } else if (state is ConfirmEmailSuccess) {
+              _navigateOnSuccess();
             }
           },
         ),
@@ -196,7 +256,7 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
 
               AppButton(
                 text: 'Verify',
-                onPressed: _otpCode.length == 6 ? _onVerifyPressed : null,
+                onPressed: _onVerifyPressed,
                 textSize: 18.sp,
                 gradient: const LinearGradient(
                   begin: Alignment.topCenter,

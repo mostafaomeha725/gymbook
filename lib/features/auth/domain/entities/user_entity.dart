@@ -11,6 +11,7 @@ class UserEntity {
   final int? branchId;
   final String? branchName;
   final AppUserRole role;
+  final bool emailConfirmed;
 
   const UserEntity({
     required this.id,
@@ -23,6 +24,7 @@ class UserEntity {
     this.branchId,
     this.branchName,
     required this.role,
+    required this.emailConfirmed,
   });
 
   bool get isAdmin =>

@@ -9,6 +9,7 @@ import 'package:gymbook/core/utils/validators.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/register_screen.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:gymbook/features/auth/presentation/widgets/password_condition_widget.dart';
@@ -65,7 +66,20 @@ class _AllTextFieldRegisterCustomerState
         if (state is RegisterSuccess) {
           hideLoading();
           showSuccess('Account created successfully!');
-          GoRouter.of(context).go(Routes.loginScreen);
+          if (!state.user.emailConfirmed) {
+            GoRouter.of(context).push(
+              Routes.otpScreen,
+              extra: OtpScreenArgs(
+                source: widget.type == RegisterType.customer
+                    ? OtpSource.customer
+                    : OtpSource.business,
+                purpose: OtpPurpose.confirmEmail,
+                email: emailController.text.trim(),
+              ),
+            );
+          } else {
+            GoRouter.of(context).go(Routes.loginScreen);
+          }
         }
       },
       child: Padding(

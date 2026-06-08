@@ -21,7 +21,7 @@ class RegisterScreenBody extends StatelessWidget {
             child: AppbarAuthCard(
               title: isCustomer ? 'Create Account' : 'Gym Registration',
               currentStep: 1,
-              totalSteps: isCustomer ? 2 : 3,
+              totalSteps: 2,
             ),
           ),
           SizedBox(height: 24.h),

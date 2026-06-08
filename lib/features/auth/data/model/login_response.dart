@@ -141,6 +141,7 @@ class LoginUser {
   final int userType;
   final WorksAtBranch? worksAtBranch;
   final AppUserRole role;
+  final bool emailConfirmed;
 
   LoginUser({
     required this.id,
@@ -152,6 +153,7 @@ class LoginUser {
     required this.userType,
     this.worksAtBranch,
     required this.role,
+    required this.emailConfirmed,
   });
 
   factory LoginUser.fromJson(Map<String, dynamic> json) {
@@ -174,6 +176,7 @@ class LoginUser {
       userType: userType,
       worksAtBranch: worksAtBranch,
       role: resolveAppUserRole(userType: userType, roleId: roleId),
+      emailConfirmed: json['emailConfirmed'] ?? false,
     );
   }
 
@@ -186,6 +189,7 @@ class LoginUser {
       'fullName': fullName,
       'secretKey': secretKey,
       'userType': userType,
+      'emailConfirmed': emailConfirmed,
       if (worksAtBranch != null) 'worksAtBranch': worksAtBranch!.toJson(),
     };
   }

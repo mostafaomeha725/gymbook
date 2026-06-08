@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/services/user_role_service.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_entity.dart';
@@ -14,8 +13,6 @@ class BranchAdminHomeScreen extends StatelessWidget {
     final branchId = roleService.getBranchId() ?? 0;
     final branchName = roleService.getBranchName() ?? 'Branch';
 
-    // Create a dummy BranchEntity using data from login
-    // The AdminBranchScreen will fetch full details based on this ID
     final dummyBranch = BranchEntity(
       id: branchId,
       name: branchName,

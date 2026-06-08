@@ -46,6 +46,7 @@ class _ForgetPasswordScreenBodyState extends State<ForgetPasswordScreenBody> {
             Routes.otpScreen,
             extra: OtpScreenArgs(
               source: OtpSource.customer,
+              purpose: OtpPurpose.resetPassword,
               email: emailController.text.trim(),
             ),
           );

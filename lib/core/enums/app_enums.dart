@@ -2,6 +2,8 @@ enum RegisterType { customer, business }
 
 enum OtpSource { customer, business }
 
+enum OtpPurpose { resetPassword, confirmEmail }
+
 enum GymType { menOnly, womenOnly, mixed }
 
 enum SubscriptionTab { all, active, expired, frozen, cancelled, scheduled }
@@ -23,6 +25,7 @@ enum PreferencesKeys {
   userId,
   userType,
   roleId,
+  isEmailConfirmed,
   branchName,
   branchId,
 }
