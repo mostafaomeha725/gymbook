@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gymbook/core/theme/styles.dart';
-import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/core/widgets/custom_icon_appbar_widget.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/domain/entities/admin_branch_option_entity.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_my_branches_cubit/admin_my_branches_cubit.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_qr_scanner_cubit/admin_qr_scanner_cubit.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_scanner_branch_selector.dart';
+import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_scanner_snackbar.dart';
+import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_qr_scanner_header.dart';
+import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_qr_scanner_camera_section.dart';
 
 class AdminQrScannerBody extends StatefulWidget {
   const AdminQrScannerBody({super.key});
@@ -42,15 +44,19 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
       listener: (context, state) {
         if (state.errorMessage != null &&
             state.errorMessage!.trim().isNotEmpty) {
-          ScaffoldMessenger.of(
+          AdminScannerSnackbar.show(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+            state.errorMessage!,
+            isError: true,
+          );
         }
         if (state.successMessage != null &&
             state.successMessage!.trim().isNotEmpty) {
-          ScaffoldMessenger.of(
+          AdminScannerSnackbar.show(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+            state.successMessage!,
+            isError: false,
+          );
         }
       },
       builder: (context, state) {
@@ -65,88 +71,79 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
           _ensureBranchSelection(branches);
         }
 
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        return Container(
+          color: const Color(0xFFF8FAFC),
           child: Column(
             children: [
-              SizedBox(height: 40.h),
-              AppText('Check-In Scanner', style: font20w700),
-              SizedBox(height: 12.h),
-              if (isBranchLoading)
-                const LinearProgressIndicator()
-              else if (branchesState is AdminMyBranchesFailure)
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppText(
-                        branchesState.message,
-                        style: font14w500.copyWith(
-                          color: const Color(0xffDC2626),
-                        ),
-                        maxLines: 2,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        context.read<AdminMyBranchesCubit>().loadBranches();
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                )
-              else
-                DropdownButtonFormField<int>(
-                  value: _selectedBranchId,
-                  decoration: const InputDecoration(
-                    labelText: 'Branch',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: branches
-                      .map(
-                        (branch) => DropdownMenuItem<int>(
-                          value: branch.id,
-                          child: Text(branch.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedBranchId = value;
-                    });
-                  },
-                ),
-              SizedBox(height: 16.h),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16.r),
-                  child: MobileScanner(
-                    fit: BoxFit.cover,
-                    onDetect: (capture) {
-                      if (state.isSubmitting || _selectedBranchId == null)
-                        return;
-                      final value = capture.barcodes.first.rawValue;
-                      if (value == null || value.trim().isEmpty) return;
+              const AdminQrScannerHeader(),
 
-                      context
-                          .read<AdminQrScannerCubit>()
-                          .submitFromScannedPayload(
-                            rawValue: value,
-                            branchId: _selectedBranchId!,
-                          );
-                    },
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 12.h),
+
+                      // Branch Selector Card
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 4.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 15.r,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: AdminScannerBranchSelector(
+                          isBranchLoading: isBranchLoading,
+                          branchesState: branchesState,
+                          branches: branches,
+                          selectedBranchId: _selectedBranchId,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedBranchId = value;
+                            });
+                          },
+                        ),
+                      ),
+
+                      SizedBox(height: 12.h),
+
+                      // Scanner Section
+                      Expanded(
+                        child: AdminQrScannerCameraSection(
+                          isSubmitting: state.isSubmitting,
+                          hasSelectedBranch: _selectedBranchId != null,
+                          onDetect: (capture) {
+                            if (state.isSubmitting ||
+                                _selectedBranchId == null) {
+                              return;
+                            }
+                            final value = capture.barcodes.first.rawValue;
+                            if (value == null || value.trim().isEmpty) {
+                              return;
+                            }
+                            context
+                                .read<AdminQrScannerCubit>()
+                                .submitFromScannedPayload(
+                                  rawValue: value,
+                                  branchId: _selectedBranchId!,
+                                );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 104.h),
+                    ],
                   ),
                 ),
               ),
-              SizedBox(height: 12.h),
-              if (state.isSubmitting)
-                const CircularProgressIndicator()
-              else
-                AppText(
-                  _selectedBranchId == null
-                      ? 'Select a branch first'
-                      : 'Scan customer QR to add check-in',
-                  style: font14w500.copyWith(color: const Color(0xff6A7282)),
-                ),
             ],
           ),
         );
