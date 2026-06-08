@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/domain/entities/admin_branch_option_entity.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_my_branches_cubit/admin_my_branches_cubit.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_qr_scanner_cubit/admin_qr_scanner_cubit.dart';
@@ -11,7 +13,8 @@ import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets
 
 class AdminQrScannerBody extends StatefulWidget {
   final String? branchName;
-  const AdminQrScannerBody({super.key, this.branchName});
+  final int? fixedBranchId;
+  const AdminQrScannerBody({super.key, this.branchName, this.fixedBranchId});
 
   @override
   State<AdminQrScannerBody> createState() => _AdminQrScannerBodyState();
@@ -24,6 +27,9 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
   @override
   void initState() {
     super.initState();
+    if (widget.fixedBranchId != null) {
+      _selectedBranchId = widget.fixedBranchId;
+    }
   }
 
   void _ensureBranchSelection(List<AdminBranchOptionEntity> branches) {
@@ -73,22 +79,24 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
         }
       },
       builder: (context, state) {
-        final branchesState = context.watch<AdminMyBranchesCubit>().state;
-        final isBranchLoading = branchesState is AdminMyBranchesLoading;
-        final branches = switch (branchesState) {
-          AdminMyBranchesSuccess(:final branches) => branches,
-          _ => <AdminBranchOptionEntity>[],
-        };
+        bool isBranchLoading = false;
+        AdminMyBranchesState? branchesState;
+        List<AdminBranchOptionEntity> branches = [];
 
-        if (branchesState is AdminMyBranchesSuccess) {
-          _ensureBranchSelection(branches);
+        if (widget.fixedBranchId == null) {
+          branchesState = context.watch<AdminMyBranchesCubit>().state;
+          isBranchLoading = branchesState is AdminMyBranchesLoading;
+          if (branchesState is AdminMyBranchesSuccess) {
+            branches = branchesState.branches;
+            _ensureBranchSelection(branches);
+          }
         }
 
         return Container(
           color: const Color(0xFFF8FAFC),
           child: Column(
             children: [
-              AdminQrScannerHeader(branchName: widget.branchName),
+              const AdminQrScannerHeader(),
 
               Expanded(
                 child: Padding(
@@ -113,19 +121,44 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
                             ),
                           ],
                         ),
-                        child: AdminScannerBranchSelector(
-                          isBranchLoading: isBranchLoading,
-                          branchesState: branchesState,
-                          branches: branches,
-                          selectedBranchId: _selectedBranchId,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedBranchId = value;
-                            });
-                          },
-                        ),
+                        child: widget.fixedBranchId != null
+                            ? Row(
+                                children: [
+                                  Icon(
+                                    Icons.storefront,
+                                    color: const Color(0xFF6B7280),
+                                    size: 20.w,
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 14.h,
+                                      ),
+                                      child: AppText(
+                                        widget.branchName ?? 'Branch',
+                                        alignment:
+                                            AlignmentDirectional.centerStart,
+                                        style: font14w700.copyWith(
+                                          color: const Color(0xFF374151),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : AdminScannerBranchSelector(
+                                isBranchLoading: isBranchLoading,
+                                branchesState: branchesState!,
+                                branches: branches,
+                                selectedBranchId: _selectedBranchId,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedBranchId = value;
+                                  });
+                                },
+                              ),
                       ),
-
                       SizedBox(height: 12.h),
 
                       Expanded(
