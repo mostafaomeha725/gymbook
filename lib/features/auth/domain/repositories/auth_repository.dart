@@ -22,6 +22,12 @@ abstract class AuthRepository {
     required String confirmNewPassword,
   });
 
+  Future<Either<Failure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  });
+
   Future<Either<Failure, LoginResultEntity>> login({
     required String email,
     required String password,

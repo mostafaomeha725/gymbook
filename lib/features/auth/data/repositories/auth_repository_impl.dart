@@ -83,6 +83,24 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) async {
+    try {
+      await remoteDataSource.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+        confirmNewPassword: confirmNewPassword,
+      );
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, LoginResultEntity>> login({
     required String email,
     required String password,
@@ -106,7 +124,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _saveSession(response);
       return Right(_mapToLoginResult(response));
     } on UserCancelledException {
-      return Left(const UserCancelledFailure());
+      return const Left(UserCancelledFailure());
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }

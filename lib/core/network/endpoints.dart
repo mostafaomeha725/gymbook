@@ -26,6 +26,8 @@ class EndPoints {
 
   static const String resetPassword = 'Authentication/reset-password';
 
+  static const String changePassword = 'Authentication/change-password';
+
   /// Profile endpoints
   static const String profile = 'profile';
   static const String getCurrentUser = 'Users/me';

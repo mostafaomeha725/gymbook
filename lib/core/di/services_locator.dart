@@ -83,6 +83,8 @@ import 'package:gymbook/features/auth/presentation/cubits/resend_confirmation_em
 import 'package:gymbook/features/auth/presentation/cubits/reset_password_cubit/reset_password_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/validate_reset_password_code_cubit/validate_reset_password_code_cubit.dart';
+import 'package:gymbook/features/auth/domain/usecases/change_password_usecase.dart';
+import 'package:gymbook/features/auth/presentation/cubits/change_password_cubit/change_password_cubit.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/data/datasources/admin_me_remote_datasource.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/data/datasources/checkin_remote_datasource.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/data/repositories/admin_me_repository_impl.dart';
@@ -194,6 +196,9 @@ class ServiceLocator {
     if (!sl.isRegistered<ResetPasswordUseCase>()) {
       sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
     }
+    if (!sl.isRegistered<ChangePasswordUseCase>()) {
+      sl.registerLazySingleton(() => ChangePasswordUseCase(sl()));
+    }
 
     // Cubits
     if (!sl.isRegistered<LoginCubit>()) {
@@ -215,6 +220,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<ResetPasswordCubit>()) {
       sl.registerFactory(() => ResetPasswordCubit(sl()));
+    }
+    if (!sl.isRegistered<ChangePasswordCubit>()) {
+      sl.registerFactory(() => ChangePasswordCubit(changePasswordUseCase: sl()));
     }
   }
 

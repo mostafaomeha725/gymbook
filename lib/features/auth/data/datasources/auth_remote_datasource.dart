@@ -22,6 +22,12 @@ abstract class AuthRemoteDataSource {
     required String confirmNewPassword,
   });
 
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  });
+
   Future<LoginResponse> login({
     required String email,
     required String password,
@@ -103,6 +109,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: {
         'email': email,
         'code': code,
+        'newPassword': newPassword,
+        'confirmNewPassword': confirmNewPassword,
+      },
+    );
+
+    result.fold(
+      (failure) => throw ServerException(failure.message),
+      (_) => null,
+    );
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmNewPassword,
+  }) async {
+    final result = await networkService.postData(
+      endPoint: EndPoints.changePassword,
+      data: {
+        'currentPassword': currentPassword,
         'newPassword': newPassword,
         'confirmNewPassword': confirmNewPassword,
       },
