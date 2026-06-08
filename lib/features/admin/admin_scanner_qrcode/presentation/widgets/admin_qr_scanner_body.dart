@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gymbook/core/widgets/custom_icon_appbar_widget.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/domain/entities/admin_branch_option_entity.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_my_branches_cubit/admin_my_branches_cubit.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_qr_scanner_cubit/admin_qr_scanner_cubit.dart';
@@ -19,6 +18,7 @@ class AdminQrScannerBody extends StatefulWidget {
 
 class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
   int? _selectedBranchId;
+  bool _isProcessingScan = false;
 
   @override
   void initState() {
@@ -42,6 +42,16 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
   Widget build(BuildContext context) {
     return BlocConsumer<AdminQrScannerCubit, AdminQrScannerState>(
       listener: (context, state) {
+        if (!state.isSubmitting && _isProcessingScan) {
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                _isProcessingScan = false;
+              });
+            }
+          });
+        }
+
         if (state.errorMessage != null &&
             state.errorMessage!.trim().isNotEmpty) {
           AdminScannerSnackbar.show(
@@ -49,6 +59,7 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
             state.errorMessage!,
             isError: true,
           );
+          context.read<AdminQrScannerCubit>().clearMessage();
         }
         if (state.successMessage != null &&
             state.successMessage!.trim().isNotEmpty) {
@@ -57,6 +68,7 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
             state.successMessage!,
             isError: false,
           );
+          context.read<AdminQrScannerCubit>().clearMessage();
         }
       },
       builder: (context, state) {
@@ -84,7 +96,6 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
                     children: [
                       SizedBox(height: 12.h),
 
-                      // Branch Selector Card
                       Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 16.w,
@@ -116,20 +127,25 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
 
                       SizedBox(height: 12.h),
 
-                      // Scanner Section
                       Expanded(
                         child: AdminQrScannerCameraSection(
                           isSubmitting: state.isSubmitting,
                           hasSelectedBranch: _selectedBranchId != null,
                           onDetect: (capture) {
                             if (state.isSubmitting ||
-                                _selectedBranchId == null) {
+                                _selectedBranchId == null ||
+                                _isProcessingScan) {
                               return;
                             }
                             final value = capture.barcodes.first.rawValue;
                             if (value == null || value.trim().isEmpty) {
                               return;
                             }
+
+                            setState(() {
+                              _isProcessingScan = true;
+                            });
+
                             context
                                 .read<AdminQrScannerCubit>()
                                 .submitFromScannedPayload(

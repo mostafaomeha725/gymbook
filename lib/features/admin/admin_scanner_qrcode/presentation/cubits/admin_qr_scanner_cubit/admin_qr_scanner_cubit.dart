@@ -52,6 +52,10 @@ class AdminQrScannerCubit extends Cubit<AdminQrScannerState> {
     _isBusy = false;
   }
 
+  void clearMessage() {
+    emit(state.copyWith(clearMessages: true));
+  }
+
   _ScannedPayload? _parsePayload(String rawValue) {
     try {
       final decoded = jsonDecode(rawValue);
