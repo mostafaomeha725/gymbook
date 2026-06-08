@@ -6,6 +6,10 @@ class UserEntity {
   final String firstName;
   final String lastName;
   final String fullName;
+  final int userType;
+  final int? roleId;
+  final int? branchId;
+  final String? branchName;
   final AppUserRole role;
 
   const UserEntity({
@@ -14,8 +18,13 @@ class UserEntity {
     required this.firstName,
     required this.lastName,
     required this.fullName,
+    required this.userType,
+    this.roleId,
+    this.branchId,
+    this.branchName,
     required this.role,
   });
 
-  bool get isAdmin => role == AppUserRole.admin;
+  bool get isAdmin =>
+      role == AppUserRole.owner || role == AppUserRole.branchAdmin;
 }

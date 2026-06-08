@@ -160,9 +160,21 @@ class AuthRepositoryImpl implements AuthRepository {
 
   Future<void> _saveSession(LoginResponse response) async {
     await storage.saveUserToken(response.accessToken);
-    await storage.saveUserRole(response.user.role == AppUserRole.admin);
+    await storage.saveUserRole(
+      response.user.role == AppUserRole.owner ||
+          response.user.role == AppUserRole.branchAdmin,
+    );
     await storage.saveUserId(response.user.id);
     await storage.saveUserSecretKey(response.user.secretKey);
+
+    // Save extended role details
+    await storage.saveUserType(response.user.userType);
+    if (response.user.worksAtBranch != null) {
+      await storage.saveRoleId(response.user.worksAtBranch!.roleId);
+      await storage.saveBranchId(response.user.worksAtBranch!.branchId);
+      await storage.saveBranchName(response.user.worksAtBranch!.branchName);
+    }
+
     networkService.addToken(response.accessToken);
   }
 
@@ -175,6 +187,10 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: response.user.firstName,
         lastName: response.user.lastName,
         fullName: response.user.fullName,
+        userType: response.user.userType,
+        roleId: response.user.worksAtBranch?.roleId,
+        branchId: response.user.worksAtBranch?.branchId,
+        branchName: response.user.worksAtBranch?.branchName,
         role: response.user.role,
       ),
     );
@@ -187,6 +203,7 @@ class AuthRepositoryImpl implements AuthRepository {
       firstName: response.firstName,
       lastName: response.lastName,
       fullName: response.fullName,
+      userType: parseAppUserRole(response.role) == AppUserRole.owner ? 2 : 4,
       role: parseAppUserRole(response.role),
     );
   }

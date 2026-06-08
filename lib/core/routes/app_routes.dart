@@ -143,9 +143,7 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.mainNavigationScreen,
         builder: (context, state) {
-          final storage = sl<PreferencesStorage>();
-          final isAdmin = (state.extra as bool?) ?? storage.isUserAdmin();
-          return CustomNavBar(isAdmin: isAdmin);
+          return const CustomNavBar();
         },
       ),
       GoRoute(

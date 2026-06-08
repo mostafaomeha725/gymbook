@@ -3,7 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/widgets/custom_icon_appbar_widget.dart';
 
 class AdminQrScannerHeader extends StatelessWidget {
-  const AdminQrScannerHeader({super.key});
+  final String? branchName;
+  const AdminQrScannerHeader({super.key, this.branchName});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,9 @@ class AdminQrScannerHeader extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: CustomIconAppbarWidget(
         text: 'Check-In Scanner',
-        subtitle: 'Scan customer QR to verify',
+        subtitle: branchName != null && branchName!.isNotEmpty
+            ? 'Branch: $branchName'
+            : 'Scan customer QR to verify',
         customIcon: Container(
           padding: EdgeInsets.all(10.w),
           decoration: BoxDecoration(

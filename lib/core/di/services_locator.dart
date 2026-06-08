@@ -117,6 +117,7 @@ import 'package:gymbook/features/customer/customer_subscriptions/presentation/cu
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/subscription_attendance_history_cubit/subscription_attendance_history_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/add_review_cubit/add_review_cubit.dart';
 import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
+import 'package:gymbook/core/services/user_role_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
@@ -136,12 +137,13 @@ class ServiceLocator {
   }
 
   /// =============================
-  /// STORAGE
+  /// STORAGE & SERVICES
   /// =============================
   Future<void> _initStorage() async {
     final sharedPreferences = await SharedPreferences.getInstance();
     sl.registerLazySingleton(() => sharedPreferences);
     sl.registerLazySingleton(() => PreferencesStorage(sl()));
+    sl.registerLazySingleton(() => UserRoleService(sl()));
   }
 
   /// =============================

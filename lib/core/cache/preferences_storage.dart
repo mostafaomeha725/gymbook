@@ -85,6 +85,39 @@ class PreferencesStorage {
     await _preferences.remove(PreferencesKeys.userId.name);
   }
 
+  /// ================= ROLE AND BRANCH INFO =================
+  Future<void> saveUserType(int userType) async {
+    await _preferences.setInt(PreferencesKeys.userType.name, userType);
+  }
+
+  int? getUserType() {
+    return _preferences.getInt(PreferencesKeys.userType.name);
+  }
+
+  Future<void> saveRoleId(int roleId) async {
+    await _preferences.setInt(PreferencesKeys.roleId.name, roleId);
+  }
+
+  int? getRoleId() {
+    return _preferences.getInt(PreferencesKeys.roleId.name);
+  }
+
+  Future<void> saveBranchId(int branchId) async {
+    await _preferences.setInt(PreferencesKeys.branchId.name, branchId);
+  }
+
+  int? getBranchId() {
+    return _preferences.getInt(PreferencesKeys.branchId.name);
+  }
+
+  Future<void> saveBranchName(String branchName) async {
+    await _preferences.setString(PreferencesKeys.branchName.name, branchName);
+  }
+
+  String? getBranchName() {
+    return _preferences.getString(PreferencesKeys.branchName.name);
+  }
+
   /// ================= LANGUAGE =================
   String getCurrentLanguage() {
     return _preferences.getString(PreferencesKeys.currentLanguage.name) ?? "en";

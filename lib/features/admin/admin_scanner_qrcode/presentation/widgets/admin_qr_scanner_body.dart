@@ -10,7 +10,8 @@ import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_qr_scanner_camera_section.dart';
 
 class AdminQrScannerBody extends StatefulWidget {
-  const AdminQrScannerBody({super.key});
+  final String? branchName;
+  const AdminQrScannerBody({super.key, this.branchName});
 
   @override
   State<AdminQrScannerBody> createState() => _AdminQrScannerBodyState();
@@ -87,7 +88,7 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
           color: const Color(0xFFF8FAFC),
           child: Column(
             children: [
-              const AdminQrScannerHeader(),
+              AdminQrScannerHeader(branchName: widget.branchName),
 
               Expanded(
                 child: Padding(

@@ -21,6 +21,15 @@ enum PreferencesKeys {
   userIsAdmin,
   userSecretKey,
   userId,
+  userType,
+  roleId,
+  branchName,
+  branchId,
 }
 
-enum AppUserRole { customer, admin }
+/// Roles:
+/// - customer  → userType = 4
+/// - owner     → userType = 2
+/// - branchAdmin → userType = 3, roleId = 1
+/// - gator     → userType = 3, roleId = 2
+enum AppUserRole { customer, owner, branchAdmin, gator }

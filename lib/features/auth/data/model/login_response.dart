@@ -28,30 +28,80 @@ class LoginResponse {
   }
 }
 
+// ──────────────────────────────────────────────────────────
+// WorksAtBranch
+// ──────────────────────────────────────────────────────────
+
+class WorksAtBranch {
+  final int branchId;
+  final String branchName;
+  final int roleId;
+  final String roleName;
+
+  const WorksAtBranch({
+    required this.branchId,
+    required this.branchName,
+    required this.roleId,
+    required this.roleName,
+  });
+
+  factory WorksAtBranch.fromJson(Map<String, dynamic> json) {
+    return WorksAtBranch(
+      branchId: json['branchId'] as int? ?? 0,
+      branchName: json['branchName'] as String? ?? '',
+      roleId: json['roleId'] as int? ?? 0,
+      roleName: json['roleName'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'branchId': branchId,
+    'branchName': branchName,
+    'roleId': roleId,
+    'roleName': roleName,
+  };
+}
+
+// ──────────────────────────────────────────────────────────
+// Role resolution
+// ──────────────────────────────────────────────────────────
+
+/// Maps userType + optional roleId to [AppUserRole].
+AppUserRole resolveAppUserRole({
+  required int userType,
+  int? roleId,
+}) {
+  switch (userType) {
+    case 2:
+      return AppUserRole.owner;
+    case 3:
+      if (roleId == 2) return AppUserRole.gator;
+      return AppUserRole.branchAdmin; // roleId == 1 (default for type 3)
+    case 4:
+    default:
+      return AppUserRole.customer;
+  }
+}
+
+// ──────────────────────────────────────────────────────────
+// Keep backward-compat helper used elsewhere in register flow
+// ──────────────────────────────────────────────────────────
 AppUserRole parseAppUserRole(dynamic rawRole) {
   if (rawRole is int) {
-    // userType: 1 = customer, 2 = PartnerAdmin
-    return (rawRole == 1 || rawRole == 2)
-        ? AppUserRole.admin
-        : AppUserRole.customer;
+    return (rawRole == 2) ? AppUserRole.owner : AppUserRole.customer;
   }
-
   if (rawRole is String) {
     final normalized = rawRole.trim().toLowerCase();
-    if (normalized == '1' ||
-        normalized == '2' ||
-        normalized == 'admin' ||
-        normalized == 'owner' ||
-        normalized == 'partneradmin') {
-      return AppUserRole.admin;
-    }
-    if (normalized == '0' || normalized == 'customer') {
-      return AppUserRole.customer;
+    if (['2', 'admin', 'owner', 'partneradmin'].contains(normalized)) {
+      return AppUserRole.owner;
     }
   }
-
   return AppUserRole.customer;
 }
+
+// ──────────────────────────────────────────────────────────
+// RefreshToken
+// ──────────────────────────────────────────────────────────
 
 class RefreshToken {
   final String token;
@@ -77,6 +127,10 @@ class RefreshToken {
   }
 }
 
+// ──────────────────────────────────────────────────────────
+// LoginUser
+// ──────────────────────────────────────────────────────────
+
 class LoginUser {
   final int id;
   final String email;
@@ -84,6 +138,8 @@ class LoginUser {
   final String lastName;
   final String fullName;
   final String secretKey;
+  final int userType;
+  final WorksAtBranch? worksAtBranch;
   final AppUserRole role;
 
   LoginUser({
@@ -93,12 +149,21 @@ class LoginUser {
     required this.lastName,
     required this.fullName,
     required this.secretKey,
+    required this.userType,
+    this.worksAtBranch,
     required this.role,
   });
 
-  bool get isAdmin => role == AppUserRole.admin;
-
   factory LoginUser.fromJson(Map<String, dynamic> json) {
+    final int userType = json['userType'] as int? ?? 4;
+    final worksAtBranchJson = json['worksAtBranch'];
+    final WorksAtBranch? worksAtBranch =
+        worksAtBranchJson != null && worksAtBranchJson is Map<String, dynamic>
+        ? WorksAtBranch.fromJson(worksAtBranchJson)
+        : null;
+
+    final int? roleId = worksAtBranch?.roleId;
+
     return LoginUser(
       id: json['id'] ?? 0,
       email: json['email'] ?? '',
@@ -106,7 +171,9 @@ class LoginUser {
       lastName: json['lastName'] ?? '',
       fullName: json['fullName'] ?? '',
       secretKey: (json['secretKey'] ?? '').toString(),
-      role: parseAppUserRole(json['userType'] ?? json['role']),
+      userType: userType,
+      worksAtBranch: worksAtBranch,
+      role: resolveAppUserRole(userType: userType, roleId: roleId),
     );
   }
 
@@ -118,7 +185,8 @@ class LoginUser {
       'lastName': lastName,
       'fullName': fullName,
       'secretKey': secretKey,
-      'role': role == AppUserRole.admin ? 1 : 0,
+      'userType': userType,
+      if (worksAtBranch != null) 'worksAtBranch': worksAtBranch!.toJson(),
     };
   }
 }

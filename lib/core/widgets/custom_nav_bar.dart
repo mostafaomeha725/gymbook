@@ -3,11 +3,13 @@ import 'package:gymbook/core/widgets/custom_bottom_navbar.dart';
 import 'package:gymbook/core/widgets/customer_nav_data.dart';
 import 'package:gymbook/core/widgets/navigation_state.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/admin_nav_data.dart';
+import 'package:gymbook/features/gator/presentation/widgets/gator_nav_data.dart';
+import 'package:gymbook/core/di/services_locator.dart';
+import 'package:gymbook/core/enums/app_enums.dart';
+import 'package:gymbook/core/services/user_role_service.dart';
 
 class CustomNavBar extends StatefulWidget {
-  final bool isAdmin;
-
-  const CustomNavBar({super.key, this.isAdmin = true});
+  const CustomNavBar({super.key});
 
   // ignore: library_private_types_in_public_api
   static _CustomNavBarState? of(BuildContext context) =>
@@ -30,12 +32,27 @@ class _CustomNavBarState extends State<CustomNavBar> {
   }
 
   void _initializeNavigation() {
-    if (widget.isAdmin) {
-      _navItems = AdminNavData.items;
-      _screens = AdminNavData.screens;
-    } else {
-      _navItems = CustomerNavData.items;
-      _screens = CustomerNavData.screens;
+    final roleService = sl<UserRoleService>();
+    final role = roleService.getCurrentRole();
+
+    switch (role) {
+      case AppUserRole.owner:
+        _navItems = AdminNavData.items;
+        _screens = AdminNavData.screens;
+        break;
+      case AppUserRole.branchAdmin:
+        _navItems = AdminNavData.branchAdminItems;
+        _screens = AdminNavData.branchAdminScreens;
+        break;
+      case AppUserRole.gator:
+        _navItems = GatorNavData.items;
+        _screens = GatorNavData.screens;
+        break;
+      case AppUserRole.customer:
+      default:
+        _navItems = CustomerNavData.items;
+        _screens = CustomerNavData.screens;
+        break;
     }
   }
 
