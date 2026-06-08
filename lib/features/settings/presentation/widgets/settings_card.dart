@@ -57,6 +57,17 @@ class SettingsCardState extends State<SettingsCard> {
           ),
 
           _Divider(),
+          
+          SettingsItem(
+            icon: Icons.lock_outline,
+            title: "Change Password",
+            showArrow: true,
+            onTap: () {
+              GoRouter.of(context).push(Routes.changePasswordScreen);
+            },
+          ),
+          
+          _Divider(),
 
           const SettingsItem(
             icon: Icons.help_outline,

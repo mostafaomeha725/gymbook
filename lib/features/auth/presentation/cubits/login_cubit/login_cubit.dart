@@ -14,8 +14,6 @@ class LoginCubit extends Cubit<LoginState> {
   final LoginUseCase loginUseCase;
   final LoginWithGoogleUseCase loginWithGoogleUseCase;
 
-  // ─── Email / Password Login ────────────────────────────────────────────────
-
   Future<void> login(String email, String password) async {
     emit(LoginLoading());
     showLoading();

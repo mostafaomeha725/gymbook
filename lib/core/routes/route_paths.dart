@@ -12,6 +12,7 @@ class Routes {
   static const mainNavigationScreen = '/mainNavigationScreen';
   static const gymDetailsScreen = '/GymDetailsScreen';
   static const editProfileScreen = '/edit-profile-screen';
+  static const changePasswordScreen = '/change-password-screen';
 
   static const fullImageViewerScreen = '/full-image-viewer-screen';
   static const subscriptionsDetailsScreen = '/subscription-Details-screen';

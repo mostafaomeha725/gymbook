@@ -1,26 +1,12 @@
 part of 'all_text_field_add_branch_one.dart';
 
 extension _AllTextFieldAddBranchOneActions on _AllTextFieldAddBranchOneState {
-  String get _branchNameHint {
-    if (!_isEditMode) return 'Enter branch name';
-    return (_existingName?.trim().isNotEmpty ?? false)
-        ? _existingName!
-        : 'Enter branch name';
-  }
+  String get _branchNameHint => 'Enter branch name';
 
-  String get _phoneNumberHint {
-    if (!_isEditMode) return '+20 XXX XXX XXX';
-    return (_existingPhoneNumber?.trim().isNotEmpty ?? false)
-        ? _existingPhoneNumber!
-        : '+20 XXX XXX XXX';
-  }
+  String get _phoneNumberHint => '+20 XXX XXX XXX';
 
-  String get _emailHint {
-    if (!_isEditMode) return 'branch.email@example.com';
-    return (_existingEmail?.trim().isNotEmpty ?? false)
-        ? _existingEmail!
-        : 'branch.email@example.com';
-  }
+  String get _emailHint => 'branch.email@example.com';
+
 
   GymType? get _existingGymType {
     final type = _existingBranchType;
@@ -48,17 +34,11 @@ extension _AllTextFieldAddBranchOneActions on _AllTextFieldAddBranchOneState {
     final isUpdateRequest =
         widget.args?.isEditMode == true && (widget.args?.branchId ?? 0) > 0;
 
-    final branchName = isUpdateRequest && branchNameInput.isEmpty
-        ? (_existingName ?? '').trim()
-        : branchNameInput;
+    final branchName = branchNameInput;
 
-    final email = isUpdateRequest && emailInput.isEmpty
-        ? _normalizeEmail(_existingEmail ?? '')
-        : emailInput;
+    final email = emailInput;
 
-    final phoneNumber = isUpdateRequest && phoneNumberInput.isEmpty
-        ? _normalizePhoneNumber(_existingPhoneNumber ?? '')
-        : phoneNumberInput;
+    final phoneNumber = phoneNumberInput;
 
     final effectiveBranchType = isUpdateRequest
         ? (selectedBranchType ?? _existingBranchType)
@@ -130,32 +110,48 @@ extension _AllTextFieldAddBranchOneActions on _AllTextFieldAddBranchOneState {
     if (branch == null) return;
 
     _existingName = branch.name;
+    if (branch.name != null && branchNameController.text.isEmpty) {
+      branchNameController.text = branch.name!;
+    }
+
     _existingPhoneNumber = branch.phoneNumber;
+    if (branch.phoneNumber != null && phoneNumberController.text.isEmpty) {
+      phoneNumberController.text = branch.phoneNumber!;
+    }
+
     _existingEmail = branch.email;
+    if (branch.email != null && emailController.text.isEmpty) {
+      emailController.text = branch.email!;
+    }
+
     _existingBranchType = branch.branchType;
   }
 
   void _applyExistingFromSetupDetails(BranchSetupDetailsEntity details) {
     _existingName = _pickBestText(_existingName, details.businessDetails.name);
+    if (_existingName != null && branchNameController.text.isEmpty) {
+      branchNameController.text = _existingName!;
+    }
+
     _existingPhoneNumber = _pickBestText(
       _existingPhoneNumber,
       details.businessDetails.phoneNumber,
     );
+    if (_existingPhoneNumber != null && phoneNumberController.text.isEmpty) {
+      phoneNumberController.text = _existingPhoneNumber!;
+    }
+
     _existingEmail = _pickBestText(
       _existingEmail,
       details.businessDetails.email,
     );
+    if (_existingEmail != null && emailController.text.isEmpty) {
+      emailController.text = _existingEmail!;
+    }
 
     final apiBranchType = details.businessDetails.branchType;
     if (apiBranchType >= 0 && apiBranchType <= 2) {
       _existingBranchType = apiBranchType;
-    }
-
-    if (_isEditMode) {
-      // In edit mode we intentionally keep user input fields empty and show old values as hints.
-      branchNameController.clear();
-      phoneNumberController.clear();
-      emailController.clear();
     }
   }
 

@@ -37,6 +37,7 @@ import 'package:gymbook/features/customer/customer_home/presentation/widgets/ful
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_details_screen_body.dart';
 
 import 'package:gymbook/features/settings/presentation/screens/edit_profile_screen.dart';
+import 'package:gymbook/features/settings/presentation/screens/change_password_screen.dart';
 
 import '/core/env.dart';
 import 'route_observer.dart';
@@ -173,6 +174,10 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.editProfileScreen,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: Routes.changePasswordScreen,
+        builder: (context, state) => const ChangePasswordScreen(),
       ),
       GoRoute(
         path: Routes.subscriptionsDetailsScreen,
