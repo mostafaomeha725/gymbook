@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1005560059828",
+    "project_id": "prime-fit-b40d6",
+    "storage_bucket": "prime-fit-b40d6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005560059828:android:587e29d49d67fe606484e1",
+        "android_client_info": {
+          "package_name": "com.example.gymbook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlaXKYqkP1tt_VCQr87RrViTHRHyluS9A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

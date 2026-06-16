@@ -121,6 +121,12 @@ import 'package:gymbook/features/customer/customer_subscriptions/presentation/cu
 import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
 import 'package:gymbook/core/services/user_role_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gymbook/core/services/notification_service.dart';
+import 'package:gymbook/features/notifications/data/datasources/notifications_remote_datasource.dart';
+import 'package:gymbook/features/notifications/domain/repositories/notifications_repository.dart';
+import 'package:gymbook/features/notifications/data/repositories/notifications_repository_impl.dart';
+import 'package:gymbook/features/notifications/domain/usecases/update_fcm_token_usecase.dart';
+import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -136,6 +142,7 @@ class ServiceLocator {
     _initCustomerHome();
     _initCustomerSubscriptions();
     _initCustomerQrCode();
+    _initNotifications();
   }
 
   /// =============================
@@ -146,6 +153,7 @@ class ServiceLocator {
     sl.registerLazySingleton(() => sharedPreferences);
     sl.registerLazySingleton(() => PreferencesStorage(sl()));
     sl.registerLazySingleton(() => UserRoleService(sl()));
+    sl.registerLazySingleton(() => NotificationService());
   }
 
   /// =============================
@@ -611,11 +619,40 @@ class ServiceLocator {
     }
   }
 
-  // /// =============================
   // /// HOME FEATURE
   // /// =============================
   // void _initHome() {
   //   sl.registerLazySingleton(() => HomeRepository(sl()));
   //   sl.registerFactory(() => HomeCubit(sl()));
   // }
+
+  /// =============================
+  /// NOTIFICATIONS FEATURE
+  /// =============================
+  void _initNotifications() {
+    if (!sl.isRegistered<NotificationsRemoteDataSource>()) {
+      sl.registerLazySingleton<NotificationsRemoteDataSource>(
+        () => NotificationsRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<NotificationsRepository>()) {
+      sl.registerLazySingleton<NotificationsRepository>(
+        () => NotificationsRepositoryImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<UpdateFcmTokenUseCase>()) {
+      sl.registerLazySingleton(() => UpdateFcmTokenUseCase(sl()));
+    }
+
+    if (!sl.isRegistered<NotificationsCubit>()) {
+      sl.registerFactory(
+        () => NotificationsCubit(
+          updateFcmTokenUseCase: sl(),
+          notificationService: sl(),
+        ),
+      );
+    }
+  }
 }
