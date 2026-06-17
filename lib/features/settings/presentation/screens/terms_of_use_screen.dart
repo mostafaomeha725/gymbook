@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gymbook/features/settings/presentation/widgets/custom_appbar.dart';
 import 'package:gymbook/features/settings/presentation/widgets/terms_of_use_screen_body.dart';
 
 class TermsOfUseScreen extends StatelessWidget {

@@ -9,48 +9,40 @@ class AmenitiesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List amenities = const [
-      AmenityItem(icon: Icons.air, label: 'AC'),
-      AmenityItem(icon: Icons.wifi, label: 'WiFi'),
-      AmenityItem(icon: Icons.water_drop_outlined, label: 'Showers'),
-      AmenityItem(icon: Icons.fitness_center, label: 'Equipment'),
-      AmenityItem(icon: Icons.person_outline, label: 'Trainer'),
+    final amenities = [
+      const AmenityItem(icon: Icons.air, label: 'AC'),
+      const AmenityItem(icon: Icons.wifi, label: 'WiFi'),
+      const AmenityItem(icon: Icons.water_drop_outlined, label: 'Showers'),
+      const AmenityItem(icon: Icons.fitness_center, label: 'Equipment'),
+      const AmenityItem(icon: Icons.person_outline, label: 'Trainer'),
+      const AmenityItem(icon: Icons.chair_outlined, label: 'Lounge'),
     ];
 
     return Container(
-      padding: EdgeInsets.all(16.w),
       margin: EdgeInsets.symmetric(horizontal: 24.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        border: Border.all(color: Colors.black.withOpacity(0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            child: AppText(
-              'Amenities',
-              style: font18w700.copyWith(color: const Color(0xff1E293B)),
-            ),
+          AppText(
+            'Amenities',
+            style: font16w500.copyWith(color: const Color(0xff0F172A)),
+            textPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
           ),
 
-          SizedBox(height: 16.h),
-
-          /// Grid
-          Wrap(
-            spacing: 20.w,
-            runSpacing: 20.h,
-            children: amenities.map((item) {
-              return AmenityWidget(item: item);
-            }).toList(),
+          GridView.count(
+            padding: EdgeInsets.zero,
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 0,
+            children: amenities
+                .map((item) => AmenityWidget(item: item))
+                .toList(),
           ),
         ],
       ),

@@ -134,38 +134,68 @@ class ManagePackageScreenBody extends StatelessWidget {
                       ),
                     )
                   else if (success != null)
-                    ...success.data.map(
-                      (pkg) => PackageCard(
-                        onEdit: () => _navigateAndRefresh(
-                          context,
-                          PackageScreenArgs(
-                            branchId: branchId,
-                            packageItem: pkg,
-                          ),
+                    if (success.data.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40.h),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.inventory_2_outlined,
+                              size: 64.sp,
+                              color: Colors.grey.shade300,
+                            ),
+                            SizedBox(height: 16.h),
+                            AppText(
+                              'No packages found',
+                              style: font16w600.copyWith(
+                                color: const Color(0xff475569),
+                              ),
+                              alignment: AlignmentDirectional.center,
+                            ),
+                            SizedBox(height: 8.h),
+                            AppText(
+                              'Add a new package to get started.',
+                              style: font14w400.copyWith(
+                                color: const Color(0xff94A3B8),
+                              ),
+                              alignment: AlignmentDirectional.center,
+                            ),
+                          ],
                         ),
-                        onToggle: (newValue) {
-                          context
-                              .read<CreatePackageCubit>()
-                              .togglePackageStatus(
-                                branchId: branchId,
-                                packageId: pkg.id,
-                                isActive: newValue,
-                              );
-                        },
-                        onDelete: () {
-                          context.read<CreatePackageCubit>().deletePackage(
-                            branchId: branchId,
-                            packageId: pkg.id,
-                          );
-                        },
-                        title: pkg.name,
-                        months: pkg.durationInMonths,
-                        freezes: pkg.numberOfFreezes,
-                        price: _formatPrice(pkg.price),
-                        isActive: pkg.isActive,
-                        sideColor: pkg.isActive ? Colors.green : Colors.red,
+                      )
+                    else
+                      ...success.data.map(
+                        (pkg) => PackageCard(
+                          onEdit: () => _navigateAndRefresh(
+                            context,
+                            PackageScreenArgs(
+                              branchId: branchId,
+                              packageItem: pkg,
+                            ),
+                          ),
+                          onToggle: (newValue) {
+                            context
+                                .read<CreatePackageCubit>()
+                                .togglePackageStatus(
+                                  branchId: branchId,
+                                  packageId: pkg.id,
+                                  isActive: newValue,
+                                );
+                          },
+                          onDelete: () {
+                            context.read<CreatePackageCubit>().deletePackage(
+                              branchId: branchId,
+                              packageId: pkg.id,
+                            );
+                          },
+                          title: pkg.name,
+                          months: pkg.durationInMonths,
+                          freezes: pkg.numberOfFreezes,
+                          price: _formatPrice(pkg.price),
+                          isActive: pkg.isActive,
+                          sideColor: pkg.isActive ? Colors.green : Colors.red,
+                        ),
                       ),
-                    ),
 
                   SizedBox(height: 20.h),
 

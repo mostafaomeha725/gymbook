@@ -203,12 +203,33 @@ class _AdminManageSubscriptionsScreenBodyState
                     return Padding(
                       padding: EdgeInsets.symmetric(vertical: 48.h),
                       child: Center(
-                        child: AppText(
-                          'No subscriptions found',
-                          alignment: AlignmentDirectional.center,
-                          style: font14w500.copyWith(
-                            color: Colors.grey.shade500,
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.card_membership_outlined,
+                              size: 64.sp,
+                              color: Colors.grey.shade300,
+                            ),
+                            SizedBox(height: 16.h),
+                            AppText(
+                              'No subscriptions found',
+                              style: font16w600.copyWith(
+                                color: const Color(0xff475569),
+                              ),
+                              alignment: AlignmentDirectional.center,
+                            ),
+                            SizedBox(height: 8.h),
+                            AppText(
+                              _searchQuery.isNotEmpty 
+                                  ? 'No subscriptions match your search.'
+                                  : 'No subscriptions found for this status.',
+                              style: font14w400.copyWith(
+                                color: const Color(0xff94A3B8),
+                              ),
+                              alignment: AlignmentDirectional.center,
+                            ),
+                          ],
                         ),
                       ),
                     );

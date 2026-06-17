@@ -10,7 +10,6 @@ import 'package:gymbook/features/customer/customer_subscriptions/presentation/sc
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/attendance_history_card.dart';
-import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/rating_card.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscriptions_details_info_card.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscriptions_info_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/image_gym_details.dart';
@@ -178,8 +177,8 @@ class _SubscriptionsDetailsScreenBodyState
                     AttendanceHistoryCard(
                       subscriptionId: details.subscriptionId,
                     ),
-                    SizedBox(height: 16.h),
-                    RatingCard(branchId: details.branchId),
+                    // SizedBox(height: 16.h),
+                    // RatingCard(branchId: details.branchId),
                     SizedBox(height: 64.h),
                   ],
                 ),

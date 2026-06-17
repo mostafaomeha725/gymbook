@@ -17,27 +17,25 @@ class AmenityWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 72.w,
-      child: Column(
-        children: [
-          Container(
-            width: 52.w,
-            height: 52.w,
-            decoration: const BoxDecoration(
-              color: Color(0xffE6F4FF),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(item.icon, color: const Color(0xff0EA5E9), size: 26.sp),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 56.w,
+          height: 56.w,
+          decoration: const BoxDecoration(
+            color: Color(0xffF0F9FF),
+            shape: BoxShape.circle,
           ),
-          SizedBox(height: 8.h),
-          AppText(
-            item.label,
-            alignment: AlignmentDirectional.center,
-            style: font14w500.copyWith(color: const Color(0xff334155)),
-          ),
-        ],
-      ),
+          child: Icon(item.icon, color: const Color(0xff0EA5E9), size: 23.sp),
+        ),
+        SizedBox(height: 9.h),
+        AppText(
+          item.label,
+          alignment: AlignmentDirectional.center,
+          style: font12w400.copyWith(color: const Color(0xff64748B)),
+        ),
+      ],
     );
   }
 }
