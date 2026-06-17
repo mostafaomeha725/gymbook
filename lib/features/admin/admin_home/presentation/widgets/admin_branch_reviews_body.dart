@@ -8,11 +8,17 @@ import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_rev
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/rating_filter.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/review_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/rating_card.dart';
 
 class AdminBranchReviewsBody extends StatefulWidget {
   final int branchId;
+  final String? branchName;
 
-  const AdminBranchReviewsBody({super.key, required this.branchId});
+  const AdminBranchReviewsBody({
+    super.key,
+    required this.branchId,
+    this.branchName,
+  });
 
   @override
   State<AdminBranchReviewsBody> createState() => _AdminBranchReviewsBodyState();
@@ -31,8 +37,8 @@ class _AdminBranchReviewsBodyState extends State<AdminBranchReviewsBody> {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.h),
-          child: const AppbarSubscriptionWidget(
-            text: 'Wolves gym',
+          child: AppbarSubscriptionWidget(
+            text: widget.branchName ?? 'Branch Reviews',
             subtitle: 'Customer feedback and ratings',
           ),
         ),
@@ -46,6 +52,18 @@ class _AdminBranchReviewsBodyState extends State<AdminBranchReviewsBody> {
                 return ListView(
                   padding: EdgeInsets.all(24.w),
                   children: [
+                    if (state.canReview) ...[
+                      RatingCard(
+                        branchId: widget.branchId,
+                        myReview: state.myReview,
+                        onReviewSubmitted: () {
+                          context.read<BranchReviewsCubit>().loadReviews(
+                            widget.branchId,
+                          );
+                        },
+                      ),
+                      SizedBox(height: 24.h),
+                    ],
                     RatingFilter(
                       ratings: const ['All', '5', '4', '3', '2', '1'],
                       selectedRating: state.selectedRating,
@@ -89,9 +107,58 @@ class _AdminBranchReviewsBodyState extends State<AdminBranchReviewsBody> {
                       ],
                     ),
                     SizedBox(height: 16.h),
-                    ...state.reviews.map(
-                      (review) => ReviewCard(review: review),
-                    ),
+
+                    if (!(state.myReview != null &&
+                            (state.selectedRating == 'All' ||
+                                state.selectedRating ==
+                                    state.myReview!.rating
+                                        .toInt()
+                                        .toString())) &&
+                        state.reviews.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40.h),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.rate_review_outlined,
+                              size: 64.sp,
+                              color: Colors.grey.shade300,
+                            ),
+                            SizedBox(height: 16.h),
+                            AppText(
+                              'No reviews yet',
+                              style: font16w600.copyWith(
+                                color: const Color(0xff475569),
+                              ),
+                              alignment: AlignmentDirectional.center,
+                            ),
+                            SizedBox(height: 8.h),
+                            AppText(
+                              state.selectedRating == 'All'
+                                  ? 'Be the first to share your experience!'
+                                  : 'No reviews found for this rating.',
+                              style: font14w400.copyWith(
+                                color: const Color(0xff94A3B8),
+                              ),
+                              alignment: AlignmentDirectional.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    else ...[
+                      if (state.myReview != null &&
+                          (state.selectedRating == 'All' ||
+                              state.selectedRating ==
+                                  state.myReview!.rating
+                                      .toInt()
+                                      .toString())) ...[
+                        ReviewCard(review: state.myReview!),
+                        SizedBox(height: 16.h),
+                      ],
+                      ...state.reviews.map(
+                        (review) => ReviewCard(review: review),
+                      ),
+                    ],
                     SizedBox(height: 16.h),
                     if (state.totalPages > 1)
                       GymPaginationWidget(

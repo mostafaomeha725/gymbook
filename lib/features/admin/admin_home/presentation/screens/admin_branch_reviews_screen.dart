@@ -6,8 +6,9 @@ import 'package:gymbook/features/admin/admin_home/presentation/widgets/admin_bra
 
 class AdminBranchReviewsScreen extends StatelessWidget {
   final int branchId;
+  final String? branchName;
 
-  const AdminBranchReviewsScreen({super.key, required this.branchId});
+  const AdminBranchReviewsScreen({super.key, required this.branchId, this.branchName});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,7 @@ class AdminBranchReviewsScreen extends StatelessWidget {
       create: (context) => sl<BranchReviewsCubit>(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
-        body: AdminBranchReviewsBody(branchId: branchId),
+        body: AdminBranchReviewsBody(branchId: branchId, branchName: branchName),
       ),
     );
   }

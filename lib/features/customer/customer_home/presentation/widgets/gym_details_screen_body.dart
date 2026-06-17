@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/utils/url_launcher_util.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/customer/customer_home/data/models/customer_branch_details_model.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/customer_branch_details_cubit/customer_branch_details_cubit.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/customer_branch_details_cubit/customer_branch_details_state.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/amenities_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_info_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/image_gym_details.dart';
@@ -22,10 +24,16 @@ class GymDetailsScreenBody extends StatelessWidget {
     final latitude = details.latitude;
     final longitude = details.longitude;
     if (latitude == 0 && longitude == 0) return false;
-    return latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    return latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180;
   }
 
-  Future<void> _openDirections(BuildContext context, CustomerBranchDetailsModel details) async {
+  Future<void> _openDirections(
+    BuildContext context,
+    CustomerBranchDetailsModel details,
+  ) async {
     if (!_hasValidCoordinates(details)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Gym location is not available yet')),
@@ -49,7 +57,8 @@ class GymDetailsScreenBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CustomerBranchDetailsCubit, CustomerBranchDetailsState>(
       builder: (context, state) {
-        if (state is CustomerBranchDetailsLoading || state is CustomerBranchDetailsInitial) {
+        if (state is CustomerBranchDetailsLoading ||
+            state is CustomerBranchDetailsInitial) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -68,7 +77,9 @@ class GymDetailsScreenBody extends StatelessWidget {
                   SizedBox(height: 12.h),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<CustomerBranchDetailsCubit>().loadBranchDetails(args.branchId);
+                      context
+                          .read<CustomerBranchDetailsCubit>()
+                          .loadBranchDetails(args.branchId);
                     },
                     child: const Text('Retry'),
                   ),
@@ -93,6 +104,15 @@ class GymDetailsScreenBody extends StatelessWidget {
                   type: details.branchTypeName,
                   address: details.address,
                   onDirectionsTap: () => _openDirections(context, details),
+                  onReviewsTap: () {
+                    context.push(
+                      Routes.adminBranchReviewsScreen,
+                      extra: {
+                        'branchId': args.branchId,
+                        'branchName': details.name,
+                      },
+                    );
+                  },
                 ),
                 SizedBox(height: 16.h),
                 OpeningHoursCard(hours: state.workingHours),

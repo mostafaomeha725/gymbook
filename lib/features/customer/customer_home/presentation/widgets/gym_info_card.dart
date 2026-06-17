@@ -4,6 +4,7 @@ import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/widgets/get_type_color.dart';
 
 class GymInfoCard extends StatelessWidget {
   final String gymName;
@@ -12,6 +13,7 @@ class GymInfoCard extends StatelessWidget {
   final int reviewsCount;
   final String type; // mixed | men | women
   final VoidCallback onDirectionsTap;
+  final VoidCallback onReviewsTap;
 
   const GymInfoCard({
     super.key,
@@ -21,40 +23,12 @@ class GymInfoCard extends StatelessWidget {
     required this.reviewsCount,
     required this.type,
     required this.onDirectionsTap,
+    required this.onReviewsTap,
   });
-
-  /// لون النوع
-  Color _getTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'mixed':
-        return const Color(0xFF9333EA); // بنفسجي
-      case 'male':
-        return const Color(0xFF2563EB); // أزرق
-      case 'female':
-        return const Color(0xFFEC4899); // وردي
-      default:
-        return Colors.grey;
-    }
-  }
-
-  /// خلفية النوع
-  Color _getTypeBgColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'mixed':
-        return const Color(0xFFF3E8FF);
-      case 'men':
-        return const Color(0xFFEFF6FF);
-      case 'women':
-        return const Color(0xFFFCE7F3);
-      default:
-        return Colors.grey.shade200;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final typeColor = _getTypeColor(type);
-    final typeBgColor = _getTypeBgColor(type);
+    final typeColor = GetTypeColor().getTypeColor(type);
+    final typeBgColor = GetTypeColor().getBgColor(type);
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -105,17 +79,30 @@ class GymInfoCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.star, size: 16.sp, color: const Color(0xffFACC15)),
-                  SizedBox(width: 4.w),
-                  AppText(rating.toString(), style: font14w700),
-                  SizedBox(width: 6.w),
-                  AppText(
-                    '($reviewsCount)',
-                    style: font14w400.copyWith(color: const Color(0xff6A7282)),
+              InkWell(
+                onTap: onReviewsTap,
+                borderRadius: BorderRadius.circular(8.r),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        size: 16.sp,
+                        color: const Color(0xffFACC15),
+                      ),
+                      SizedBox(width: 4.w),
+                      AppText(rating.toString(), style: font14w700),
+                      SizedBox(width: 6.w),
+                      AppText(
+                        '($reviewsCount)',
+                        style: font14w400.copyWith(
+                          color: const Color(0xff6A7282),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
 
               /// Type Badge

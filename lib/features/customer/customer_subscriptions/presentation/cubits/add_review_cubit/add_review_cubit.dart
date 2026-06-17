@@ -15,6 +15,10 @@ class AddReviewCubit extends Cubit<AddReviewState> {
 
   bool get hasReview => _reviewId != null;
 
+  void initReview({required int reviewId, required int rating, required String comment}) {
+    _reviewId = reviewId;
+  }
+
   Future<void> submitReview({
     required int branchId,
     required int rating,

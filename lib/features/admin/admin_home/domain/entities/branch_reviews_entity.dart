@@ -6,6 +6,8 @@ class BranchReviewsEntity {
   final int totalPages;
   final int totalCount;
   final int pageSize;
+  final bool canReview;
+  final ReviewEntity? myReview;
 
   const BranchReviewsEntity({
     required this.data,
@@ -13,5 +15,7 @@ class BranchReviewsEntity {
     required this.totalPages,
     required this.totalCount,
     required this.pageSize,
+    this.canReview = false,
+    this.myReview,
   });
 }

@@ -13,6 +13,8 @@ class BranchReviewsLoaded extends BranchReviewsState {
   final int totalPages;
   final double averageRating;
   final int totalCount;
+  final bool canReview;
+  final ReviewEntity? myReview;
 
   BranchReviewsLoaded({
     required this.reviews,
@@ -21,6 +23,8 @@ class BranchReviewsLoaded extends BranchReviewsState {
     required this.totalPages,
     required this.averageRating,
     required this.totalCount,
+    required this.canReview,
+    this.myReview,
   });
 }
 

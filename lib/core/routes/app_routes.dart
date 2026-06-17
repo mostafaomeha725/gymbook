@@ -287,10 +287,20 @@ GoRouter createRouter() {
       GoRoute(
         path: Routes.adminBranchReviewsScreen,
         builder: (context, state) {
-          final branchId = state.extra as int? ?? 0;
+          final extra = state.extra;
+          int branchId = 0;
+          String? branchName;
+          
+          if (extra is int) {
+            branchId = extra;
+          } else if (extra is Map<String, dynamic>) {
+            branchId = extra['branchId'] as int? ?? 0;
+            branchName = extra['branchName'] as String?;
+          }
+
           return BlocProvider(
             create: (context) => BranchReviewsCubit(sl()),
-            child: AdminBranchReviewsScreen(branchId: branchId),
+            child: AdminBranchReviewsScreen(branchId: branchId, branchName: branchName),
           );
         },
       ),

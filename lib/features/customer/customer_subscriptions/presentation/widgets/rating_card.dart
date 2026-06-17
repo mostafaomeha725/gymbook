@@ -5,14 +5,23 @@ import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/core/widgets/custom_snack_bar.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/add_review_cubit/add_review_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/add_review_cubit/add_review_state.dart';
+import 'package:gymbook/features/admin/admin_home/domain/entities/review_entity.dart';
 
 class RatingCard extends StatefulWidget {
   final int branchId;
-  const RatingCard({super.key, required this.branchId});
+  final ReviewEntity? myReview;
+  final VoidCallback? onReviewSubmitted;
+
+  const RatingCard({
+    super.key,
+    required this.branchId,
+    this.myReview,
+    this.onReviewSubmitted,
+  });
 
   @override
   State<RatingCard> createState() => _RatingCardState();
@@ -27,6 +36,15 @@ class _RatingCardState extends State<RatingCard> {
   void initState() {
     super.initState();
     _addReviewCubit = sl<AddReviewCubit>();
+    if (widget.myReview != null) {
+      selectedRating = widget.myReview!.rating.toInt();
+      _controller.text = widget.myReview!.content;
+      _addReviewCubit.initReview(
+        reviewId: widget.myReview!.id,
+        rating: selectedRating,
+        comment: _controller.text,
+      );
+    }
   }
 
   @override
@@ -43,17 +61,13 @@ class _RatingCardState extends State<RatingCard> {
       child: BlocConsumer<AddReviewCubit, AddReviewState>(
         listener: (context, state) {
           if (state is AddReviewSuccess) {
-            CustomSnackBar.showSuccess(
-              context,
-              message: 'Review submitted successfully',
-            );
+            EasyLoading.showSuccess('Review submitted successfully');
+            widget.onReviewSubmitted?.call();
           } else if (state is AddReviewUpdated) {
-            CustomSnackBar.showSuccess(
-              context,
-              message: 'Review updated successfully',
-            );
+            EasyLoading.showSuccess('Review updated successfully');
+            widget.onReviewSubmitted?.call();
           } else if (state is AddReviewError) {
-            CustomSnackBar.showError(context, message: state.message);
+            EasyLoading.showError(state.message);
           }
         },
         builder: (context, state) {
@@ -63,7 +77,6 @@ class _RatingCardState extends State<RatingCard> {
 
           return Container(
             padding: EdgeInsets.all(20.w),
-            margin: EdgeInsets.symmetric(horizontal: 24.w),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20.r),
@@ -135,9 +148,8 @@ class _RatingCardState extends State<RatingCard> {
                       ? null
                       : () {
                           if (selectedRating == 0) {
-                            CustomSnackBar.showError(
-                              context,
-                              message: 'Please select a rating first',
+                            EasyLoading.showInfo(
+                              'Please select a rating first',
                             );
                             return;
                           }

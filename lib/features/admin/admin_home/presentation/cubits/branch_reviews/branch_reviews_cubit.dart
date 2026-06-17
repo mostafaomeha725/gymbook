@@ -15,6 +15,8 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
   int _totalPages = 1;
   int _totalCount = 0;
   double _averageRating = 0.0;
+  bool _canReview = false;
+  ReviewEntity? _myReview;
   late int _currentBranchId;
 
   Future<void> loadReviews(int branchId, {bool isLoadMore = false}) async {
@@ -48,12 +50,19 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
         }
         
         _totalPages = entity.totalPages;
+        _canReview = entity.canReview;
+        _myReview = entity.myReview;
+        
+        final allItems = [
+          if (_myReview != null) _myReview!,
+          ..._allReviews
+        ];
+
+        // The API already includes myReview in the total count
         _totalCount = entity.totalCount;
         
-        // Assuming averageRating might be calculated or fetched somewhere else,
-        // for now we'll calculate it from current items or mock it
-        if (_allReviews.isNotEmpty) {
-           _averageRating = _allReviews.map((e) => e.rating).reduce((a, b) => a + b) / _allReviews.length;
+        if (allItems.isNotEmpty) {
+           _averageRating = allItems.map((e) => e.rating).reduce((a, b) => a + b) / allItems.length;
         } else {
           _averageRating = 0.0;
         }
@@ -82,6 +91,8 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
         totalPages: _totalPages,
         averageRating: double.parse(_averageRating.toStringAsFixed(1)),
         totalCount: _totalCount,
+        canReview: _canReview,
+        myReview: _myReview,
       ),
     );
   }

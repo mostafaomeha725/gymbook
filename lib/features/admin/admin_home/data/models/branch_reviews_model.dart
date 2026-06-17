@@ -8,6 +8,8 @@ class BranchReviewsModel extends BranchReviewsEntity {
     required super.totalPages,
     required super.totalCount,
     required super.pageSize,
+    required super.canReview,
+    super.myReview,
   });
 
   factory BranchReviewsModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,10 @@ class BranchReviewsModel extends BranchReviewsEntity {
       totalPages: json['totalPages'] ?? 1,
       totalCount: json['totalCount'] ?? 0,
       pageSize: json['pageSize'] ?? 10,
+      canReview: json['meta']?['canReview'] ?? false,
+      myReview: json['meta']?['myReview'] != null
+          ? ReviewModel.fromJson(json['meta']['myReview'])
+          : null,
     );
   }
 }
