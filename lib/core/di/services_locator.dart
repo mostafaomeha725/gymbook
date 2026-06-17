@@ -132,6 +132,12 @@ import 'package:gymbook/features/notifications/domain/repositories/notifications
 import 'package:gymbook/features/notifications/data/repositories/notifications_repository_impl.dart';
 import 'package:gymbook/features/notifications/domain/usecases/update_fcm_token_usecase.dart';
 import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
+import 'package:gymbook/features/settings/data/datasources/profile_remote_datasource.dart';
+import 'package:gymbook/features/settings/data/repositories/profile_repository_impl.dart';
+import 'package:gymbook/features/settings/domain/repositories/profile_repository.dart';
+import 'package:gymbook/features/settings/domain/usecases/get_profile_usecase.dart';
+import 'package:gymbook/features/settings/domain/usecases/update_profile_usecase.dart';
+import 'package:gymbook/features/settings/presentation/cubits/edit_profile_cubit/edit_profile_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -148,6 +154,7 @@ class ServiceLocator {
     _initCustomerSubscriptions();
     _initCustomerQrCode();
     _initNotifications();
+    _initSettings();
   }
 
   /// =============================
@@ -678,6 +685,31 @@ class ServiceLocator {
           notificationService: sl(),
         ),
       );
+    }
+  }
+
+  /// =============================
+  /// SETTINGS FEATURE
+  /// =============================
+  void _initSettings() {
+    if (!sl.isRegistered<ProfileRemoteDataSource>()) {
+      sl.registerLazySingleton<ProfileRemoteDataSource>(
+        () => ProfileRemoteDataSourceImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<ProfileRepository>()) {
+      sl.registerLazySingleton<ProfileRepository>(
+        () => ProfileRepositoryImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<GetProfileUseCase>()) {
+      sl.registerLazySingleton(() => GetProfileUseCase(sl()));
+    }
+    if (!sl.isRegistered<UpdateProfileUseCase>()) {
+      sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+    }
+    if (!sl.isRegistered<EditProfileCubit>()) {
+      sl.registerFactory(() => EditProfileCubit(sl(), sl()));
     }
   }
 }

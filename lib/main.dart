@@ -31,8 +31,7 @@ Future<void> main() async {
 
   await ServiceLocator().init();
 
-  // Initialize notifications
-  sl<NotificationsCubit>().initNotifications();
+  // Notifications are initialized in the home screen
 
   configureEasyLoading();
 

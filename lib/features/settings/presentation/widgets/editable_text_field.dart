@@ -5,7 +5,7 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 
 class EditableTextField extends StatelessWidget {
   final String label;
-  final String initialValue;
+  final TextEditingController controller;
   final IconData icon;
   final TextInputType? inputType;
   final VoidCallback onEditTap;
@@ -15,7 +15,7 @@ class EditableTextField extends StatelessWidget {
   const EditableTextField({
     super.key,
     required this.label,
-    required this.initialValue,
+    required this.controller,
     required this.icon,
     required this.onEditTap,
     required this.isEditable,
@@ -33,7 +33,7 @@ class EditableTextField extends StatelessWidget {
           AppText(label, style: font14w700.copyWith(color: Colors.grey[700])),
           SizedBox(height: 8.h),
           TextFormField(
-            initialValue: initialValue,
+            controller: controller,
             keyboardType: inputType,
             focusNode: focusNode,
             readOnly: !isEditable,

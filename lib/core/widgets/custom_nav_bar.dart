@@ -7,6 +7,7 @@ import 'package:gymbook/features/gator/presentation/widgets/gator_nav_data.dart'
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/services/user_role_service.dart';
+import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
 
 class CustomNavBar extends StatefulWidget {
   const CustomNavBar({super.key});
@@ -29,6 +30,9 @@ class _CustomNavBarState extends State<CustomNavBar> {
     super.initState();
     _navState = NavigationState();
     _initializeNavigation();
+    
+    // Request permission and initialize notifications when the home screen is loaded
+    sl<NotificationsCubit>().initNotifications();
   }
 
   void _initializeNavigation() {
