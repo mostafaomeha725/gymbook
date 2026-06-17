@@ -69,17 +69,23 @@ class SettingsCardState extends State<SettingsCard> {
           
           _Divider(),
 
-          const SettingsItem(
-            icon: Icons.help_outline,
-            title: "Help & Support",
+          SettingsItem(
+            icon: Icons.privacy_tip_outlined,
+            title: "Privacy Policy",
             showArrow: true,
+            onTap: () {
+              GoRouter.of(context).push(Routes.privacyPolicyScreen);
+            },
           ),
           _Divider(),
 
-          const SettingsItem(
+          SettingsItem(
             icon: Icons.description_outlined,
             title: "Terms & Conditions",
             showArrow: true,
+            onTap: () {
+              GoRouter.of(context).push(Routes.termsOfUseScreen);
+            },
           ),
           _Divider(),
 

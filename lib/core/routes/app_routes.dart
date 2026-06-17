@@ -37,8 +37,11 @@ import 'package:gymbook/features/customer/customer_home/presentation/screens/gym
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/full_image_viewer_args.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_details_screen_body.dart';
 
-import 'package:gymbook/features/settings/presentation/screens/edit_profile_screen.dart';
 import 'package:gymbook/features/settings/presentation/screens/change_password_screen.dart';
+
+import 'package:gymbook/features/settings/presentation/screens/edit_profile_screen.dart';
+import 'package:gymbook/features/settings/presentation/screens/privacy_policy_screen.dart';
+import 'package:gymbook/features/settings/presentation/screens/terms_of_use_screen.dart';
 
 import '/core/env.dart';
 import 'route_observer.dart';
@@ -137,11 +140,13 @@ GoRouter createRouter() {
         path: Routes.otpScreen,
         builder: (context, state) {
           final extra = state.extra;
-          
+
           final storage = sl<PreferencesStorage>();
           final savedEmail = storage.getString(key: PreferencesKeys.email);
           final userType = storage.getUserType() ?? 4;
-          final fallbackSource = userType == 2 ? OtpSource.business : OtpSource.customer;
+          final fallbackSource = userType == 2
+              ? OtpSource.business
+              : OtpSource.customer;
 
           final OtpScreenArgs args = extra is OtpScreenArgs
               ? extra
@@ -290,7 +295,7 @@ GoRouter createRouter() {
           final extra = state.extra;
           int branchId = 0;
           String? branchName;
-          
+
           if (extra is int) {
             branchId = extra;
           } else if (extra is Map<String, dynamic>) {
@@ -300,7 +305,10 @@ GoRouter createRouter() {
 
           return BlocProvider(
             create: (context) => BranchReviewsCubit(sl()),
-            child: AdminBranchReviewsScreen(branchId: branchId, branchName: branchName),
+            child: AdminBranchReviewsScreen(
+              branchId: branchId,
+              branchName: branchName,
+            ),
           );
         },
       ),
@@ -349,6 +357,14 @@ GoRouter createRouter() {
           if (branch == null) return const SizedBox.shrink();
           return EditBranchDetailsScreen(branch: branch);
         },
+      ),
+      GoRoute(
+        path: Routes.privacyPolicyScreen,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: Routes.termsOfUseScreen,
+        builder: (context, state) => const TermsOfUseScreen(),
       ),
     ],
   );

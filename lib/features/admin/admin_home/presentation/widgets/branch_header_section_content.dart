@@ -44,7 +44,7 @@ class BranchHeaderSectionContent extends StatelessWidget {
           children: [
             AppImage(
               imageUrl: displayedCoverUrl,
-              height: 200.h,
+              height: 320.h,
               width: double.infinity,
               fit: BoxFit.cover,
             ),

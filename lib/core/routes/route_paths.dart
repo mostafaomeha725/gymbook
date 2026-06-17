@@ -13,6 +13,8 @@ class Routes {
   static const gymDetailsScreen = '/GymDetailsScreen';
   static const editProfileScreen = '/edit-profile-screen';
   static const changePasswordScreen = '/change-password-screen';
+  static const privacyPolicyScreen = '/privacy-policy-screen';
+  static const termsOfUseScreen = '/terms-of-use-screen';
 
   static const fullImageViewerScreen = '/full-image-viewer-screen';
   static const subscriptionsDetailsScreen = '/subscription-Details-screen';

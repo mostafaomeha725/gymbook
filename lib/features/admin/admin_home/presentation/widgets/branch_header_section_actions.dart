@@ -70,13 +70,17 @@ extension _BranchHeaderSectionActions on _BranchHeaderSectionState {
     _updateState(() => _selectedGalleryIndex = index);
   }
 
-  void _showPreviousImage(int currentIndex) {
-    if (currentIndex <= 0) return;
-    _updateState(() => _selectedGalleryIndex = currentIndex - 1);
+  void _showPreviousImage(int currentIndex, int total) {
+    if (total <= 0) return;
+    int nextIndex = currentIndex - 1;
+    if (nextIndex < 0) nextIndex = total - 1;
+    _updateState(() => _selectedGalleryIndex = nextIndex);
   }
 
   void _showNextImage(int currentIndex, int total) {
-    if (currentIndex >= total - 1) return;
-    _updateState(() => _selectedGalleryIndex = currentIndex + 1);
+    if (total <= 0) return;
+    int nextIndex = currentIndex + 1;
+    if (nextIndex >= total) nextIndex = 0;
+    _updateState(() => _selectedGalleryIndex = nextIndex);
   }
 }

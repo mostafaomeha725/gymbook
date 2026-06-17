@@ -88,7 +88,7 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
               galleryUrls: galleryUrls,
               selectedIndex: selectedIndex,
               onPreviousTap: galleryUrls.length > 1
-                  ? () => _showPreviousImage(selectedIndex)
+                  ? () => _showPreviousImage(selectedIndex, galleryUrls.length)
                   : null,
               onNextTap: galleryUrls.length > 1
                   ? () => _showNextImage(selectedIndex, galleryUrls.length)

@@ -26,8 +26,8 @@ Future<void> main() async {
 
   await initializeDateFormatting('en', null);
 
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear(); // يمسح كل البيانات
+  // final prefs = await SharedPreferences.getInstance();
+  // await prefs.clear(); // يمسح كل البيانات
 
   await ServiceLocator().init();
 
