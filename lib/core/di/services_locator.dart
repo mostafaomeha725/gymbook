@@ -102,6 +102,11 @@ import 'package:gymbook/features/customer/customer_home/data/repositories/nearby
 import 'package:gymbook/features/customer/customer_home/domain/repositories/nearby_branches_repository.dart';
 import 'package:gymbook/features/customer/customer_home/domain/usecases/get_nearby_branches_usecase.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/nearby_branches_cubit/nearby_branches_cubit.dart';
+import 'package:gymbook/features/customer/customer_home/data/datasources/customer_branch_details_remote_datasource.dart';
+import 'package:gymbook/features/customer/customer_home/data/repositories/customer_branch_details_repository_impl.dart';
+import 'package:gymbook/features/customer/customer_home/domain/repositories/customer_branch_details_repository.dart';
+import 'package:gymbook/features/customer/customer_home/domain/usecases/get_customer_branch_details_usecase.dart';
+import 'package:gymbook/features/customer/customer_home/presentation/cubits/customer_branch_details_cubit/customer_branch_details_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/subscription_attendance_history_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/customer_subscription_details_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/add_review_remote_datasource.dart';
@@ -538,6 +543,26 @@ class ServiceLocator {
 
     if (!sl.isRegistered<NearbyBranchesCubit>()) {
       sl.registerFactory(() => NearbyBranchesCubit(sl()));
+    }
+
+    if (!sl.isRegistered<CustomerBranchDetailsRemoteDataSource>()) {
+      sl.registerLazySingleton<CustomerBranchDetailsRemoteDataSource>(
+        () => CustomerBranchDetailsRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<CustomerBranchDetailsRepository>()) {
+      sl.registerLazySingleton<CustomerBranchDetailsRepository>(
+        () => CustomerBranchDetailsRepositoryImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<GetCustomerBranchDetailsUseCase>()) {
+      sl.registerLazySingleton(() => GetCustomerBranchDetailsUseCase(sl()));
+    }
+
+    if (!sl.isRegistered<CustomerBranchDetailsCubit>()) {
+      sl.registerFactory(() => CustomerBranchDetailsCubit(sl()));
     }
   }
 
