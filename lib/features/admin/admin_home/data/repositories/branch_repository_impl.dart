@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'dart:convert';
 import 'package:gymbook/core/cache/hive_boxes.dart';
-import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_data.dart'
-    as HiveKeys;
+import 'package:gymbook/core/cache/hive_keys.dart';
 import 'package:hive/hive.dart';
 
 import 'package:dartz/dartz.dart';
@@ -138,6 +137,7 @@ class BranchRepositoryImpl implements BranchRepository {
     final bool isInitialFetch =
         pageNumber == 1 && (search == null || search.trim().isEmpty);
     bool emittedCache = false;
+    bool needsBackgroundRefresh = true;
 
     // 1. Emit Cache if valid
     if (isInitialFetch) {
@@ -150,13 +150,16 @@ class BranchRepositoryImpl implements BranchRepository {
           final int? timestamp = wrapper['timestamp'];
           final Map<String, dynamic>? dataMap = wrapper['data'];
 
-          if (timestamp != null && dataMap != null) {
-            final now = DateTime.now().millisecondsSinceEpoch;
-            // Check if cache is not expired
-            if (now - timestamp < _cacheTtlMillis) {
-              final model = BranchListResponse.fromJson(dataMap);
-              emittedCache = true;
-              yield Right(_mapBranchList(model));
+          if (dataMap != null) {
+            final model = BranchListResponse.fromJson(dataMap);
+            emittedCache = true;
+            yield Right(_mapBranchList(model));
+
+            if (timestamp != null) {
+              final now = DateTime.now().millisecondsSinceEpoch;
+              if (now - timestamp < _cacheTtlMillis) {
+                needsBackgroundRefresh = false; // Cache is fresh, skip background refresh
+              }
             }
           }
         } catch (_) {
@@ -166,59 +169,59 @@ class BranchRepositoryImpl implements BranchRepository {
     }
 
     // 2. Fetch from Network
-    try {
-      final remoteModel = await remoteDataSource.getBranches(
-        pageNumber: pageNumber,
-        pageSize: pageSize,
-        search: search,
-      );
+    if (needsBackgroundRefresh || !isInitialFetch) {
+      try {
+        final remoteModel = await remoteDataSource.getBranches(
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+          search: search,
+        );
 
-      if (isInitialFetch) {
-        final remoteJsonString = jsonEncode(remoteModel.toJson());
+        if (isInitialFetch) {
+          final remoteJsonString = jsonEncode(remoteModel.toJson());
 
-        // Retrieve current cache to compare
-        bool shouldUpdateCacheAndEmit = true;
-        if (emittedCache) {
-          final cachedJsonString = Hive.box<String>(
-            HiveBoxes.cacheBox,
-          ).get(HiveKeys.branchesList);
-          if (cachedJsonString != null && cachedJsonString.isNotEmpty) {
-            try {
-              final wrapper = jsonDecode(cachedJsonString);
-              final cachedDataString = jsonEncode(wrapper['data']);
-              // If data is identical, we don't need to emit again
-              if (remoteJsonString == cachedDataString) {
-                shouldUpdateCacheAndEmit = false;
-              }
-            } catch (_) {}
+          // Retrieve current cache to compare
+          bool shouldUpdateCacheAndEmit = true;
+          if (emittedCache) {
+            final cachedJsonString = Hive.box<String>(
+              HiveBoxes.cacheBox,
+            ).get(HiveKeys.branchesList);
+            if (cachedJsonString != null && cachedJsonString.isNotEmpty) {
+              try {
+                final wrapper = jsonDecode(cachedJsonString);
+                final cachedDataString = jsonEncode(wrapper['data']);
+                // If data is identical, we don't need to emit again
+                if (remoteJsonString == cachedDataString) {
+                  shouldUpdateCacheAndEmit = false;
+                }
+              } catch (_) {}
+            }
           }
-        }
 
-        if (shouldUpdateCacheAndEmit) {
-          final newCacheWrapper = {
-            'timestamp': DateTime.now().millisecondsSinceEpoch,
-            'data': remoteModel.toJson(),
-          };
-          await Hive.box<String>(
-            HiveBoxes.cacheBox,
-          ).put(HiveKeys.branchesList, jsonEncode(newCacheWrapper));
+          if (shouldUpdateCacheAndEmit) {
+            final newCacheWrapper = {
+              'timestamp': DateTime.now().millisecondsSinceEpoch,
+              'data': remoteModel.toJson(),
+            };
+            await Hive.box<String>(
+              HiveBoxes.cacheBox,
+            ).put(HiveKeys.branchesList, jsonEncode(newCacheWrapper));
+            yield Right(_mapBranchList(remoteModel));
+          }
+        } else {
+          // Not initial fetch (pagination or search), just yield remote data
           yield Right(_mapBranchList(remoteModel));
         }
-      } else {
-        // Not initial fetch (pagination or search), just yield remote data
-        yield Right(_mapBranchList(remoteModel));
-      }
-    } catch (e) {
-      // 3. Handle Errors
-      if (!emittedCache) {
-        if (e is ServerException) {
-          yield Left(ServerFailure(message: e.message));
-        } else {
-          yield const Left(ServerFailure(message: "Network Error"));
+      } catch (e) {
+        // 3. Handle Errors
+        if (!emittedCache) {
+          if (e is ServerException) {
+            yield Left(ServerFailure(message: e.message));
+          } else {
+            yield const Left(ServerFailure(message: "Network Error"));
+          }
         }
       }
-      // If we already emitted cache, we silently swallow the network error
-      // (or we could emit a specific failure to show a snackbar, but usually SWR hides it)
     }
   }
 
