@@ -311,7 +311,7 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<BranchRepository>()) {
       sl.registerLazySingleton<BranchRepository>(
-        () => BranchRepositoryImpl(sl(), sl()),
+        () => BranchRepositoryImpl(sl()),
       );
     }
     if (!sl.isRegistered<PackageRepository>()) {

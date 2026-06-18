@@ -9,9 +9,10 @@ import 'package:gymbook/core/routes/app_routes.dart';
 import 'package:gymbook/core/theme/light_colors.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/services/notification_service.dart';
-import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
+import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> clearPrefs() async {
   final prefs = await SharedPreferences.getInstance();
@@ -25,6 +26,9 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   await initializeDateFormatting('en', null);
+
+  await Hive.initFlutter();
+  await Hive.openBox<String>(HiveBoxes.cacheBox);
 
   // final prefs = await SharedPreferences.getInstance();
   // await prefs.clear(); // يمسح كل البيانات

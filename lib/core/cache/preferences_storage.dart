@@ -152,18 +152,6 @@ class PreferencesStorage {
     await _preferences.remove(PreferencesKeys.userProfile.name);
   }
 
-  Future<void> saveBranchesList(String branchesJson) async {
-    await _preferences.setString(PreferencesKeys.branchesList.name, branchesJson);
-  }
-
-  String? getBranchesList() {
-    return _preferences.getString(PreferencesKeys.branchesList.name);
-  }
-
-  Future<void> deleteBranchesList() async {
-    await _preferences.remove(PreferencesKeys.branchesList.name);
-  }
-
   /// ================= LANGUAGE =================
   String getCurrentLanguage() {
     return _preferences.getString(PreferencesKeys.currentLanguage.name) ?? "en";

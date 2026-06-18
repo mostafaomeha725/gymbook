@@ -30,7 +30,6 @@ enum PreferencesKeys {
   branchName,
   branchId,
   userProfile,
-  branchesList,
 }
 
 /// Roles:

@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'dart:convert';
+import 'package:gymbook/core/cache/hive_boxes.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_data.dart'
+    as HiveKeys;
+import 'package:hive/hive.dart';
 
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/error/failure.dart';
-import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/features/admin/admin_home/data/datasources/branch_remote_datasource.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_details_model.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_list_model.dart';
@@ -25,9 +28,8 @@ import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_rep
 
 class BranchRepositoryImpl implements BranchRepository {
   final BranchRemoteDataSource remoteDataSource;
-  final PreferencesStorage preferencesStorage;
 
-  BranchRepositoryImpl(this.remoteDataSource, this.preferencesStorage);
+  BranchRepositoryImpl(this.remoteDataSource);
 
   static const int _cacheTtlMillis = 5 * 60 * 1000; // 5 minutes TTL
 
@@ -133,12 +135,15 @@ class BranchRepositoryImpl implements BranchRepository {
     int pageSize = 10,
     String? search,
   }) async* {
-    final bool isInitialFetch = pageNumber == 1 && (search == null || search.trim().isEmpty);
+    final bool isInitialFetch =
+        pageNumber == 1 && (search == null || search.trim().isEmpty);
     bool emittedCache = false;
 
     // 1. Emit Cache if valid
     if (isInitialFetch) {
-      final cachedJson = preferencesStorage.getBranchesList();
+      final cachedJson = Hive.box<String>(
+        HiveBoxes.cacheBox,
+      ).get(HiveKeys.branchesList);
       if (cachedJson != null && cachedJson.isNotEmpty) {
         try {
           final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
@@ -170,11 +175,13 @@ class BranchRepositoryImpl implements BranchRepository {
 
       if (isInitialFetch) {
         final remoteJsonString = jsonEncode(remoteModel.toJson());
-        
+
         // Retrieve current cache to compare
         bool shouldUpdateCacheAndEmit = true;
         if (emittedCache) {
-          final cachedJsonString = preferencesStorage.getBranchesList();
+          final cachedJsonString = Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).get(HiveKeys.branchesList);
           if (cachedJsonString != null && cachedJsonString.isNotEmpty) {
             try {
               final wrapper = jsonDecode(cachedJsonString);
@@ -192,7 +199,9 @@ class BranchRepositoryImpl implements BranchRepository {
             'timestamp': DateTime.now().millisecondsSinceEpoch,
             'data': remoteModel.toJson(),
           };
-          await preferencesStorage.saveBranchesList(jsonEncode(newCacheWrapper));
+          await Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).put(HiveKeys.branchesList, jsonEncode(newCacheWrapper));
           yield Right(_mapBranchList(remoteModel));
         }
       } else {
@@ -208,7 +217,7 @@ class BranchRepositoryImpl implements BranchRepository {
           yield const Left(ServerFailure(message: "Network Error"));
         }
       }
-      // If we already emitted cache, we silently swallow the network error 
+      // If we already emitted cache, we silently swallow the network error
       // (or we could emit a specific failure to show a snackbar, but usually SWR hides it)
     }
   }
