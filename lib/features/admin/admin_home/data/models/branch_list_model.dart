@@ -32,6 +32,18 @@ class BranchListResponse {
       hasNextPage: json['hasNextPage'] ?? false,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.map((e) => e.toJson()).toList(),
+      'currentPage': currentPage,
+      'totalPages': totalPages,
+      'totalCount': totalCount,
+      'pageSize': pageSize,
+      'hasPreviousPage': hasPreviousPage,
+      'hasNextPage': hasNextPage,
+    };
+  }
 }
 
 class BranchItem {
@@ -135,6 +147,28 @@ class BranchItem {
     return null;
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'location': {
+        'address': address,
+        'coordinates': {
+          'latitude': latitude,
+          'longitude': longitude,
+        },
+        'governorate': governorate?.toJson(),
+      },
+      'branchType': branchType,
+      'logoImageId': logoImageId,
+      'logoUrl': logo,
+      'branchStatus': branchStatus,
+      'subscriptionsCount': subscriptionsCount,
+    };
+  }
+
   /// 0=MaleOnly, 1=FemaleOnly, 2=Mixed
   String get branchTypeName {
     const names = ['Male Only', 'Female Only', 'Mixed'];
@@ -164,6 +198,13 @@ class BranchGovernorate {
 
   factory BranchGovernorate.fromJson(Map<String, dynamic> json) {
     return BranchGovernorate(id: json['id'] ?? 0, name: json['name'] ?? '');
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }
 

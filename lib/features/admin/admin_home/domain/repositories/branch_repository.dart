@@ -44,7 +44,7 @@ abstract class BranchRepository {
     required int branchStatus,
   });
 
-  Future<Either<Failure, BranchListEntity>> getBranches({
+  Stream<Either<Failure, BranchListEntity>> getBranches({
     int pageNumber = 1,
     int pageSize = 10,
     String? search,

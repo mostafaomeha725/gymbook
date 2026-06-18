@@ -8,7 +8,7 @@ class GetBranchesUseCase {
 
   GetBranchesUseCase(this.repository);
 
-  Future<Either<Failure, BranchListEntity>> call({
+  Stream<Either<Failure, BranchListEntity>> call({
     int pageNumber = 1,
     int pageSize = 10,
     String? search,

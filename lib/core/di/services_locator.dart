@@ -36,12 +36,12 @@ import 'package:gymbook/features/admin/admin_home/domain/usecases/create_branch_
 import 'package:gymbook/features/admin/admin_home/domain/usecases/create_package_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/delete_package_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/edit_branch_usecase.dart';
+import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branches_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_details_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_packages_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_setup_details_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_statistics_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_reviews_usecase.dart';
-import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branches_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/update_branch_location_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/update_branch_status_usecase.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/update_package_status_usecase.dart';
@@ -311,7 +311,7 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<BranchRepository>()) {
       sl.registerLazySingleton<BranchRepository>(
-        () => BranchRepositoryImpl(sl()),
+        () => BranchRepositoryImpl(sl(), sl()),
       );
     }
     if (!sl.isRegistered<PackageRepository>()) {

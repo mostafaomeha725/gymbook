@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/error/failure.dart';
+import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/features/admin/admin_home/data/datasources/branch_remote_datasource.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_details_model.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_list_model.dart';
@@ -22,8 +25,11 @@ import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_rep
 
 class BranchRepositoryImpl implements BranchRepository {
   final BranchRemoteDataSource remoteDataSource;
+  final PreferencesStorage preferencesStorage;
 
-  BranchRepositoryImpl(this.remoteDataSource);
+  BranchRepositoryImpl(this.remoteDataSource, this.preferencesStorage);
+
+  static const int _cacheTtlMillis = 5 * 60 * 1000; // 5 minutes TTL
 
   @override
   Future<Either<Failure, CreatedBranchEntity>> createBranch({
@@ -122,20 +128,88 @@ class BranchRepositoryImpl implements BranchRepository {
   }
 
   @override
-  Future<Either<Failure, BranchListEntity>> getBranches({
+  Stream<Either<Failure, BranchListEntity>> getBranches({
     int pageNumber = 1,
     int pageSize = 10,
     String? search,
-  }) async {
+  }) async* {
+    final bool isInitialFetch = pageNumber == 1 && (search == null || search.trim().isEmpty);
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    if (isInitialFetch) {
+      final cachedJson = preferencesStorage.getBranchesList();
+      if (cachedJson != null && cachedJson.isNotEmpty) {
+        try {
+          final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+          final int? timestamp = wrapper['timestamp'];
+          final Map<String, dynamic>? dataMap = wrapper['data'];
+
+          if (timestamp != null && dataMap != null) {
+            final now = DateTime.now().millisecondsSinceEpoch;
+            // Check if cache is not expired
+            if (now - timestamp < _cacheTtlMillis) {
+              final model = BranchListResponse.fromJson(dataMap);
+              emittedCache = true;
+              yield Right(_mapBranchList(model));
+            }
+          }
+        } catch (_) {
+          // Ignore cache parse errors
+        }
+      }
+    }
+
+    // 2. Fetch from Network
     try {
-      final model = await remoteDataSource.getBranches(
+      final remoteModel = await remoteDataSource.getBranches(
         pageNumber: pageNumber,
         pageSize: pageSize,
         search: search,
       );
-      return Right(_mapBranchList(model));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+
+      if (isInitialFetch) {
+        final remoteJsonString = jsonEncode(remoteModel.toJson());
+        
+        // Retrieve current cache to compare
+        bool shouldUpdateCacheAndEmit = true;
+        if (emittedCache) {
+          final cachedJsonString = preferencesStorage.getBranchesList();
+          if (cachedJsonString != null && cachedJsonString.isNotEmpty) {
+            try {
+              final wrapper = jsonDecode(cachedJsonString);
+              final cachedDataString = jsonEncode(wrapper['data']);
+              // If data is identical, we don't need to emit again
+              if (remoteJsonString == cachedDataString) {
+                shouldUpdateCacheAndEmit = false;
+              }
+            } catch (_) {}
+          }
+        }
+
+        if (shouldUpdateCacheAndEmit) {
+          final newCacheWrapper = {
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'data': remoteModel.toJson(),
+          };
+          await preferencesStorage.saveBranchesList(jsonEncode(newCacheWrapper));
+          yield Right(_mapBranchList(remoteModel));
+        }
+      } else {
+        // Not initial fetch (pagination or search), just yield remote data
+        yield Right(_mapBranchList(remoteModel));
+      }
+    } catch (e) {
+      // 3. Handle Errors
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
+      // If we already emitted cache, we silently swallow the network error 
+      // (or we could emit a specific failure to show a snackbar, but usually SWR hides it)
     }
   }
 
