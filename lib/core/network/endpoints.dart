@@ -33,7 +33,7 @@ class EndPoints {
   /// Profile endpoints
   static const String profile = 'profile';
   static const String getCurrentUser = 'Users/me';
-  static const String updateFcmToken = 'user/update-fcm-token';
+  static const String updateFcmToken = 'Notifications/register-token';
 
   /// Owner endpoints
   static const String createBranch = 'Owner/Branches';

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
 
@@ -15,7 +16,7 @@ class NotificationsRemoteDataSourceImpl
   Future<void> updateFcmToken(String token) async {
     await _networkService.postData(
       endPoint: EndPoints.updateFcmToken,
-      data: {'fcmToken': token},
+      data: {'token': token, 'devicePlatform': Platform.isIOS ? 1 : 0},
     );
   }
 }
