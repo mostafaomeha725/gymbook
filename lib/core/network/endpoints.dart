@@ -6,6 +6,8 @@ class EndPoints {
   static const String registerOwner = 'Authentication/register-owner';
 
   static const String login = 'Authentication/login';
+  static const String logout = 'Authentication/logout';
+  static const String refreshToken = 'Authentication/refresh-token';
 
   static const String googleLogin = 'Authentication/google';
 

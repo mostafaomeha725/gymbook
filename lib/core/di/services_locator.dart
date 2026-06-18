@@ -138,6 +138,7 @@ import 'package:gymbook/features/settings/domain/repositories/profile_repository
 import 'package:gymbook/features/settings/domain/usecases/get_profile_usecase.dart';
 import 'package:gymbook/features/settings/domain/usecases/update_profile_usecase.dart';
 import 'package:gymbook/features/settings/presentation/cubits/edit_profile_cubit/edit_profile_cubit.dart';
+import 'package:gymbook/features/auth/domain/usecases/logout_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -225,6 +226,9 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<ConfirmEmailUseCase>()) {
       sl.registerLazySingleton(() => ConfirmEmailUseCase(sl()));
+    }
+    if (!sl.isRegistered<LogoutUseCase>()) {
+      sl.registerLazySingleton(() => LogoutUseCase(sl()));
     }
 
     // Cubits

@@ -37,6 +37,8 @@ abstract class AuthRemoteDataSource {
 
   Future<LoginResponse> loginWithGoogle();
 
+  Future<void> logout({required String refreshToken});
+
   Future<RegisterResponse> register({
     required String firstName,
     required String lastName,
@@ -183,6 +185,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return result.fold(
       (failure) => throw ServerException(failure.message),
       (data) => LoginResponse.fromJson(data),
+    );
+  }
+
+  @override
+  Future<void> logout({required String refreshToken}) async {
+    final result = await networkService.postData(
+      endPoint: EndPoints.logout,
+      data: {'refreshToken': refreshToken},
+    );
+
+    result.fold(
+      (failure) => throw ServerException(failure.message),
+      (_) => null,
     );
   }
 

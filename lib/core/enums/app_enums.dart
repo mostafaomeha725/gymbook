@@ -20,6 +20,7 @@ enum PreferencesKeys {
   email,
   phone,
   userToken,
+  refreshToken,
   userIsAdmin,
   userSecretKey,
   userId,

@@ -116,6 +116,24 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> logout() async {
+    try {
+      final refreshToken = storage.getRefreshToken();
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        await remoteDataSource.logout(refreshToken: refreshToken);
+      }
+      clearPendingSession();
+      return const Right(null);
+    } on ServerException catch (e) {
+      clearPendingSession();
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      clearPendingSession();
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, LoginResultEntity>> login({
     required String email,
     required String password,
@@ -183,6 +201,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   Future<void> _saveSession(LoginResponse response) async {
     await storage.saveUserToken(response.accessToken);
+    await storage.saveRefreshToken(response.refreshToken.token);
     await storage.saveUserRole(
       response.user.role == AppUserRole.owner ||
           response.user.role == AppUserRole.branchAdmin,
@@ -247,6 +266,7 @@ class AuthRepositoryImpl implements AuthRepository {
   void clearPendingSession() {
     _pendingLoginResponse = null;
     storage.deleteUserToken();
+    storage.deleteRefreshToken();
     networkService.removeToken();
   }
 }

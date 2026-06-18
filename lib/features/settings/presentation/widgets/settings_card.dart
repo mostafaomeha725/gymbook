@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/switch_open_gym.dart';
+import 'package:gymbook/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:gymbook/features/notifications/domain/usecases/update_fcm_token_usecase.dart';
 import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
 import 'package:gymbook/features/settings/presentation/widgets/settings_item.dart';
@@ -133,9 +133,15 @@ class SettingsCardState extends State<SettingsCard> {
             title: "Logout",
             titleColor: Colors.red,
             onTap: () async {
-              final storage = sl<PreferencesStorage>();
-              await storage.deleteUserToken();
-              await storage.deleteUserRole();
+              showLoading();
+              try {
+                // Clear FCM token first if possible
+                await FirebaseMessaging.instance.deleteToken();
+              } catch (_) {}
+              
+              await sl<LogoutUseCase>()();
+              hideLoading();
+              
               if (context.mounted) {
                 GoRouter.of(context).go(Routes.loginScreen);
               }

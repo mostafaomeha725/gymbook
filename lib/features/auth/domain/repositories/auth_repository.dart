@@ -40,6 +40,8 @@ abstract class AuthRepository {
 
   Future<Either<Failure, LoginResultEntity>> loginWithGoogle();
 
+  Future<Either<Failure, void>> logout();
+
   Future<Either<Failure, UserEntity>> register({
     required String firstName,
     required String lastName,
