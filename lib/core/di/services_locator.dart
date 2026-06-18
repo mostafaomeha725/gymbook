@@ -136,8 +136,10 @@ import 'package:gymbook/features/settings/data/datasources/profile_remote_dataso
 import 'package:gymbook/features/settings/data/repositories/profile_repository_impl.dart';
 import 'package:gymbook/features/settings/domain/repositories/profile_repository.dart';
 import 'package:gymbook/features/settings/domain/usecases/get_profile_usecase.dart';
+import 'package:gymbook/features/settings/domain/usecases/get_cached_profile_usecase.dart';
 import 'package:gymbook/features/settings/domain/usecases/update_profile_usecase.dart';
 import 'package:gymbook/features/settings/presentation/cubits/edit_profile_cubit/edit_profile_cubit.dart';
+import 'package:gymbook/features/settings/presentation/cubits/profile_cubit/profile_cubit.dart';
 import 'package:gymbook/features/auth/domain/usecases/logout_usecase.dart';
 
 final sl = GetIt.instance;
@@ -703,17 +705,23 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<ProfileRepository>()) {
       sl.registerLazySingleton<ProfileRepository>(
-        () => ProfileRepositoryImpl(sl()),
+        () => ProfileRepositoryImpl(sl(), sl()),
       );
     }
     if (!sl.isRegistered<GetProfileUseCase>()) {
       sl.registerLazySingleton(() => GetProfileUseCase(sl()));
+    }
+    if (!sl.isRegistered<GetCachedProfileUseCase>()) {
+      sl.registerLazySingleton(() => GetCachedProfileUseCase(sl()));
     }
     if (!sl.isRegistered<UpdateProfileUseCase>()) {
       sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
     }
     if (!sl.isRegistered<EditProfileCubit>()) {
       sl.registerFactory(() => EditProfileCubit(sl(), sl()));
+    }
+    if (!sl.isRegistered<ProfileCubit>()) {
+      sl.registerFactory(() => ProfileCubit(sl(), sl()));
     }
   }
 }

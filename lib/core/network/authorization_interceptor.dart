@@ -1,3 +1,4 @@
+import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
@@ -32,6 +33,7 @@ class AuthorizationInterceptor extends Interceptor {
       if (accessToken != null && refreshToken != null) {
         try {
           final dio = Dio(BaseOptions(baseUrl: AppStrings.baseUrl));
+          dio.interceptors.add(ChuckerDioInterceptor());
           
           final refreshResponse = await dio.post(
             EndPoints.refreshToken,
@@ -53,6 +55,7 @@ class AuthorizationInterceptor extends Interceptor {
             err.requestOptions.headers['Authorization'] = "Bearer $newAccessToken";
             
             final retryDio = Dio(BaseOptions(baseUrl: AppStrings.baseUrl));
+            retryDio.interceptors.add(ChuckerDioInterceptor());
             final retryResponse = await retryDio.fetch(err.requestOptions);
             
             return handler.resolve(retryResponse);

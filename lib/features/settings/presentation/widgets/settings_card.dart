@@ -134,10 +134,6 @@ class SettingsCardState extends State<SettingsCard> {
             titleColor: Colors.red,
             onTap: () async {
               showLoading();
-              try {
-                // Clear FCM token first if possible
-                await FirebaseMessaging.instance.deleteToken();
-              } catch (_) {}
               
               await sl<LogoutUseCase>()();
               hideLoading();

@@ -29,6 +29,7 @@ enum PreferencesKeys {
   isEmailConfirmed,
   branchName,
   branchId,
+  userProfile,
 }
 
 /// Roles:

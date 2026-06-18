@@ -140,6 +140,18 @@ class PreferencesStorage {
     return _preferences.getString(PreferencesKeys.branchName.name);
   }
 
+  Future<void> saveUserProfile(String profileJson) async {
+    await _preferences.setString(PreferencesKeys.userProfile.name, profileJson);
+  }
+
+  String? getUserProfile() {
+    return _preferences.getString(PreferencesKeys.userProfile.name);
+  }
+
+  Future<void> deleteUserProfile() async {
+    await _preferences.remove(PreferencesKeys.userProfile.name);
+  }
+
   /// ================= LANGUAGE =================
   String getCurrentLanguage() {
     return _preferences.getString(PreferencesKeys.currentLanguage.name) ?? "en";
