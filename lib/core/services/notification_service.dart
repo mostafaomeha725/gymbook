@@ -57,4 +57,28 @@ class NotificationService {
   }
 
   Stream<String> get onTokenRefresh => _firebaseMessaging.onTokenRefresh;
+
+  Future<bool> isNotificationEnabled() async {
+    final settings = await _firebaseMessaging.getNotificationSettings();
+    return settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+  }
+
+  Future<bool> requestPermission() async {
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      announcement: false,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+    );
+    return settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+  }
+
+  Future<void> deleteToken() async {
+    await _firebaseMessaging.deleteToken();
+  }
 }
