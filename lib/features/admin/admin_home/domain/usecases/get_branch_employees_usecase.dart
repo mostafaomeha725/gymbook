@@ -8,7 +8,7 @@ class GetBranchEmployeesUseCase {
 
   GetBranchEmployeesUseCase(this.repository);
 
-  Future<Either<Failure, BranchEmployeesResponse>> call(int branchId, int pageNumber) async {
-    return await repository.getBranchEmployees(branchId, pageNumber);
+  Stream<Either<Failure, BranchEmployeesResponse>> call(int branchId, int pageNumber) {
+    return repository.getBranchEmployees(branchId, pageNumber);
   }
 }

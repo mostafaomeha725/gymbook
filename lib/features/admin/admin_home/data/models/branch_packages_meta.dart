@@ -16,4 +16,12 @@ class BranchPackagesMeta {
       averagePrice: (json['averagePrice'] as num?)?.toDouble() ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'totalPackageCount': totalPackageCount,
+      'activePackagesCount': activePackagesCount,
+      'averagePrice': averagePrice,
+    };
+  }
 }

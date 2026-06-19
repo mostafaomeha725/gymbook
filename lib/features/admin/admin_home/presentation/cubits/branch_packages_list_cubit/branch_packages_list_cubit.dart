@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/packages_list_entity.dart';
@@ -10,6 +11,7 @@ class BranchPackagesListCubit extends Cubit<BranchPackagesListState> {
     : super(BranchPackagesListInitial());
 
   final GetBranchPackagesUseCase getBranchPackagesUseCase;
+  StreamSubscription? _subscription;
 
   int _currentPage = 1;
   static const int _pageSize = 10;
@@ -25,24 +27,32 @@ class BranchPackagesListCubit extends Cubit<BranchPackagesListState> {
       _currentPage = pageNumber;
     }
 
-    emit(BranchPackagesListLoading());
-    showLoading();
+    if (state is! BranchPackagesListSuccess) {
+      emit(BranchPackagesListLoading());
+    }
 
-    final result = await getBranchPackagesUseCase(
+    _subscription?.cancel();
+    _subscription = getBranchPackagesUseCase(
       branchId: branchId,
       pageNumber: _currentPage,
       pageSize: _pageSize,
-    );
+    ).listen((result) {
+      result.fold(
+        (failure) {
+          if (state is! BranchPackagesListSuccess) {
+            emit(BranchPackagesListFailure(failure.message));
+          }
+        },
+        (entity) {
+          emit(BranchPackagesListSuccess(entity));
+        },
+      );
+    });
+  }
 
-    result.fold(
-      (failure) {
-        hideLoading();
-        emit(BranchPackagesListFailure(failure.message));
-      },
-      (entity) {
-        hideLoading();
-        emit(BranchPackagesListSuccess(entity));
-      },
-    );
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 }

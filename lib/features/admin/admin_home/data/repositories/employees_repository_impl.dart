@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:hive/hive.dart';
+import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/error/failure.dart';
@@ -24,14 +27,61 @@ class EmployeesRepositoryImpl implements EmployeesRepository {
   }
 
   @override
-  Future<Either<Failure, BranchEmployeesResponse>> getBranchEmployees(int branchId, int pageNumber) async {
+  Stream<Either<Failure, BranchEmployeesResponse>> getBranchEmployees(int branchId, int pageNumber) async* {
+    final String cacheKey = 'branch_employees_${branchId}_page_$pageNumber';
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = BranchEmployeesResponse.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(model);
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from Network
     try {
-      final response = await remoteDataSource.getBranchEmployees(branchId, pageNumber);
-      return Right(response);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      final remoteModel = await remoteDataSource.getBranchEmployees(branchId, pageNumber);
+      final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+      // Retrieve current cache to compare
+      bool shouldUpdateCacheAndEmit = true;
+      if (emittedCache) {
+        final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+        if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+          try {
+            final wrapper = jsonDecode(currentCachedJson);
+            final cachedDataString = jsonEncode(wrapper['data']);
+            if (remoteJsonString == cachedDataString) {
+              shouldUpdateCacheAndEmit = false;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (shouldUpdateCacheAndEmit) {
+        final newCacheWrapper = {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'data': remoteModel.toJson(),
+        };
+        await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+        yield Right(remoteModel);
+      }
     } catch (e) {
-      return const Left(ServerFailure(message: 'An unexpected error occurred'));
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
     }
   }
 

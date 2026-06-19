@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:hive/hive.dart';
+import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/error/failure.dart';
@@ -57,24 +60,74 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   }
 
   @override
-  Future<Either<Failure, SubscriptionsListEntity>> getBranchSubscriptions({
+  Stream<Either<Failure, SubscriptionsListEntity>> getBranchSubscriptions({
     required int branchId,
     required int pageNumber,
     required int pageSize,
     String? search,
     int? status,
-  }) async {
+  }) async* {
+    final String cacheKey =
+        'branch_subscriptions_${branchId}_page_${pageNumber}_size_${pageSize}_search_${search ?? ''}_status_${status ?? 'all'}';
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = BranchSubscriptionsResponse.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(_mapSubscriptionsList(model));
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from Network
     try {
-      final model = await remoteDataSource.getBranchSubscriptions(
+      final remoteModel = await remoteDataSource.getBranchSubscriptions(
         branchId: branchId,
         pageNumber: pageNumber,
         pageSize: pageSize,
         search: search,
         status: status,
       );
-      return Right(_mapSubscriptionsList(model));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+      // Retrieve current cache to compare
+      bool shouldUpdateCacheAndEmit = true;
+      if (emittedCache) {
+        final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+        if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+          try {
+            final wrapper = jsonDecode(currentCachedJson);
+            final cachedDataString = jsonEncode(wrapper['data']);
+            if (remoteJsonString == cachedDataString) {
+              shouldUpdateCacheAndEmit = false;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (shouldUpdateCacheAndEmit) {
+        final newCacheWrapper = {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'data': remoteModel.toJson(),
+        };
+        await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+        yield Right(_mapSubscriptionsList(remoteModel));
+      }
+    } catch (e) {
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
     }
   }
 

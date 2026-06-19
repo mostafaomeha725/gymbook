@@ -34,6 +34,16 @@ class SubscriptionItemModel {
       remainingDurationInDays: remainingDurationInDays,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'subscriptionId': subscriptionId,
+      'fullName': fullName,
+      'status': status,
+      'totalDurationInDays': totalDurationInDays,
+      'remainingDurationInDays': remainingDurationInDays,
+    };
+  }
 }
 
 class BranchSubscriptionsResponse {
@@ -67,5 +77,17 @@ class BranchSubscriptionsResponse {
       hasPreviousPage: json['hasPreviousPage'] ?? false,
       hasNextPage: json['hasNextPage'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.map((e) => e.toJson()).toList(),
+      'currentPage': currentPage,
+      'totalPages': totalPages,
+      'totalCount': totalCount,
+      'pageSize': pageSize,
+      'hasPreviousPage': hasPreviousPage,
+      'hasNextPage': hasNextPage,
+    };
   }
 }

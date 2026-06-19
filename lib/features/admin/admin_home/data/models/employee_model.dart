@@ -37,6 +37,21 @@ class EmployeeModel {
       createdAt: json['createdAt'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'branchId': branchId,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phone': phone,
+      'roleId': roleId,
+      'roleName': roleName,
+      'isActive': isActive,
+      'createdAt': createdAt,
+    };
+  }
 }
 
 class BranchEmployeesResponse {
@@ -70,5 +85,17 @@ class BranchEmployeesResponse {
       hasPreviousPage: json['hasPreviousPage'] ?? false,
       hasNextPage: json['hasNextPage'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.map((e) => e.toJson()).toList(),
+      'currentPage': currentPage,
+      'totalPages': totalPages,
+      'totalCount': totalCount,
+      'pageSize': pageSize,
+      'hasPreviousPage': hasPreviousPage,
+      'hasNextPage': hasNextPage,
+    };
   }
 }

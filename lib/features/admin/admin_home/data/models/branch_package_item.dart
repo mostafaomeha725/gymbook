@@ -28,4 +28,16 @@ class BranchPackageItem {
       freezeDurationInDays: json['freezeDurationInDays'] ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'durationInMonths': durationInMonths,
+      'isActive': isActive,
+      'numberOfFreezes': numberOfFreezes,
+      'freezeDurationInDays': freezeDurationInDays,
+    };
+  }
 }

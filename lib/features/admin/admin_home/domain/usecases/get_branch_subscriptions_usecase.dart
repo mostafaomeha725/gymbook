@@ -7,7 +7,7 @@ class GetBranchSubscriptionsUseCase {
   final SubscriptionRepository repository;
   GetBranchSubscriptionsUseCase(this.repository);
 
-  Future<Either<Failure, SubscriptionsListEntity>> call({
+  Stream<Either<Failure, SubscriptionsListEntity>> call({
     required int branchId,
     required int pageNumber,
     required int pageSize,

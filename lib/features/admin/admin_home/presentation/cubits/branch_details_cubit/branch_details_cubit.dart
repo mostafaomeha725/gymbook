@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_details_usecase.dart';
 

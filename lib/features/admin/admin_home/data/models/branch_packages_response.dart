@@ -40,4 +40,17 @@ class BranchPackagesResponse {
       hasNextPage: json['hasNextPage'] ?? false,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.map((e) => e.toJson()).toList(),
+      'currentPage': currentPage,
+      'totalPages': totalPages,
+      'totalCount': totalCount,
+      'meta': meta.toJson(),
+      'pageSize': pageSize,
+      'hasPreviousPage': hasPreviousPage,
+      'hasNextPage': hasNextPage,
+    };
+  }
 }

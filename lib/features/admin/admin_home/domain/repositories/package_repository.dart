@@ -25,7 +25,7 @@ abstract class PackageRepository {
     required int freezeDurationInDays,
   });
 
-  Future<Either<Failure, PackagesListEntity>> getBranchPackages({
+  Stream<Either<Failure, PackagesListEntity>> getBranchPackages({
     required int branchId,
     required int pageNumber,
     required int pageSize,

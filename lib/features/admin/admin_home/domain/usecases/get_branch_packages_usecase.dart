@@ -8,7 +8,7 @@ class GetBranchPackagesUseCase {
 
   GetBranchPackagesUseCase(this.repository);
 
-  Future<Either<Failure, PackagesListEntity>> call({
+  Stream<Either<Failure, PackagesListEntity>> call({
     required int branchId,
     required int pageNumber,
     required int pageSize,

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:hive/hive.dart';
+import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:dartz/dartz.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/error/failure.dart';
@@ -81,20 +84,69 @@ class PackageRepositoryImpl implements PackageRepository {
   }
 
   @override
-  Future<Either<Failure, PackagesListEntity>> getBranchPackages({
+  Stream<Either<Failure, PackagesListEntity>> getBranchPackages({
     required int branchId,
     required int pageNumber,
     required int pageSize,
-  }) async {
+  }) async* {
+    final String cacheKey = 'branch_packages_${branchId}_page_${pageNumber}_size_$pageSize';
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = BranchPackagesResponse.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(_mapPackagesList(model));
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from Network
     try {
-      final model = await remoteDataSource.getBranchPackages(
+      final remoteModel = await remoteDataSource.getBranchPackages(
         branchId: branchId,
         pageNumber: pageNumber,
         pageSize: pageSize,
       );
-      return Right(_mapPackagesList(model));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+      // Retrieve current cache to compare
+      bool shouldUpdateCacheAndEmit = true;
+      if (emittedCache) {
+        final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+        if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+          try {
+            final wrapper = jsonDecode(currentCachedJson);
+            final cachedDataString = jsonEncode(wrapper['data']);
+            if (remoteJsonString == cachedDataString) {
+              shouldUpdateCacheAndEmit = false;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (shouldUpdateCacheAndEmit) {
+        final newCacheWrapper = {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'data': remoteModel.toJson(),
+        };
+        await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+        yield Right(_mapPackagesList(remoteModel));
+      }
+    } catch (e) {
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
     }
   }
 

@@ -21,7 +21,7 @@ abstract class SubscriptionRepository {
     required int packageId,
   });
 
-  Future<Either<Failure, SubscriptionsListEntity>> getBranchSubscriptions({
+  Stream<Either<Failure, SubscriptionsListEntity>> getBranchSubscriptions({
     required int branchId,
     required int pageNumber,
     required int pageSize,
