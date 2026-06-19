@@ -199,7 +199,7 @@ class ManagePackageScreenBody extends StatelessWidget {
 
                   SizedBox(height: 20.h),
 
-                  if (success != null)
+                  if (success != null && success.totalPages > 1)
                     GymPaginationWidget(
                       totalPages: success.totalPages,
                       currentPage: success.currentPage,
