@@ -8,7 +8,7 @@ class GetCustomerSubscriptionDetailsUseCase {
 
   GetCustomerSubscriptionDetailsUseCase(this.repository);
 
-  Future<Either<Failure, CustomerSubscriptionDetailsEntity>> call({
+  Stream<Either<Failure, CustomerSubscriptionDetailsEntity>> call({
     required int subscriptionId,
   }) {
     return repository.getDetails(subscriptionId: subscriptionId);

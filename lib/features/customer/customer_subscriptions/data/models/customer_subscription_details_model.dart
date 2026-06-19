@@ -78,6 +78,25 @@ class CustomerSubscriptionDetailsModel {
       packageName: packageName,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'branchId': branchId,
+      'branchName': branchName,
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+      'images': images.map((item) => item.toJson()).toList(),
+      'subscriptionId': subscriptionId,
+      'subscriptionStatus': subscriptionStatus,
+      'price': price,
+      'activationDate': activationDate,
+      'endDate': endDate,
+      'durationInDays': durationInDays,
+      'checkInsCount': checkInsCount,
+      'packageName': packageName,
+    };
+  }
 }
 
 class CustomerSubscriptionImageModel {
@@ -91,5 +110,9 @@ class CustomerSubscriptionImageModel {
 
   CustomerSubscriptionImageEntity toEntity() {
     return CustomerSubscriptionImageEntity(url: url);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'url': url};
   }
 }
