@@ -63,8 +63,9 @@ class CustomerSubscriptionDetailsRepositoryImpl
         // Compare with current cache
         bool shouldUpdateCacheAndEmit = true;
         if (emittedCache) {
-          final currentCachedJson =
-              Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+          final currentCachedJson = Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).get(cacheKey);
           if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
             try {
               final wrapper = jsonDecode(currentCachedJson);
@@ -81,10 +82,9 @@ class CustomerSubscriptionDetailsRepositoryImpl
             'timestamp': DateTime.now().millisecondsSinceEpoch,
             'data': remoteModel.toJson(),
           };
-          await Hive.box<String>(HiveBoxes.cacheBox).put(
-            cacheKey,
-            jsonEncode(newCacheWrapper),
-          );
+          await Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).put(cacheKey, jsonEncode(newCacheWrapper));
           yield Right(remoteModel.toEntity());
         }
       } catch (e) {

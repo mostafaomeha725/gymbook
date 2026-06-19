@@ -13,7 +13,7 @@ class BranchesListCubit extends Cubit<BranchesListState> {
   int _currentPage = 1;
   static const int _pageSize = 3;
   String? _currentSearch;
-  
+
   StreamSubscription? _branchesSubscription;
 
   Future<void> loadBranches({
@@ -21,19 +21,34 @@ class BranchesListCubit extends Cubit<BranchesListState> {
     int? pageNumber,
     String? search,
   }) async {
+    bool filtersChanged = false;
+
     if (refresh) {
+      if (_currentPage != 1 || _currentSearch != null) {
+        filtersChanged = true;
+      }
       _currentPage = 1;
       _currentSearch = null;
     } else {
-      if (pageNumber != null && pageNumber > 0) _currentPage = pageNumber;
+      if (pageNumber != null && pageNumber > 0 && pageNumber != _currentPage) {
+        _currentPage = pageNumber;
+        filtersChanged = true;
+      }
       if (search != null) {
-        _currentSearch = search.trim().isEmpty ? null : search.trim();
-        _currentPage = 1;
+        final newSearch = search.trim().isEmpty ? null : search.trim();
+        if (_currentSearch != newSearch) {
+          _currentSearch = newSearch;
+          _currentPage = 1;
+          filtersChanged = true;
+        }
       }
     }
 
     _branchesSubscription?.cancel();
-    emit(BranchesListLoading());
+
+    if (state is! BranchesListSuccess || filtersChanged) {
+      emit(BranchesListLoading());
+    }
 
     _branchesSubscription = getBranchesUseCase(
       pageNumber: _currentPage,

@@ -34,11 +34,10 @@ class CustomerSubscriptionsRepositoryImpl
         final List<dynamic>? dataList = wrapper['data'];
 
         if (dataList != null) {
-          final list =
-              dataList
-                  .whereType<Map<String, dynamic>>()
-                  .map((e) => CustomerSubscriptionModel.fromJson(e))
-                  .toList();
+          final list = dataList
+              .whereType<Map<String, dynamic>>()
+              .map((e) => CustomerSubscriptionModel.fromJson(e))
+              .toList();
           emittedCache = true;
           yield Right(list);
 
@@ -69,8 +68,9 @@ class CustomerSubscriptionsRepositoryImpl
         // Retrieve current cache to compare
         bool shouldUpdateCacheAndEmit = true;
         if (emittedCache) {
-          final currentCachedJson =
-              Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+          final currentCachedJson = Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).get(cacheKey);
           if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
             try {
               final wrapper = jsonDecode(currentCachedJson);
@@ -88,10 +88,9 @@ class CustomerSubscriptionsRepositoryImpl
             'timestamp': DateTime.now().millisecondsSinceEpoch,
             'data': remoteModels.map((e) => e.toJson()).toList(),
           };
-          await Hive.box<String>(HiveBoxes.cacheBox).put(
-            cacheKey,
-            jsonEncode(newCacheWrapper),
-          );
+          await Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).put(cacheKey, jsonEncode(newCacheWrapper));
           yield Right(remoteModels);
         }
       } catch (e) {
