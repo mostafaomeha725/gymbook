@@ -14,8 +14,6 @@ class CustomerBranchDetailsRepositoryImpl
 
   CustomerBranchDetailsRepositoryImpl(this.remoteDataSource);
 
-  static const int _cacheTtlMillis = 5 * 60 * 1000; // 5 minutes TTL
-
   @override
   Stream<Either<Failure, CustomerBranchDetailsModel>> getBranchDetails({
     required int branchId,
@@ -29,7 +27,6 @@ class CustomerBranchDetailsRepositoryImpl
     if (cachedJson != null && cachedJson.isNotEmpty) {
       try {
         final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
-        final int? timestamp = wrapper['timestamp'];
         final Map<String, dynamic>? dataMap = wrapper['data'];
 
         if (dataMap != null) {
@@ -51,7 +48,9 @@ class CustomerBranchDetailsRepositoryImpl
         // Retrieve current cache to compare
         bool shouldUpdateCacheAndEmit = true;
         if (emittedCache) {
-          final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+          final currentCachedJson = Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).get(cacheKey);
           if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
             try {
               final wrapper = jsonDecode(currentCachedJson);
@@ -69,7 +68,9 @@ class CustomerBranchDetailsRepositoryImpl
             'timestamp': DateTime.now().millisecondsSinceEpoch,
             'data': remoteModel.toJson(),
           };
-          await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+          await Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).put(cacheKey, jsonEncode(newCacheWrapper));
           yield Right(remoteModel);
         }
       } catch (e) {

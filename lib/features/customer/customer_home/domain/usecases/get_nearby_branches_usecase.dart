@@ -8,7 +8,7 @@ class GetNearbyBranchesUseCase {
 
   GetNearbyBranchesUseCase(this.repository);
 
-  Future<Either<Failure, NearbyBranchesPageEntity>> call({
+  Stream<Either<Failure, NearbyBranchesPageEntity>> call({
     double? latitude,
     double? longitude,
     required int radiusInMeters,

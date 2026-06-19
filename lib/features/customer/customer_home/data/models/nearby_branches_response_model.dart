@@ -36,6 +36,18 @@ class NearbyBranchesResponseModel {
       hasNextPage: json['hasNextPage'] ?? false,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.map((e) => e.toJson()).toList(),
+      'currentPage': currentPage,
+      'totalPages': totalPages,
+      'totalCount': totalCount,
+      'pageSize': pageSize,
+      'hasPreviousPage': hasPreviousPage,
+      'hasNextPage': hasNextPage,
+    };
+  }
 }
 
 class NearbyBranchItemModel {
@@ -103,6 +115,24 @@ class NearbyBranchItemModel {
       totalRatings: _asInt(json['totalRatings']),
       averageRating: _asDouble(json['averageRating']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'branchType': branchType,
+      'logoUrl': logoUrl,
+      'governate': governate,
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+      'isOpenNow': isOpenNow,
+      'hasDistance': hasDistance,
+      'distanceInMeters': distanceInMeters,
+      'totalRatings': totalRatings,
+      'averageRating': averageRating,
+    };
   }
 
   static double _asDouble(dynamic value) {

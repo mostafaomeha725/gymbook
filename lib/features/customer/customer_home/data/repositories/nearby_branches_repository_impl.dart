@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:hive/hive.dart';
+import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/error/failure.dart';
 import 'package:gymbook/features/customer/customer_home/data/datasources/nearby_branches_remote_datasource.dart';
@@ -12,30 +15,101 @@ class NearbyBranchesRepositoryImpl implements NearbyBranchesRepository {
 
   NearbyBranchesRepositoryImpl(this.remoteDataSource);
 
+  static const int _cacheTtlMillis = 5 * 60 * 1000; // 5 minutes TTL
+
   @override
-  Future<Either<Failure, NearbyBranchesPageEntity>> getNearbyBranches({
+  Stream<Either<Failure, NearbyBranchesPageEntity>> getNearbyBranches({
     double? latitude,
     double? longitude,
     required int radiusInMeters,
     required int pageNumber,
     required int pageSize,
     String? search,
-  }) async {
-    try {
-      final model = await remoteDataSource.getNearbyBranches(
-        latitude: latitude,
-        longitude: longitude,
-        radiusInMeters: radiusInMeters,
-        pageNumber: pageNumber,
-        pageSize: pageSize,
-        search: search,
-      );
+  }) async* {
+    final String cacheKey =
+        'nearby_branches_${latitude}_${longitude}_${radiusInMeters}_${pageNumber}_${pageSize}_$search';
 
-      return Right(_mapPage(model));
-    } on ServerException catch (error) {
-      return Left(Failure(error.message));
-    } catch (error) {
-      return Left(Failure(error.toString()));
+    bool emittedCache = false;
+    bool needsBackgroundRefresh = true;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final int? timestamp = wrapper['timestamp'];
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = NearbyBranchesResponseModel.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(_mapPage(model));
+
+          // Check TTL
+          if (timestamp != null) {
+            final now = DateTime.now().millisecondsSinceEpoch;
+            if (now - timestamp < _cacheTtlMillis) {
+              needsBackgroundRefresh = false;
+            }
+          }
+        }
+      } catch (_) {
+        // Ignore cache parse errors
+      }
+    }
+
+    // 2. Fetch from Network
+    if (needsBackgroundRefresh) {
+      try {
+        final remoteModel = await remoteDataSource.getNearbyBranches(
+          latitude: latitude,
+          longitude: longitude,
+          radiusInMeters: radiusInMeters,
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+          search: search,
+        );
+
+        final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+        // Retrieve current cache to compare
+        bool shouldUpdateCacheAndEmit = true;
+        if (emittedCache) {
+          final currentCachedJson =
+              Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+          if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+            try {
+              final wrapper = jsonDecode(currentCachedJson);
+              final cachedDataString = jsonEncode(wrapper['data']);
+              // If data is identical, we don't need to emit again
+              if (remoteJsonString == cachedDataString) {
+                shouldUpdateCacheAndEmit = false;
+              }
+            } catch (_) {}
+          }
+        }
+
+        if (shouldUpdateCacheAndEmit) {
+          final newCacheWrapper = {
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'data': remoteModel.toJson(),
+          };
+          await Hive.box<String>(HiveBoxes.cacheBox).put(
+            cacheKey,
+            jsonEncode(newCacheWrapper),
+          );
+          yield Right(_mapPage(remoteModel));
+        }
+      } catch (e) {
+        // 3. Handle Errors
+        if (!emittedCache) {
+          if (e is ServerException) {
+            yield Left(ServerFailure(message: e.message));
+          } else {
+            yield Left(ServerFailure(message: e.toString()));
+          }
+        }
+      }
     }
   }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/features/customer/customer_home/domain/entities/nearby_branches_page_entity.dart';
 import 'package:gymbook/features/customer/customer_home/domain/usecases/get_nearby_branches_usecase.dart';
@@ -18,6 +19,8 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
   double? _latitude;
   double? _longitude;
 
+  StreamSubscription? _subscription;
+
   int get currentPage => _currentPage;
   double? get latitude => _latitude;
   double? get longitude => _longitude;
@@ -26,9 +29,12 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
     required double latitude,
     required double longitude,
   }) async {
-    _latitude = latitude;
-    _longitude = longitude;
-    _currentPage = 1;
+    if (_latitude != latitude || _longitude != longitude) {
+      _latitude = latitude;
+      _longitude = longitude;
+      _currentPage = 1;
+      emit(NearbyBranchesLoading());
+    }
     await loadNearby();
   }
 
@@ -37,33 +43,59 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
     String? search,
     bool refresh = false,
   }) async {
+    bool filtersChanged = false;
+
     if (refresh) {
+      if (_currentPage != 1 || _currentSearch != null) {
+        filtersChanged = true;
+      }
       _currentPage = 1;
       _currentSearch = null;
     } else {
-      if (pageNumber != null && pageNumber > 0) {
+      if (pageNumber != null && pageNumber > 0 && pageNumber != _currentPage) {
         _currentPage = pageNumber;
+        filtersChanged = true;
       }
       if (search != null) {
-        _currentSearch = search.trim().isEmpty ? null : search.trim();
-        _currentPage = 1;
+        final newSearch = search.trim().isEmpty ? null : search.trim();
+        if (_currentSearch != newSearch) {
+          _currentSearch = newSearch;
+          _currentPage = 1;
+          filtersChanged = true;
+        }
       }
     }
 
-    emit(NearbyBranchesLoading());
+    await _subscription?.cancel();
 
-    final result = await getNearbyBranchesUseCase(
+    if (state is! NearbyBranchesSuccess || filtersChanged) {
+      emit(NearbyBranchesLoading());
+    }
+
+    _subscription = getNearbyBranchesUseCase(
       latitude: _latitude,
       longitude: _longitude,
       radiusInMeters: _radiusInMeters,
       pageNumber: _currentPage,
       pageSize: _pageSize,
       search: _currentSearch,
-    );
+    ).listen((result) {
+      result.fold(
+        (failure) {
+          if (state is! NearbyBranchesSuccess) {
+            emit(NearbyBranchesFailure(failure.message));
+          }
+        },
+        (response) {
+          emit(NearbyBranchesSuccess(response));
+        },
+      );
+    });
+  }
 
-    result.fold(
-      (failure) => emit(NearbyBranchesFailure(failure.message)),
-      (response) => emit(NearbyBranchesSuccess(response)),
-    );
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 }

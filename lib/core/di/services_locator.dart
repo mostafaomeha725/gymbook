@@ -110,19 +110,24 @@ import 'package:gymbook/features/customer/customer_home/presentation/cubits/cust
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/subscription_attendance_history_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/customer_subscription_details_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/add_review_remote_datasource.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/customer_subscriptions_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/repositories/customer_subscription_details_repository_impl.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/repositories/subscription_attendance_history_repository_impl.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/repositories/add_review_repository_impl.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/data/repositories/customer_subscriptions_repository_impl.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/customer_subscription_details_repository.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/subscription_attendance_history_repository.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/add_review_repository.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/customer_subscriptions_repository.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/build_attendance_weeks_usecase.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/get_customer_subscription_details_usecase.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/get_subscription_attendance_history_usecase.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/add_review_usecase.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/domain/usecases/get_customer_subscriptions_usecase.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/customer_subscription_details_cubit/customer_subscription_details_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/subscription_attendance_history_cubit/subscription_attendance_history_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/add_review_cubit/add_review_cubit.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/customer_subscriptions_cubit/customer_subscriptions_cubit.dart';
 import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
 import 'package:gymbook/core/services/user_role_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -600,6 +605,23 @@ class ServiceLocator {
       sl.registerFactory(
         () => AddReviewCubit(addReviewUseCase: sl(), updateReviewUseCase: sl()),
       );
+    }
+
+    if (!sl.isRegistered<CustomerSubscriptionsRemoteDataSource>()) {
+      sl.registerLazySingleton<CustomerSubscriptionsRemoteDataSource>(
+        () => CustomerSubscriptionsRemoteDataSourceImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<CustomerSubscriptionsRepository>()) {
+      sl.registerLazySingleton<CustomerSubscriptionsRepository>(
+        () => CustomerSubscriptionsRepositoryImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<GetCustomerSubscriptionsUseCase>()) {
+      sl.registerLazySingleton(() => GetCustomerSubscriptionsUseCase(sl()));
+    }
+    if (!sl.isRegistered<CustomerSubscriptionsCubit>()) {
+      sl.registerFactory(() => CustomerSubscriptionsCubit(sl()));
     }
 
     if (!sl.isRegistered<CustomerSubscriptionDetailsRemoteDataSource>()) {

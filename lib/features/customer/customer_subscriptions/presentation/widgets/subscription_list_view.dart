@@ -4,12 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/data/models/customer_subscription_model.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/screens/subscriptions_details_screen.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/my_subscription_card.dart';
 
 class SubscriptionListView extends StatelessWidget {
   final SubscriptionTab selectedTab;
-  final List<Map<String, dynamic>> subscriptions;
+  final List<CustomerSubscriptionModel> subscriptions;
 
   const SubscriptionListView({
     super.key,
@@ -34,18 +35,10 @@ class SubscriptionListView extends StatelessWidget {
     }
   }
 
-  int _asInt(dynamic value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0;
-  }
-
   @override
   Widget build(BuildContext context) {
     final currentList = subscriptions.where((item) {
-      final status = _asInt(item['status']);
-      return _matchesTab(status);
+      return _matchesTab(item.status);
     }).toList();
 
     if (currentList.isEmpty) {
@@ -64,19 +57,19 @@ class SubscriptionListView extends StatelessWidget {
       itemBuilder: (_, index) {
         final item = currentList[index];
         final isLast = index == currentList.length - 1;
-        final status = _asInt(item['status']);
+        final status = item.status;
 
-        final totalDuration = _asInt(item['totalDurationInDays']);
-        final daysLeft = _asInt(item['daysLeft']);
+        final totalDuration = item.totalDurationInDays;
+        final daysLeft = item.daysLeft;
         final sessionsUsed = (totalDuration - daysLeft).clamp(0, totalDuration);
         final isExpired = status == 3;
 
         return Padding(
           padding: EdgeInsets.only(bottom: isLast ? 152.h : 0),
           child: MySubscriptionCard(
-            image: (item['branchLogoUrl'] ?? '').toString(),
-            title: (item['branchName'] ?? '').toString(),
-            plan: (item['packageName'] ?? '').toString(),
+            image: item.branchLogoUrl,
+            title: item.branchName,
+            plan: item.packageName,
             sessionsUsed: sessionsUsed,
             sessionsTotal: totalDuration,
             daysLeft: isExpired ? null : daysLeft,
@@ -87,7 +80,7 @@ class SubscriptionListView extends StatelessWidget {
               GoRouter.of(context).push(
                 Routes.subscriptionsDetailsScreen,
                 extra: CustomerSubscriptionDetailsArgs(
-                  subscriptionId: _asInt(item['subscriptionId']),
+                  subscriptionId: item.subscriptionId,
                   status: status,
                 ),
               );

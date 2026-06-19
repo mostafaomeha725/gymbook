@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab;
-import 'package:gymbook/core/network/endpoints.dart';
-import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/customer_subscriptions_cubit/customer_subscriptions_cubit.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/customer_subscriptions_cubit/customer_subscriptions_state.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscription_list_view.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscription_tabs.dart';
 
@@ -20,51 +20,6 @@ class SubscriptionsScreenBody extends StatefulWidget {
 
 class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
   SubscriptionTab selectedTab = SubscriptionTab.all;
-  bool _isLoading = true;
-  String? _errorMessage;
-  List<Map<String, dynamic>> _subscriptions = const [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSubscriptions();
-  }
-
-  Future<void> _loadSubscriptions() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    final networkService = sl<NetworkService>();
-    final response = await networkService.getData(
-      endPoint: EndPoints.getMySubscriptions,
-      queryParameters: {'PageNumber': 1, 'PageSize': 50},
-    );
-
-    if (!mounted) return;
-
-    response.fold(
-      (failure) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = failure.message;
-        });
-      },
-      (data) {
-        final map = data as Map<String, dynamic>;
-        final list = (map['data'] as List<dynamic>? ?? const [])
-            .whereType<Map>()
-            .map((item) => Map<String, dynamic>.from(item))
-            .toList();
-
-        setState(() {
-          _isLoading = false;
-          _subscriptions = list;
-        });
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +33,7 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
               CustomNavBar.of(context)?.goBack();
             },
           ),
-
           SizedBox(height: 16.h),
-
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: SubscriptionTabs(
@@ -92,36 +45,47 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
               },
             ),
           ),
-
           SizedBox(height: 32.h),
-
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage != null
-                ? Center(
+            child: BlocBuilder<CustomerSubscriptionsCubit,
+                CustomerSubscriptionsState>(
+              builder: (context, state) {
+                if (state is CustomerSubscriptionsLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is CustomerSubscriptionsError) {
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        AppText(_errorMessage!),
+                        AppText(state.message),
                         SizedBox(height: 12.h),
                         ElevatedButton(
-                          onPressed: _loadSubscriptions,
+                          onPressed: () {
+                            context
+                                .read<CustomerSubscriptionsCubit>()
+                                .loadSubscriptions();
+                          },
                           child: const Text('Retry'),
                         ),
                       ],
                     ),
-                  )
-                : Padding(
+                  );
+                } else if (state is CustomerSubscriptionsLoaded) {
+                  return Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: SubscriptionListView(
                       selectedTab: selectedTab,
-                      subscriptions: _subscriptions,
+                      subscriptions: state.subscriptions,
                     ),
-                  ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         ],
       ),
     );
   }
 }
+
