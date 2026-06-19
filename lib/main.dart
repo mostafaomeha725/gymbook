@@ -28,6 +28,8 @@ Future<void> main() async {
   await initializeDateFormatting('en', null);
 
   await Hive.initFlutter();
+  await Hive.deleteFromDisk(); // يمسح كل Boxes وكل البيانات
+
   await Hive.openBox<String>(HiveBoxes.cacheBox);
 
   // final prefs = await SharedPreferences.getInstance();

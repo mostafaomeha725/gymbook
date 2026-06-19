@@ -64,6 +64,27 @@ class CustomerBranchDetailsModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'branchType': branchType,
+      'isOpenNow': isOpenNow,
+      'images': images.map((e) => e.toJson()).toList(),
+      'location': {
+        'address': address,
+        'coordinates': {
+          'latitude': latitude,
+          'longitude': longitude,
+        },
+      },
+      'totalRatings': totalRatings,
+      'averageRating': averageRating,
+      'workingHours': workingHours.map((e) => e.toJson()).toList(),
+      'packages': packages.map((e) => e.toJson()).toList(),
+    };
+  }
+
   String get branchTypeName {
     switch (branchType) {
       case 0:
@@ -117,6 +138,14 @@ class CustomerBranchImageModel {
       url: (json['url'] ?? '').toString(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'url': url,
+    };
+  }
 }
 
 class CustomerWorkingHourModel {
@@ -139,6 +168,15 @@ class CustomerWorkingHourModel {
       closeTime: (json['closeTime'] ?? '').toString(),
       isClosed: json['isClosed'] == true,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'day': day,
+      'openTime': openTime,
+      'closeTime': closeTime,
+      'isClosed': isClosed,
+    };
   }
 }
 
@@ -166,5 +204,14 @@ class CustomerPackageModel {
           ? json['durationInMonths'] as int
           : 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'durationInMonths': durationInMonths,
+    };
   }
 }

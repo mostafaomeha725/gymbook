@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/core/constants/app_assets.dart';
 import 'package:gymbook/features/customer/customer_home/data/models/customer_branch_details_model.dart';
@@ -12,35 +13,55 @@ class CustomerBranchDetailsCubit extends Cubit<CustomerBranchDetailsState> {
   CustomerBranchDetailsCubit(this.getBranchDetailsUseCase)
     : super(CustomerBranchDetailsInitial());
 
+  StreamSubscription? _subscription;
+
   Future<void> loadBranchDetails(int branchId) async {
-    emit(CustomerBranchDetailsLoading());
+    await _subscription?.cancel();
 
-    final result = await getBranchDetailsUseCase(branchId: branchId);
+    // Only show loading if there is no data yet.
+    if (state is! CustomerBranchDetailsLoaded) {
+      emit(CustomerBranchDetailsLoading());
+    }
 
-    result.fold(
-      (failure) => emit(CustomerBranchDetailsError(failure.message)),
-      (details) {
-        final images = details.images
-            .map((item) => item.url)
-            .where((url) => url.trim().isNotEmpty)
-            .toList();
-        final displayImages = images.isEmpty
-            ? <String>[Assets.gym3, Assets.gym2, Assets.gym3]
-            : images;
+    _subscription = getBranchDetailsUseCase(branchId: branchId).listen(
+      (result) {
+        result.fold(
+          (failure) {
+            // Only emit error if we don't already have data displayed.
+            if (state is! CustomerBranchDetailsLoaded) {
+              emit(CustomerBranchDetailsError(failure.message));
+            }
+          },
+          (details) {
+            final images = details.images
+                .map((item) => item.url)
+                .where((url) => url.trim().isNotEmpty)
+                .toList();
+            final displayImages = images.isEmpty
+                ? <String>[Assets.gym3, Assets.gym2, Assets.gym3]
+                : images;
 
-        final workingHours = _mapWorkingHours(details.workingHours);
-        final plans = _mapPlans(details.packages);
+            final workingHours = _mapWorkingHours(details.workingHours);
+            final plans = _mapPlans(details.packages);
 
-        emit(
-          CustomerBranchDetailsLoaded(
-            details: details,
-            displayImages: displayImages,
-            workingHours: workingHours,
-            plans: plans,
-          ),
+            emit(
+              CustomerBranchDetailsLoaded(
+                details: details,
+                displayImages: displayImages,
+                workingHours: workingHours,
+                plans: plans,
+              ),
+            );
+          },
         );
       },
     );
+  }
+
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 
   String _formatTime(String value) {
