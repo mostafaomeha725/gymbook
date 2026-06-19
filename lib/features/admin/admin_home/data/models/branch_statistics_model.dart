@@ -23,4 +23,14 @@ class BranchStatisticsModel {
       checkInsCount: json['checksInCount'] ?? json['checksInCout'] ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': branchId,
+      'newSubscriptionsCount': newSubscriptionsCount,
+      'expiredSubscriptionsCount': expiredSubscriptionsCount,
+      'totalRevenue': totalRevenue,
+      'checksInCount': checkInsCount,
+    };
+  }
 }

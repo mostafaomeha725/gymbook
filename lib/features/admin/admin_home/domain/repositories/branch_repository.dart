@@ -50,9 +50,9 @@ abstract class BranchRepository {
     String? search,
   });
 
-  Future<Either<Failure, BranchDetailsEntity>> getBranchDetails(int branchId);
+  Stream<Either<Failure, BranchDetailsEntity>> getBranchDetails(int branchId);
 
-  Future<Either<Failure, BranchSetupDetailsEntity>> getBranchSetupDetails(
+  Stream<Either<Failure, BranchSetupDetailsEntity>> getBranchSetupDetails(
     int branchId,
   );
 
@@ -74,12 +74,12 @@ abstract class BranchRepository {
     required List<int> imageIds,
   });
 
-  Future<Either<Failure, BranchStatisticsEntity>> getBranchStatistics({
+  Stream<Either<Failure, BranchStatisticsEntity>> getBranchStatistics({
     required int branchId,
     required StatisticsTimePeriod timePeriod,
   });
 
-  Future<Either<Failure, BranchStatisticsEntity>> getAllBranchesStatistics({
+  Stream<Either<Failure, BranchStatisticsEntity>> getAllBranchesStatistics({
     required StatisticsTimePeriod timePeriod,
   });
 

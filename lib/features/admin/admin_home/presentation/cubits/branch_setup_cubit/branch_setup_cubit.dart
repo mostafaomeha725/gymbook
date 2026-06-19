@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_setup_details_entity.dart';
@@ -31,6 +33,8 @@ class BranchSetupCubit extends Cubit<BranchSetupState> {
     );
   }
 
+  StreamSubscription? _subscription;
+
   Future<void> fetchBranchDetails(int branchId) async {
     if (!state.isEditMode || branchId <= 0) return;
 
@@ -38,34 +42,48 @@ class BranchSetupCubit extends Cubit<BranchSetupState> {
       '[BranchSetupCubit] fetchBranchDetails start | branchId=$branchId | isEditMode=${state.isEditMode}',
     );
 
-    emit(state.copyWith(isLoading: true, clearError: true));
+    _subscription?.cancel();
 
-    final result = await getBranchSetupDetailsUseCase(branchId);
+    if (state.details == null) {
+      emit(state.copyWith(isLoading: true, clearError: true));
+    }
 
-    result.fold(
-      (failure) {
-        debugPrint(
-          '[BranchSetupCubit] fetchBranchDetails failure | branchId=$branchId | message=${failure.message}',
-        );
-        emit(
-          state.copyWith(
-            isLoading: false,
-            errorMessage: failure.message,
-            clearDetails: true,
-          ),
-        );
-      },
-      (details) {
-        debugPrint(
-          '[BranchSetupCubit] fetchBranchDetails success | branchId=$branchId | '
-          'name=${details.businessDetails.name} | email=${details.businessDetails.email} | '
-          'phone=${details.businessDetails.phoneNumber} | branchType=${details.businessDetails.branchType}',
-        );
-        emit(
-          state.copyWith(isLoading: false, details: details, clearError: true),
-        );
-      },
-    );
+    _subscription = getBranchSetupDetailsUseCase(branchId).listen((result) {
+      result.fold(
+        (failure) {
+          debugPrint(
+            '[BranchSetupCubit] fetchBranchDetails failure | branchId=$branchId | message=${failure.message}',
+          );
+          if (state.details == null) {
+            emit(
+              state.copyWith(
+                isLoading: false,
+                errorMessage: failure.message,
+                clearDetails: true,
+              ),
+            );
+          }
+        },
+        (details) {
+          debugPrint(
+            '[BranchSetupCubit] fetchBranchDetails success | branchId=$branchId',
+          );
+          emit(
+            state.copyWith(
+              isLoading: false,
+              details: details,
+              clearError: true,
+            ),
+          );
+        },
+      );
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 
   String dayNameFromIndex(int day) {

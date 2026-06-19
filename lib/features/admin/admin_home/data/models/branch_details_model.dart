@@ -14,6 +14,14 @@ class BranchImageModel {
       url: json['url'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'url': url,
+    };
+  }
 }
 
 class BranchDetailsResponse {
@@ -60,5 +68,20 @@ class BranchDetailsResponse {
       activePackagesCount: json['activePackagesCount'] ?? 0,
       activeSubscriptionsCount: json['activeSubscriptionsCount'] ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'branchType': branchType,
+      'branchStatus': branchStatus,
+      'images': images.map((e) => e.toJson()).toList(),
+      if (governorate != null) 'governorate': governorate!.toJson(),
+      'address': address,
+      'isOpenNow': isOpenNow,
+      'activePackagesCount': activePackagesCount,
+      'activeSubscriptionsCount': activeSubscriptionsCount,
+    };
   }
 }

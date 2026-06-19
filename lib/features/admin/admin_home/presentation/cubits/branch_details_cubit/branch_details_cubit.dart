@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_details_entity.dart';
@@ -10,18 +12,27 @@ class BranchDetailsCubit extends Cubit<BranchDetailsState> {
     : super(BranchDetailsInitial());
 
   final GetBranchDetailsUseCase getBranchDetailsUseCase;
+  StreamSubscription? _subscription;
 
   Future<void> loadBranchDetails(int branchId) async {
-    emit(BranchDetailsLoading());
-    showLoading();
+    _subscription?.cancel();
 
-    final result = await getBranchDetailsUseCase(branchId);
+    if (state is! BranchDetailsSuccess) {
+      emit(BranchDetailsLoading());
+    }
 
-    hideLoading();
+    _subscription = getBranchDetailsUseCase(branchId).listen((result) {
+      result.fold((failure) {
+        if (state is! BranchDetailsSuccess) {
+          emit(BranchDetailsFailure(failure.message));
+        }
+      }, (entity) => emit(BranchDetailsSuccess(entity)));
+    });
+  }
 
-    result.fold(
-      (failure) => emit(BranchDetailsFailure(failure.message)),
-      (entity) => emit(BranchDetailsSuccess(entity)),
-    );
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 }

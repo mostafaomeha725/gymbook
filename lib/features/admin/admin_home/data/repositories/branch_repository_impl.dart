@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'dart:convert';
 import 'package:gymbook/core/cache/hive_boxes.dart';
+import 'package:gymbook/features/admin/admin_home/data/models/branch_statistics_model.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_data.dart'
     as HiveKeys;
 import 'package:hive/hive.dart';
@@ -31,13 +32,15 @@ class BranchRepositoryImpl implements BranchRepository {
 
   BranchRepositoryImpl(this.remoteDataSource);
 
-  static const int _cacheTtlMillis = 5 * 60 * 1000; // 5 minutes TTL
-
   Future<void> _invalidateBranchesListCache() async {
     final box = Hive.box<String>(HiveBoxes.cacheBox);
     final keysToDelete = box.keys.where((k) {
       if (k is String) {
-        return k.startsWith('branches_page_');
+        return k.startsWith('branches_page_') ||
+            k.startsWith('branch_details_') ||
+            k.startsWith('branch_setup_') ||
+            k.startsWith('branch_statistics_') ||
+            k.startsWith('all_branches_statistics_');
       }
       return false;
     }).toList();
@@ -168,9 +171,9 @@ class BranchRepositoryImpl implements BranchRepository {
           final model = BranchListResponse.fromJson(dataMap);
           emittedCache = true;
           yield Right(_mapBranchList(model));
-          
+
           if (timestamp != null) {
-             // We do NOT use TTL to bypass background refresh. True SWR always fetches.
+            // We do NOT use TTL to bypass background refresh. True SWR always fetches.
           }
         }
       } catch (_) {
@@ -192,7 +195,9 @@ class BranchRepositoryImpl implements BranchRepository {
         // Retrieve current cache to compare
         bool shouldUpdateCacheAndEmit = true;
         if (emittedCache) {
-          final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+          final currentCachedJson = Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).get(cacheKey);
           if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
             try {
               final wrapper = jsonDecode(currentCachedJson);
@@ -210,7 +215,9 @@ class BranchRepositoryImpl implements BranchRepository {
             'timestamp': DateTime.now().millisecondsSinceEpoch,
             'data': remoteModel.toJson(),
           };
-          await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+          await Hive.box<String>(
+            HiveBoxes.cacheBox,
+          ).put(cacheKey, jsonEncode(newCacheWrapper));
           yield Right(_mapBranchList(remoteModel));
         }
       } catch (e) {
@@ -227,26 +234,134 @@ class BranchRepositoryImpl implements BranchRepository {
   }
 
   @override
-  Future<Either<Failure, BranchDetailsEntity>> getBranchDetails(
+  Stream<Either<Failure, BranchDetailsEntity>> getBranchDetails(
     int branchId,
-  ) async {
+  ) async* {
+    final String cacheKey = 'branch_details_$branchId';
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = BranchDetailsResponse.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(_mapBranchDetails(model));
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from Network
     try {
-      final model = await remoteDataSource.getBranchDetails(branchId);
-      return Right(_mapBranchDetails(model));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      final remoteModel = await remoteDataSource.getBranchDetails(branchId);
+      final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+      // Retrieve current cache to compare
+      bool shouldUpdateCacheAndEmit = true;
+      if (emittedCache) {
+        final currentCachedJson = Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).get(cacheKey);
+        if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+          try {
+            final wrapper = jsonDecode(currentCachedJson);
+            final cachedDataString = jsonEncode(wrapper['data']);
+            if (remoteJsonString == cachedDataString) {
+              shouldUpdateCacheAndEmit = false;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (shouldUpdateCacheAndEmit) {
+        final newCacheWrapper = {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'data': remoteModel.toJson(),
+        };
+        await Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).put(cacheKey, jsonEncode(newCacheWrapper));
+        yield Right(_mapBranchDetails(remoteModel));
+      }
+    } catch (e) {
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
     }
   }
 
   @override
-  Future<Either<Failure, BranchSetupDetailsEntity>> getBranchSetupDetails(
+  Stream<Either<Failure, BranchSetupDetailsEntity>> getBranchSetupDetails(
     int branchId,
-  ) async {
+  ) async* {
+    final String cacheKey = 'branch_setup_$branchId';
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = BranchSetupDetailsResponse.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(_mapBranchSetupDetails(model));
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from Network
     try {
-      final model = await remoteDataSource.getBranchSetupDetails(branchId);
-      return Right(_mapBranchSetupDetails(model));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      final remoteModel = await remoteDataSource.getBranchSetupDetails(
+        branchId,
+      );
+      final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+      // Retrieve current cache to compare
+      bool shouldUpdateCacheAndEmit = true;
+      if (emittedCache) {
+        final currentCachedJson = Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).get(cacheKey);
+        if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+          try {
+            final wrapper = jsonDecode(currentCachedJson);
+            final cachedDataString = jsonEncode(wrapper['data']);
+            if (remoteJsonString == cachedDataString) {
+              shouldUpdateCacheAndEmit = false;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (shouldUpdateCacheAndEmit) {
+        final newCacheWrapper = {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'data': remoteModel.toJson(),
+        };
+        await Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).put(cacheKey, jsonEncode(newCacheWrapper));
+        yield Right(_mapBranchSetupDetails(remoteModel));
+      }
+    } catch (e) {
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
     }
   }
 
@@ -305,48 +420,166 @@ class BranchRepositoryImpl implements BranchRepository {
   }
 
   @override
-  Future<Either<Failure, BranchStatisticsEntity>> getBranchStatistics({
+  Stream<Either<Failure, BranchStatisticsEntity>> getBranchStatistics({
     required int branchId,
     required StatisticsTimePeriod timePeriod,
-  }) async {
+  }) async* {
+    final String cacheKey = 'branch_statistics_${branchId}_${timePeriod.name}';
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = BranchStatisticsModel.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(
+            BranchStatisticsEntity(
+              branchId: model.branchId,
+              newSubscriptionsCount: model.newSubscriptionsCount,
+              expiredSubscriptionsCount: model.expiredSubscriptionsCount,
+              totalRevenue: model.totalRevenue,
+              checkInsCount: model.checkInsCount,
+            ),
+          );
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from Network
     try {
-      final model = await remoteDataSource.getBranchStatistics(
+      final remoteModel = await remoteDataSource.getBranchStatistics(
         branchId: branchId,
         timePeriod: timePeriod,
       );
-      return Right(
-        BranchStatisticsEntity(
-          branchId: model.branchId,
-          newSubscriptionsCount: model.newSubscriptionsCount,
-          expiredSubscriptionsCount: model.expiredSubscriptionsCount,
-          totalRevenue: model.totalRevenue,
-          checkInsCount: model.checkInsCount,
-        ),
-      );
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+      // Retrieve current cache to compare
+      bool shouldUpdateCacheAndEmit = true;
+      if (emittedCache) {
+        final currentCachedJson = Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).get(cacheKey);
+        if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+          try {
+            final wrapper = jsonDecode(currentCachedJson);
+            final cachedDataString = jsonEncode(wrapper['data']);
+            if (remoteJsonString == cachedDataString) {
+              shouldUpdateCacheAndEmit = false;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (shouldUpdateCacheAndEmit) {
+        final newCacheWrapper = {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'data': remoteModel.toJson(),
+        };
+        await Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).put(cacheKey, jsonEncode(newCacheWrapper));
+        yield Right(
+          BranchStatisticsEntity(
+            branchId: remoteModel.branchId,
+            newSubscriptionsCount: remoteModel.newSubscriptionsCount,
+            expiredSubscriptionsCount: remoteModel.expiredSubscriptionsCount,
+            totalRevenue: remoteModel.totalRevenue,
+            checkInsCount: remoteModel.checkInsCount,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
     }
   }
 
   @override
-  Future<Either<Failure, BranchStatisticsEntity>> getAllBranchesStatistics({
+  Stream<Either<Failure, BranchStatisticsEntity>> getAllBranchesStatistics({
     required StatisticsTimePeriod timePeriod,
-  }) async {
+  }) async* {
+    final String cacheKey = 'all_branches_statistics_${timePeriod.name}';
+    bool emittedCache = false;
+
+    // 1. Emit Cache if valid
+    final cachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+    if (cachedJson != null && cachedJson.isNotEmpty) {
+      try {
+        final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
+        final Map<String, dynamic>? dataMap = wrapper['data'];
+
+        if (dataMap != null) {
+          final model = BranchStatisticsModel.fromJson(dataMap);
+          emittedCache = true;
+          yield Right(
+            BranchStatisticsEntity(
+              branchId: model.branchId,
+              newSubscriptionsCount: model.newSubscriptionsCount,
+              expiredSubscriptionsCount: model.expiredSubscriptionsCount,
+              totalRevenue: model.totalRevenue,
+              checkInsCount: model.checkInsCount,
+            ),
+          );
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from Network
     try {
-      final model = await remoteDataSource.getAllBranchesStatistics(
+      final remoteModel = await remoteDataSource.getAllBranchesStatistics(
         timePeriod: timePeriod,
       );
-      return Right(
-        BranchStatisticsEntity(
-          branchId: model.branchId,
-          newSubscriptionsCount: model.newSubscriptionsCount,
-          expiredSubscriptionsCount: model.expiredSubscriptionsCount,
-          totalRevenue: model.totalRevenue,
-          checkInsCount: model.checkInsCount,
-        ),
-      );
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      final remoteJsonString = jsonEncode(remoteModel.toJson());
+
+      // Retrieve current cache to compare
+      bool shouldUpdateCacheAndEmit = true;
+      if (emittedCache) {
+        final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+        if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
+          try {
+            final wrapper = jsonDecode(currentCachedJson);
+            final cachedDataString = jsonEncode(wrapper['data']);
+            if (remoteJsonString == cachedDataString) {
+              shouldUpdateCacheAndEmit = false;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (shouldUpdateCacheAndEmit) {
+        final newCacheWrapper = {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'data': remoteModel.toJson(),
+        };
+        await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+        yield Right(
+          BranchStatisticsEntity(
+            branchId: remoteModel.branchId,
+            newSubscriptionsCount: remoteModel.newSubscriptionsCount,
+            expiredSubscriptionsCount: remoteModel.expiredSubscriptionsCount,
+            totalRevenue: remoteModel.totalRevenue,
+            checkInsCount: remoteModel.checkInsCount,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!emittedCache) {
+        if (e is ServerException) {
+          yield Left(ServerFailure(message: e.message));
+        } else {
+          yield const Left(ServerFailure(message: "Network Error"));
+        }
+      }
     }
   }
 

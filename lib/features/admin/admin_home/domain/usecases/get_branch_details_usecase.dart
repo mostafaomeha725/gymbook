@@ -8,7 +8,7 @@ class GetBranchDetailsUseCase {
 
   GetBranchDetailsUseCase(this.repository);
 
-  Future<Either<Failure, BranchDetailsEntity>> call(int branchId) {
+  Stream<Either<Failure, BranchDetailsEntity>> call(int branchId) {
     return repository.getBranchDetails(branchId);
   }
 }

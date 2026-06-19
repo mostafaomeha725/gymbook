@@ -8,7 +8,7 @@ class GetBranchStatisticsUseCase {
 
   GetBranchStatisticsUseCase(this.repository);
 
-  Future<Either<Failure, BranchStatisticsEntity>> call({
+  Stream<Either<Failure, BranchStatisticsEntity>> call({
     required int branchId,
     required StatisticsTimePeriod timePeriod,
   }) {

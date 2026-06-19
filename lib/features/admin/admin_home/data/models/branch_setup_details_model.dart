@@ -19,6 +19,15 @@ class BranchSetupBusinessDetailsModel {
       branchType: _asInt(json['branchType']) ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'branchType': branchType,
+    };
+  }
 }
 
 class BranchSetupCoordinatesModel {
@@ -33,6 +42,13 @@ class BranchSetupCoordinatesModel {
       longitude: _asDouble(json['longitude']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+    };
+  }
 }
 
 class BranchSetupGovernorateModel {
@@ -46,6 +62,13 @@ class BranchSetupGovernorateModel {
       id: _asInt(json['id']) ?? 0,
       name: (json['name'] ?? '').toString(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }
 
@@ -75,6 +98,14 @@ class BranchSetupLocationModel {
       ),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (governorate != null) 'governorate': governorate!.toJson(),
+      'address': address,
+      'coordinates': coordinates.toJson(),
+    };
+  }
 }
 
 class BranchSetupWorkingHourModel {
@@ -98,6 +129,15 @@ class BranchSetupWorkingHourModel {
       isClosed: json['isClosed'] == true,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'day': day,
+      if (openTime != null) 'openTime': openTime,
+      if (closeTime != null) 'closeTime': closeTime,
+      'isClosed': isClosed,
+    };
+  }
 }
 
 class BranchSetupImageModel {
@@ -120,6 +160,15 @@ class BranchSetupImageModel {
       url: (json['url'] ?? '').toString(),
       displayOrder: _asInt(json['displayOrder']) ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'url': url,
+      'displayOrder': displayOrder,
+    };
   }
 }
 
@@ -157,6 +206,15 @@ class BranchSetupDetailsResponse {
           .map(BranchSetupImageModel.fromJson)
           .toList(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'businessDetails': businessDetails.toJson(),
+      'location': location.toJson(),
+      'workingHours': workingHours.map((e) => e.toJson()).toList(),
+      'images': images.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
