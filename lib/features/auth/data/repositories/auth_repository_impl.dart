@@ -1,4 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:hive/hive.dart';
+import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/error/exceptions.dart';
@@ -15,7 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final PreferencesStorage storage;
   final NetworkService networkService;
-  
+
   LoginResponse? _pendingLoginResponse;
 
   AuthRepositoryImpl({
@@ -122,14 +124,29 @@ class AuthRepositoryImpl implements AuthRepository {
       if (refreshToken != null && refreshToken.isNotEmpty) {
         await remoteDataSource.logout(refreshToken: refreshToken);
       }
-      clearPendingSession();
+      await _clearAllLocalData();
       return const Right(null);
     } on ServerException catch (e) {
-      clearPendingSession();
+      await _clearAllLocalData();
       return Left(ServerFailure(message: e.message));
     } catch (e) {
-      clearPendingSession();
+      await _clearAllLocalData();
       return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  Future<void> _clearAllLocalData() async {
+    _pendingLoginResponse = null;
+    networkService.removeToken();
+    await storage.clear(); // Clear all SharedPreferences
+
+    try {
+      // 1. Wipe everything from disk (all boxes, all data)
+      await Hive.deleteFromDisk();
+      // 2. Reopen the cacheBox so the app can continue working without restarting
+      await Hive.openBox<String>(HiveBoxes.cacheBox);
+    } catch (e) {
+      // Ignore if it fails to delete or reopen
     }
   }
 
@@ -155,9 +172,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, LoginResultEntity>> loginWithGoogle() async {
+  Future<Either<Failure, LoginResultEntity>> loginWithGoogle(int userType) async {
     try {
-      final response = await remoteDataSource.loginWithGoogle();
+      final response = await remoteDataSource.loginWithGoogle(userType);
       if (response.user.emailConfirmed) {
         await _saveSession(response);
       } else {
@@ -209,7 +226,10 @@ class AuthRepositoryImpl implements AuthRepository {
     await storage.saveUserId(response.user.id);
     await storage.saveUserSecretKey(response.user.secretKey);
     await storage.saveUserEmailConfirmed(response.user.emailConfirmed);
-    await storage.putString(key: PreferencesKeys.email, value: response.user.email);
+    await storage.putString(
+      key: PreferencesKeys.email,
+      value: response.user.email,
+    );
 
     // Save extended role details
     await storage.saveUserType(response.user.userType);

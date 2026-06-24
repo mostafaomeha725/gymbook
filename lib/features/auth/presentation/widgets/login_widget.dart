@@ -14,6 +14,7 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/widgets/divider_widget.dart';
+import 'package:gymbook/features/auth/presentation/widgets/role_selection_widget.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -29,6 +30,8 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   bool obscurePassword = true;
   bool _formSubmitted = false;
+  int selectedUserType =
+      4; // Default to Customer (4), PartnerAdmin (2), Employee (3)
 
   @override
   void dispose() {
@@ -83,13 +86,25 @@ class _LoginWidgetState extends State<LoginWidget> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 12.h),
               AppText(
                 'Sign In',
                 style: font24w700.copyWith(color: Colors.black),
                 alignment: AlignmentDirectional.center,
               ),
+              SizedBox(height: 4.h),
+              AppText(
+                'Choose your role',
+                style: font14w500.copyWith(color: const Color(0xff64748B)),
+                alignment: AlignmentDirectional.center,
+              ),
+              SizedBox(height: 16.h),
+              RoleSelectionWidget(
+                selectedRole: selectedUserType,
+                onChanged: (value) => setState(() => selectedUserType = value),
+              ),
               SizedBox(height: 24.h),
+              const DividerWidget(),
+              SizedBox(height: 16.h),
               AppText(
                 'Email',
                 style: font14w500.copyWith(color: const Color(0xff364153)),
@@ -177,13 +192,15 @@ class _LoginWidgetState extends State<LoginWidget> {
                   style: font14w500.copyWith(color: const Color(0xff0EA5E9)),
                 ),
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 16.h),
               const DividerWidget(),
-              SizedBox(height: 24.h),
+              SizedBox(height: 16.h),
               BouncingSocialButton(
                 text: "Continue with Google",
                 assetName: Assets.google,
-                onTap: () => context.read<LoginCubit>().loginWithGoogle(),
+                onTap: () => context.read<LoginCubit>().loginWithGoogle(
+                  selectedUserType,
+                ),
                 textColor: Colors.black,
               ),
             ],

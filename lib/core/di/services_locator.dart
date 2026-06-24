@@ -146,6 +146,15 @@ import 'package:gymbook/features/settings/domain/usecases/update_profile_usecase
 import 'package:gymbook/features/settings/presentation/cubits/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:gymbook/features/settings/presentation/cubits/profile_cubit/profile_cubit.dart';
 import 'package:gymbook/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:gymbook/core/services/stripe_service.dart';
+import 'package:gymbook/features/payments/data/data_sources/payments_remote_data_source.dart';
+import 'package:gymbook/features/payments/data/repositories/payments_repository_impl.dart';
+import 'package:gymbook/features/payments/domain/repositories/payments_repository.dart';
+import 'package:gymbook/features/payments/domain/usecases/initialize_payment_usecase.dart';
+import 'package:gymbook/features/payments/domain/usecases/get_payment_transaction_status_usecase.dart';
+import 'package:gymbook/features/payments/domain/usecases/init_payment_sheet_usecase.dart';
+import 'package:gymbook/features/payments/domain/usecases/present_payment_sheet_usecase.dart';
+import 'package:gymbook/features/payments/presentation/cubits/payment_cubit/payment_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -163,6 +172,7 @@ class ServiceLocator {
     _initCustomerQrCode();
     _initNotifications();
     _initSettings();
+    _initPayments();
   }
 
   /// =============================
@@ -174,6 +184,7 @@ class ServiceLocator {
     sl.registerLazySingleton(() => PreferencesStorage(sl()));
     sl.registerLazySingleton(() => UserRoleService(sl()));
     sl.registerLazySingleton(() => NotificationService());
+    sl.registerLazySingleton(() => StripeService());
   }
 
   /// =============================
@@ -744,6 +755,44 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<ProfileCubit>()) {
       sl.registerFactory(() => ProfileCubit(sl(), sl()));
+    }
+  }
+
+  /// =============================
+  /// PAYMENTS FEATURE
+  /// =============================
+  void _initPayments() {
+    if (!sl.isRegistered<PaymentsRemoteDataSource>()) {
+      sl.registerLazySingleton<PaymentsRemoteDataSource>(
+        () => PaymentsRemoteDataSourceImpl(sl()),
+      );
+    }
+    if (!sl.isRegistered<PaymentsRepository>()) {
+      sl.registerLazySingleton<PaymentsRepository>(
+        () => PaymentsRepositoryImpl(sl(), sl()),
+      );
+    }
+    if (!sl.isRegistered<InitializePaymentUseCase>()) {
+      sl.registerLazySingleton(() => InitializePaymentUseCase(sl()));
+    }
+    if (!sl.isRegistered<GetPaymentTransactionStatusUseCase>()) {
+      sl.registerLazySingleton(() => GetPaymentTransactionStatusUseCase(sl()));
+    }
+    if (!sl.isRegistered<InitPaymentSheetUseCase>()) {
+      sl.registerLazySingleton(() => InitPaymentSheetUseCase(sl()));
+    }
+    if (!sl.isRegistered<PresentPaymentSheetUseCase>()) {
+      sl.registerLazySingleton(() => PresentPaymentSheetUseCase(sl()));
+    }
+    if (!sl.isRegistered<PaymentCubit>()) {
+      sl.registerFactory(
+        () => PaymentCubit(
+          initializePaymentUseCase: sl(),
+          getPaymentTransactionStatusUseCase: sl(),
+          initPaymentSheetUseCase: sl(),
+          presentPaymentSheetUseCase: sl(),
+        ),
+      );
     }
   }
 }

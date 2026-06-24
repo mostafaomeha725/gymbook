@@ -25,6 +25,7 @@ class _AddNewPackageTextFieldBodyState
   late final TextEditingController priceController;
   late final TextEditingController durationController;
   late final TextEditingController freezesController;
+  late final TextEditingController freezeDurationController;
   late bool _isActive;
 
   bool get _isEditMode => widget.args.isEditMode;
@@ -43,6 +44,9 @@ class _AddNewPackageTextFieldBodyState
     freezesController = TextEditingController(
       text: pkg != null ? pkg.numberOfFreezes.toString() : '',
     );
+    freezeDurationController = TextEditingController(
+      text: pkg != null ? pkg.freezeDurationInDays.toString() : '',
+    );
     _isActive = pkg?.isActive ?? true;
   }
 
@@ -57,6 +61,7 @@ class _AddNewPackageTextFieldBodyState
     priceController.dispose();
     durationController.dispose();
     freezesController.dispose();
+    freezeDurationController.dispose();
     super.dispose();
   }
 
@@ -79,6 +84,7 @@ class _AddNewPackageTextFieldBodyState
         priceText: priceController.text,
         durationText: durationController.text,
         freezesText: freezesController.text,
+        freezeDurationText: freezeDurationController.text,
         isActive: _isActive,
       );
     } else {
@@ -88,6 +94,7 @@ class _AddNewPackageTextFieldBodyState
         priceText: priceController.text,
         durationText: durationController.text,
         freezesText: freezesController.text,
+        freezeDurationText: freezeDurationController.text,
         isActive: _isActive,
       );
     }
@@ -150,6 +157,16 @@ class _AddNewPackageTextFieldBodyState
             _label('Number of Freezes Allowed'),
             AppFormField(
               controller: freezesController,
+              hintText: '0',
+              keyboardType: TextInputType.number,
+              radius: 16.r,
+            ),
+
+            SizedBox(height: 16.h),
+
+            _label('Freeze Duration (Days)'),
+            AppFormField(
+              controller: freezeDurationController,
               hintText: '0',
               keyboardType: TextInputType.number,
               radius: 16.r,

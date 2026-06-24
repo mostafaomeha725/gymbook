@@ -30,7 +30,6 @@ class CustomerSubscriptionsRepositoryImpl
     if (cachedJson != null && cachedJson.isNotEmpty) {
       try {
         final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
-        final int? timestamp = wrapper['timestamp'];
         final List<dynamic>? dataList = wrapper['data'];
 
         if (dataList != null) {
@@ -41,13 +40,8 @@ class CustomerSubscriptionsRepositoryImpl
           emittedCache = true;
           yield Right(list);
 
-          // Check TTL
-          if (timestamp != null) {
-            final now = DateTime.now().millisecondsSinceEpoch;
-            if (now - timestamp < _cacheTtlMillis) {
-              needsBackgroundRefresh = false;
-            }
-          }
+          // Always refresh in the background (Silent refresh)
+          needsBackgroundRefresh = true;
         }
       } catch (_) {
         // Ignore cache parse errors

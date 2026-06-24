@@ -153,7 +153,7 @@ class BranchHeaderSectionContent extends StatelessWidget {
             children: [
               TagBadge(tag: branch.branchTypeName),
               SizedBox(width: 8.w),
-              TagBadge(tag: branch.branchStatusName),
+              TagBadge(tag: isActive ? 'Active' : 'Inactive'),
               if (branch.subscriptionsCount > 0) ...[
                 SizedBox(width: 8.w),
                 TagBadge(tag: '${branch.subscriptionsCount} subs'),

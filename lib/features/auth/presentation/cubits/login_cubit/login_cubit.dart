@@ -30,11 +30,11 @@ class LoginCubit extends Cubit<LoginState> {
 
   // ─── Google Login ──────────────────────────────────────────────────────────
 
-  Future<void> loginWithGoogle() async {
+  Future<void> loginWithGoogle(int userType) async {
     emit(LoginLoading());
     showLoading();
 
-    final result = await loginWithGoogleUseCase();
+    final result = await loginWithGoogleUseCase(userType);
 
     hideLoading();
 

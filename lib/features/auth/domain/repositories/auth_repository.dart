@@ -38,7 +38,7 @@ abstract class AuthRepository {
     required String password,
   });
 
-  Future<Either<Failure, LoginResultEntity>> loginWithGoogle();
+  Future<Either<Failure, LoginResultEntity>> loginWithGoogle(int userType);
 
   Future<Either<Failure, void>> logout();
 

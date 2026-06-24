@@ -14,58 +14,44 @@ class LoginScreenBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: SizedBox(
-        height:
-            MediaQuery.of(context).size.height -
-            MediaQuery.of(context).padding.top -
-            MediaQuery.of(context).padding.bottom,
-        child: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  GymbookCard(
-                    title: 'GymBook',
-                    subtitle: 'Welcome back!',
-                    height: 280.h,
-                    height1: 80.h,
-                  ),
-
-                  Positioned(
-                    top: 225.h,
-                    left: 56.w,
-                    right: 56.w,
-                    child: const LoginWidget(),
-                  ),
-                ],
+      child: Column(
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              GymbookCard(
+                title: 'GymBook',
+                subtitle: 'Welcome back!',
+                height: 220.h,
+                height1: 40.h,
               ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(bottom: 24.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppText(
-                    "Don't have an account? ",
-                    style: font16w400.copyWith(color: const Color(0xff364153)),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      GoRouter.of(context).push(Routes.joinusScreen);
-                    },
-                    child: AppText(
-                      "Register",
-                      style: font16w600.copyWith(
-                        color: const Color(0xff0EA5E9),
-                      ),
-                    ),
-                  ),
-                ],
+              Padding(
+                padding: EdgeInsets.only(top: 160.h, left: 48.w, right: 48.w),
+                child: const LoginWidget(),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AppText(
+                "Don't have an account? ",
+                style: font16w400.copyWith(color: const Color(0xff364153)),
+              ),
+              GestureDetector(
+                onTap: () {
+                  GoRouter.of(context).push(Routes.joinusScreen);
+                },
+                child: AppText(
+                  "Register",
+                  style: font16w600.copyWith(color: const Color(0xff0EA5E9)),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+        ],
       ),
     );
   }

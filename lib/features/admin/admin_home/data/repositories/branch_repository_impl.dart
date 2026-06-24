@@ -3,8 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_statistics_model.dart';
-import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_data.dart'
-    as HiveKeys;
+
 import 'package:hive/hive.dart';
 
 import 'package:dartz/dartz.dart';
@@ -544,7 +543,9 @@ class BranchRepositoryImpl implements BranchRepository {
       // Retrieve current cache to compare
       bool shouldUpdateCacheAndEmit = true;
       if (emittedCache) {
-        final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+        final currentCachedJson = Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).get(cacheKey);
         if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
           try {
             final wrapper = jsonDecode(currentCachedJson);
@@ -561,7 +562,9 @@ class BranchRepositoryImpl implements BranchRepository {
           'timestamp': DateTime.now().millisecondsSinceEpoch,
           'data': remoteModel.toJson(),
         };
-        await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+        await Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).put(cacheKey, jsonEncode(newCacheWrapper));
         yield Right(
           BranchStatisticsEntity(
             branchId: remoteModel.branchId,

@@ -105,6 +105,7 @@ class CustomerBranchDetailsCubit extends Cubit<CustomerBranchDetailsState> {
     return packages
         .map(
           (item) => PlanModel(
+            id: item.id,
             title: item.name,
             price: item.price,
             duration:

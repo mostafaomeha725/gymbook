@@ -35,7 +35,7 @@ abstract class AuthRemoteDataSource {
     required String password,
   });
 
-  Future<LoginResponse> loginWithGoogle();
+  Future<LoginResponse> loginWithGoogle(int userType);
 
   Future<void> logout({required String refreshToken});
 
@@ -175,12 +175,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<LoginResponse> loginWithGoogle() async {
+  Future<LoginResponse> loginWithGoogle(int userType) async {
     final idToken = await GoogleSignInService.getIdToken();
 
     final result = await networkService.postData(
       endPoint: EndPoints.googleLogin,
-      data: {'idToken': idToken},
+      data: {'idToken': idToken, 'userType': userType},
     );
     return result.fold(
       (failure) => throw ServerException(failure.message),

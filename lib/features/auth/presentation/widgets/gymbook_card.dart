@@ -73,7 +73,7 @@ class GymbookCard extends StatelessWidget {
                   : font36w800.copyWith(color: Colors.white),
               alignment: AlignmentDirectional.center,
             ),
-            SizedBox(height: showAppBar ? 12.h : 22.h),
+            SizedBox(height: showAppBar ? 12.h : 8.h),
 
             AppText(
               subtitle,

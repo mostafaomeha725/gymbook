@@ -15,8 +15,6 @@ class NearbyBranchesRepositoryImpl implements NearbyBranchesRepository {
 
   NearbyBranchesRepositoryImpl(this.remoteDataSource);
 
-  static const int _cacheTtlMillis = 5 * 60 * 1000; // 5 minutes TTL
-
   @override
   Stream<Either<Failure, NearbyBranchesPageEntity>> getNearbyBranches({
     double? latitude,
@@ -37,7 +35,6 @@ class NearbyBranchesRepositoryImpl implements NearbyBranchesRepository {
     if (cachedJson != null && cachedJson.isNotEmpty) {
       try {
         final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
-        final int? timestamp = wrapper['timestamp'];
         final Map<String, dynamic>? dataMap = wrapper['data'];
 
         if (dataMap != null) {
@@ -45,13 +42,8 @@ class NearbyBranchesRepositoryImpl implements NearbyBranchesRepository {
           emittedCache = true;
           yield Right(_mapPage(model));
 
-          // Check TTL
-          if (timestamp != null) {
-            final now = DateTime.now().millisecondsSinceEpoch;
-            if (now - timestamp < _cacheTtlMillis) {
-              needsBackgroundRefresh = false;
-            }
-          }
+          // Always refresh in the background (Silent refresh)
+          needsBackgroundRefresh = true;
         }
       } catch (_) {
         // Ignore cache parse errors

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/packages_list_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branch_packages_usecase.dart';
 
@@ -32,22 +31,23 @@ class BranchPackagesListCubit extends Cubit<BranchPackagesListState> {
     }
 
     _subscription?.cancel();
-    _subscription = getBranchPackagesUseCase(
-      branchId: branchId,
-      pageNumber: _currentPage,
-      pageSize: _pageSize,
-    ).listen((result) {
-      result.fold(
-        (failure) {
-          if (state is! BranchPackagesListSuccess) {
-            emit(BranchPackagesListFailure(failure.message));
-          }
-        },
-        (entity) {
-          emit(BranchPackagesListSuccess(entity));
-        },
-      );
-    });
+    _subscription =
+        getBranchPackagesUseCase(
+          branchId: branchId,
+          pageNumber: _currentPage,
+          pageSize: _pageSize,
+        ).listen((result) {
+          result.fold(
+            (failure) {
+              if (state is! BranchPackagesListSuccess) {
+                emit(BranchPackagesListFailure(failure.message));
+              }
+            },
+            (entity) {
+              emit(BranchPackagesListSuccess(entity));
+            },
+          );
+        });
   }
 
   @override

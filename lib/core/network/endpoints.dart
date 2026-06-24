@@ -136,4 +136,8 @@ class EndPoints {
 
   static const String addEmployee = 'Employees';
   static String updateEmployee(int employeeId) => 'Employees/$employeeId';
+
+  /// Payment endpoints
+  static const String initializePayment = 'payments/initialize';
+  static String getPaymentTransactionStatus(int transactionId) => 'payments/$transactionId';
 }

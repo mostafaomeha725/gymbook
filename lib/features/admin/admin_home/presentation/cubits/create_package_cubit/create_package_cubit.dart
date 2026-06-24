@@ -27,6 +27,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     required String priceText,
     required String durationText,
     required String freezesText,
+    required String freezeDurationText,
     required bool isActive,
   }) async {
     if (name.trim().isEmpty) {
@@ -50,6 +51,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     }
 
     final freezes = int.tryParse(freezesText.trim()) ?? 0;
+    final freezeDuration = int.tryParse(freezeDurationText.trim()) ?? 0;
 
     emit(CreatePackageLoading());
     showLoading();
@@ -61,6 +63,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
       durationInMonths: duration,
       isActive: isActive,
       numberOfFreezes: freezes,
+      freezeDurationInDays: freezeDuration,
     );
 
     hideLoading();
@@ -84,6 +87,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     required String priceText,
     required String durationText,
     required String freezesText,
+    required String freezeDurationText,
     required bool isActive,
   }) async {
     if (name.trim().isEmpty) {
@@ -107,6 +111,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
     }
 
     final freezes = int.tryParse(freezesText.trim()) ?? 0;
+    final freezeDuration = int.tryParse(freezeDurationText.trim()) ?? 0;
 
     emit(CreatePackageLoading());
     showLoading();
@@ -119,6 +124,7 @@ class CreatePackageCubit extends Cubit<CreatePackageState> {
       durationInMonths: duration,
       isActive: isActive,
       numberOfFreezes: freezes,
+      freezeDurationInDays: freezeDuration,
     );
 
     hideLoading();

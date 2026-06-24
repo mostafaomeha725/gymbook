@@ -11,16 +11,14 @@ import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/services/notification_service.dart';
 import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-Future<void> clearPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
-}
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Stripe.publishableKey =
+      'pk_test_51Tk4fTGa2A5vL1OXYl2iidUNJPbwphHmbqRbxHeiL5BEvBlKVjhGs38SguMK5Imkm1Tagul07wfdGwi9WmVSjrG100TndSenXj';
 
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -28,16 +26,12 @@ Future<void> main() async {
   await initializeDateFormatting('en', null);
 
   await Hive.initFlutter();
-  // await Hive.deleteFromDisk(); // يمسح كل Boxes وكل البيانات
 
   await Hive.openBox<String>(HiveBoxes.cacheBox);
 
-  // final prefs = await SharedPreferences.getInstance();
-  // await prefs.clear(); // يمسح كل البيانات
-
   await ServiceLocator().init();
 
-  // Notifications are initialized in the home screen
+
 
   configureEasyLoading();
 

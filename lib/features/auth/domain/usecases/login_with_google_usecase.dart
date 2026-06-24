@@ -8,7 +8,7 @@ class LoginWithGoogleUseCase {
 
   LoginWithGoogleUseCase(this.repository);
 
-  Future<Either<Failure, LoginResultEntity>> call() {
-    return repository.loginWithGoogle();
+  Future<Either<Failure, LoginResultEntity>> call(int userType) {
+    return repository.loginWithGoogle(userType);
   }
 }

@@ -8,8 +8,9 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 
 class SubscriptionPlanCard extends StatelessWidget {
   final PlanModel plan;
+  final VoidCallback? onSubscribe;
 
-  const SubscriptionPlanCard({super.key, required this.plan});
+  const SubscriptionPlanCard({super.key, required this.plan, this.onSubscribe});
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +66,9 @@ class SubscriptionPlanCard extends StatelessWidget {
 
           AppButton(
             text: 'Subscribe',
-            onPressed: () {},
+            onPressed: () {
+              if (onSubscribe != null) onSubscribe!();
+            },
             color: Colors.white,
             textColor: const Color(0xff0EA5E9),
           ),
@@ -76,11 +79,13 @@ class SubscriptionPlanCard extends StatelessWidget {
 }
 
 class PlanModel {
+  final int id;
   final String title;
   final double price;
   final String duration;
 
   const PlanModel({
+    required this.id,
     required this.title,
     required this.price,
     required this.duration,

@@ -104,14 +104,19 @@ class GymDetailsScreenBody extends StatelessWidget {
                   type: details.branchTypeName,
                   address: details.address,
                   onDirectionsTap: () => _openDirections(context, details),
-                  onReviewsTap: () {
-                    context.push(
+                  onReviewsTap: () async {
+                    await context.push(
                       Routes.adminBranchReviewsScreen,
                       extra: {
                         'branchId': args.branchId,
                         'branchName': details.name,
                       },
                     );
+                    if (context.mounted) {
+                      context
+                          .read<CustomerBranchDetailsCubit>()
+                          .loadBranchDetails(args.branchId);
+                    }
                   },
                 ),
                 SizedBox(height: 16.h),
@@ -127,7 +132,10 @@ class GymDetailsScreenBody extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                SubscriptionPlansHorizontalList(plans: state.plans),
+                SubscriptionPlansHorizontalList(
+                  branchId: args.branchId,
+                  plans: state.plans,
+                ),
                 SizedBox(height: 32.h),
               ],
             ),
