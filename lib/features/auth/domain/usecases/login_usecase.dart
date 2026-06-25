@@ -11,7 +11,8 @@ class LoginUseCase {
   Future<Either<Failure, LoginResultEntity>> call({
     required String email,
     required String password,
+    required int userType,
   }) {
-    return repository.login(email: email, password: password);
+    return repository.login(email: email, password: password, userType: userType);
   }
 }

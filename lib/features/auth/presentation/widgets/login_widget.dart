@@ -91,11 +91,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                 style: font24w700.copyWith(color: Colors.black),
                 alignment: AlignmentDirectional.center,
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: 8.h),
               AppText(
                 'Choose your role',
                 style: font14w500.copyWith(color: const Color(0xff64748B)),
-                alignment: AlignmentDirectional.center,
               ),
               SizedBox(height: 16.h),
               RoleSelectionWidget(
@@ -172,6 +171,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                     context.read<LoginCubit>().login(
                       emailController.text.trim(),
                       passwordController.text,
+                      selectedUserType,
                     );
                   }
                 },

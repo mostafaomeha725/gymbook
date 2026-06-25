@@ -36,6 +36,7 @@ abstract class AuthRepository {
   Future<Either<Failure, LoginResultEntity>> login({
     required String email,
     required String password,
+    required int userType,
   });
 
   Future<Either<Failure, LoginResultEntity>> loginWithGoogle(int userType);

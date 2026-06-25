@@ -14,8 +14,6 @@ class CustomerSubscriptionsRepositoryImpl
 
   CustomerSubscriptionsRepositoryImpl(this.remoteDataSource);
 
-  static const int _cacheTtlMillis = 5 * 60 * 1000; // 5 minutes TTL
-
   @override
   Stream<Either<Failure, List<CustomerSubscriptionModel>>> getMySubscriptions({
     int pageNumber = 1,

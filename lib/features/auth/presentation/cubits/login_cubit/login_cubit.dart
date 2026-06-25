@@ -14,11 +14,11 @@ class LoginCubit extends Cubit<LoginState> {
   final LoginUseCase loginUseCase;
   final LoginWithGoogleUseCase loginWithGoogleUseCase;
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(String email, String password, int userType) async {
     emit(LoginLoading());
     showLoading();
 
-    final result = await loginUseCase(email: email, password: password);
+    final result = await loginUseCase(email: email, password: password, userType: userType);
 
     hideLoading();
 

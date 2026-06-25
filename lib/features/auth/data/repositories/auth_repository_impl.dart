@@ -154,11 +154,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, LoginResultEntity>> login({
     required String email,
     required String password,
+    required int userType,
   }) async {
     try {
       final response = await remoteDataSource.login(
         email: email,
         password: password,
+        userType: userType,
       );
       if (response.user.emailConfirmed) {
         await _saveSession(response);

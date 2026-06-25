@@ -65,7 +65,7 @@ class GymbookCard extends StatelessWidget {
                   ],
                 ),
               ),
-
+            SizedBox(height: 8.h),
             AppText(
               title,
               style: showAppBar

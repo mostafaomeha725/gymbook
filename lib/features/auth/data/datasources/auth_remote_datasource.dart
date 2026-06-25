@@ -33,6 +33,7 @@ abstract class AuthRemoteDataSource {
   Future<LoginResponse> login({
     required String email,
     required String password,
+    required int userType,
   });
 
   Future<LoginResponse> loginWithGoogle(int userType);
@@ -162,10 +163,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<LoginResponse> login({
     required String email,
     required String password,
+    required int userType,
   }) async {
     final result = await networkService.postData(
       endPoint: EndPoints.login,
-      data: {'email': email, 'password': password},
+      data: {'email': email, 'password': password, 'userType': userType},
     );
 
     return result.fold(
