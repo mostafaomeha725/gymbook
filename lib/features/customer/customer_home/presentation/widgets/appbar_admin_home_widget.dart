@@ -6,6 +6,7 @@ import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_search.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/customer/customer_home/presentation/widgets/notification_icon.dart';
 
 class AppbarAdminHomeWidget extends StatefulWidget {
   final String userName;
@@ -58,23 +59,26 @@ class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppText(
-                      'My Branches',
-                      style: font20w700.copyWith(color: Colors.white),
-                    ),
-                    SizedBox(height: 4.h),
-                    AppText(
-                      'Manage all your gym locations',
-                      style: font14w500.copyWith(
-                        // ignore: deprecated_member_use
-                        color: Colors.white.withOpacity(0.9),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppText(
+                        'My Branches',
+                        style: font20w700.copyWith(color: Colors.white),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 4.h),
+                      AppText(
+                        'Manage all your gym locations',
+                        style: font14w500.copyWith(
+                          // ignore: deprecated_member_use
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const NotificationIcon(),
               ],
             ),
 
@@ -93,7 +97,7 @@ class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
               text: 'Add New Branch',
               icon: Icons.add,
               color: Colors.white,
-              textColor: Color(0xff0EA5E9),
+              textColor: const Color(0xff0EA5E9),
             ),
 
             SizedBox(height: 24.h),

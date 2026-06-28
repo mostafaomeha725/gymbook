@@ -12,6 +12,8 @@ import 'package:gymbook/features/auth/data/model/register_response.dart';
 import 'package:gymbook/features/auth/domain/entities/login_result_entity.dart';
 import 'package:gymbook/features/auth/domain/entities/user_entity.dart';
 import 'package:gymbook/features/auth/domain/repositories/auth_repository.dart';
+import 'package:gymbook/core/services/signalr_service.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -124,12 +126,15 @@ class AuthRepositoryImpl implements AuthRepository {
       if (refreshToken != null && refreshToken.isNotEmpty) {
         await remoteDataSource.logout(refreshToken: refreshToken);
       }
+      await sl<SignalRService>().disconnect();
       await _clearAllLocalData();
       return const Right(null);
     } on ServerException catch (e) {
+      await sl<SignalRService>().disconnect();
       await _clearAllLocalData();
       return Left(ServerFailure(message: e.message));
     } catch (e) {
+      await sl<SignalRService>().disconnect();
       await _clearAllLocalData();
       return Left(ServerFailure(message: e.toString()));
     }
@@ -242,6 +247,12 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     networkService.addToken(response.accessToken);
+
+    // Connect SignalR if admin/branch admin
+    if (response.user.role == AppUserRole.owner || 
+        response.user.role == AppUserRole.branchAdmin) {
+      await sl<SignalRService>().connect();
+    }
   }
 
   LoginResultEntity _mapToLoginResult(LoginResponse response) {

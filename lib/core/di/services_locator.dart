@@ -137,6 +137,9 @@ import 'package:gymbook/features/notifications/domain/repositories/notifications
 import 'package:gymbook/features/notifications/data/repositories/notifications_repository_impl.dart';
 import 'package:gymbook/features/notifications/domain/usecases/update_fcm_token_usecase.dart';
 import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
+import 'package:gymbook/features/notifications/domain/usecases/get_in_app_notifications_usecase.dart';
+import 'package:gymbook/features/notifications/domain/usecases/mark_notification_as_read_usecase.dart';
+import 'package:gymbook/core/services/signalr_service.dart';
 import 'package:gymbook/features/settings/data/datasources/profile_remote_datasource.dart';
 import 'package:gymbook/features/settings/data/repositories/profile_repository_impl.dart';
 import 'package:gymbook/features/settings/domain/repositories/profile_repository.dart';
@@ -184,6 +187,7 @@ class ServiceLocator {
     sl.registerLazySingleton(() => PreferencesStorage(sl()));
     sl.registerLazySingleton(() => UserRoleService(sl()));
     sl.registerLazySingleton(() => NotificationService());
+    sl.registerLazySingleton(() => SignalRService(sl()));
     sl.registerLazySingleton(() => StripeService());
   }
 
@@ -717,11 +721,22 @@ class ServiceLocator {
       sl.registerLazySingleton(() => UpdateFcmTokenUseCase(sl()));
     }
 
+    if (!sl.isRegistered<GetInAppNotificationsUseCase>()) {
+      sl.registerLazySingleton(() => GetInAppNotificationsUseCase(sl()));
+    }
+
+    if (!sl.isRegistered<MarkNotificationAsReadUseCase>()) {
+      sl.registerLazySingleton(() => MarkNotificationAsReadUseCase(sl()));
+    }
+
     if (!sl.isRegistered<NotificationsCubit>()) {
-      sl.registerFactory(
+      sl.registerLazySingleton(
         () => NotificationsCubit(
           updateFcmTokenUseCase: sl(),
           notificationService: sl(),
+          signalRService: sl(),
+          getInAppNotificationsUseCase: sl(),
+          markNotificationAsReadUseCase: sl(),
         ),
       );
     }

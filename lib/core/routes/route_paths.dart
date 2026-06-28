@@ -18,6 +18,7 @@ class Routes {
 
   static const fullImageViewerScreen = '/full-image-viewer-screen';
   static const subscriptionsDetailsScreen = '/subscription-Details-screen';
+  static const notificationsScreen = '/notifications-screen';
 
   static const addBranchOneScreen = '/add-branch-one-screen';
   static const addBranchTwoScreen = '/add-branch-two-screen';

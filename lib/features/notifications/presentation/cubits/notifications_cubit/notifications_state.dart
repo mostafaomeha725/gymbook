@@ -1,34 +1,59 @@
-import 'package:flutter/foundation.dart';
+import 'package:equatable/equatable.dart';
+import 'package:gymbook/features/notifications/domain/entities/notification_entity.dart';
 
-@immutable
-abstract class NotificationsState {}
+abstract class NotificationsState extends Equatable {
+  const NotificationsState();
+
+  @override
+  List<Object?> get props => [];
+}
 
 class NotificationsInitial extends NotificationsState {}
 
-class NotificationsStatusLoading extends NotificationsState {}
+class NotificationsLoading extends NotificationsState {}
 
-class NotificationsStatusLoaded extends NotificationsState {
-  final bool isEnabled;
-  NotificationsStatusLoaded(this.isEnabled);
-}
+class NotificationsLoaded extends NotificationsState {
+  final List<NotificationEntity> notifications;
+  final int badgeCount;
 
-class NotificationsToggling extends NotificationsState {}
+  const NotificationsLoaded({
+    required this.notifications,
+    required this.badgeCount,
+  });
 
-class NotificationsToggled extends NotificationsState {
-  final bool isEnabled;
-  NotificationsToggled(this.isEnabled);
+  @override
+  List<Object?> get props => [notifications, badgeCount];
 }
 
 class NotificationsError extends NotificationsState {
   final String message;
-  NotificationsError(this.message);
+
+  const NotificationsError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }
 
 class NotificationsTokenUpdating extends NotificationsState {}
-
 class NotificationsTokenUpdated extends NotificationsState {}
-
 class NotificationsTokenUpdateError extends NotificationsState {
   final String message;
-  NotificationsTokenUpdateError(this.message);
+  const NotificationsTokenUpdateError(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+class NotificationsStatusLoading extends NotificationsState {}
+class NotificationsStatusLoaded extends NotificationsState {
+  final bool isEnabled;
+  const NotificationsStatusLoaded(this.isEnabled);
+  @override
+  List<Object?> get props => [isEnabled];
+}
+class NotificationsToggling extends NotificationsState {}
+class NotificationsToggled extends NotificationsState {
+  final bool isEnabled;
+  const NotificationsToggled(this.isEnabled);
+  @override
+  List<Object?> get props => [isEnabled];
 }

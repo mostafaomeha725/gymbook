@@ -64,6 +64,9 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   flutter_stripe: ^13.0.0
+  signalr_netcore: ^1.4.4
+  equatable: ^2.0.8
+  timeago: ^3.7.1
 
 dev_dependencies:
   flutter_lints: ^4.0.0

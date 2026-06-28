@@ -36,6 +36,8 @@ class EndPoints {
   static const String profile = 'profile';
   static const String getCurrentUser = 'Users/me';
   static const String updateFcmToken = 'Notifications/register-token';
+  static const String getInAppNotifications = 'InAppNotifications';
+  static String markNotificationAsRead(int id) => 'InAppNotifications/$id/read';
 
   /// Owner endpoints
   static const String createBranch = 'Owner/Branches';

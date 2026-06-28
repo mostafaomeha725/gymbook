@@ -36,6 +36,7 @@ import 'package:gymbook/features/customer/customer_home/presentation/screens/ful
 import 'package:gymbook/features/customer/customer_home/presentation/screens/gym_details_screen.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/full_image_viewer_args.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_details_screen_body.dart';
+import 'package:gymbook/features/notifications/presentation/screens/notifications_screen.dart';
 
 import 'package:gymbook/features/settings/presentation/screens/change_password_screen.dart';
 
@@ -213,6 +214,10 @@ GoRouter createRouter() {
               );
           return SubscriptionsDetailsScreen(args: args);
         },
+      ),
+      GoRoute(
+        path: Routes.notificationsScreen,
+        builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
         path: Routes.addBranchOneScreen,

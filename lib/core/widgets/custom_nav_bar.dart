@@ -8,6 +8,7 @@ import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/services/user_role_service.dart';
 import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
+import 'package:gymbook/core/services/signalr_service.dart';
 
 class CustomNavBar extends StatefulWidget {
   const CustomNavBar({super.key});
@@ -57,6 +58,10 @@ class _CustomNavBarState extends State<CustomNavBar> {
         _navItems = CustomerNavData.items;
         _screens = CustomerNavData.screens;
         break;
+    }
+
+    if (role == AppUserRole.owner || role == AppUserRole.branchAdmin) {
+      sl<SignalRService>().connect();
     }
   }
 

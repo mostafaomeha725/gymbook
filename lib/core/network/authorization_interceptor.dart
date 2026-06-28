@@ -6,6 +6,8 @@ import 'package:gymbook/core/cache/preferences_storage.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
+import 'package:gymbook/core/services/signalr_service.dart';
+import 'package:gymbook/core/utils/safe_print.dart';
 
 class AuthorizationInterceptor extends Interceptor {
   bool _isRefreshing = false;
@@ -107,6 +109,9 @@ class AuthorizationInterceptor extends Interceptor {
 
               // Update the global NetworkService Dio instance!
               networkService.addToken(newAccessToken!);
+
+              safePrint("Restart SignalR After Refresh");
+              await sl<SignalRService>().reconnect();
 
               refreshSuccess = true;
             },
