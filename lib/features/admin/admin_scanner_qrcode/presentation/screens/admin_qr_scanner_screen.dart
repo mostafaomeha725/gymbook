@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/core/di/services_locator.dart';
+import 'package:gymbook/core/enums/app_enums.dart';
+import 'package:gymbook/core/services/user_role_service.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_my_branches_cubit/admin_my_branches_cubit.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/cubits/admin_qr_scanner_cubit/admin_qr_scanner_cubit.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_qr_scanner_body.dart';
@@ -10,12 +12,27 @@ class AdminQrScannerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final roleService = sl<UserRoleService>();
+    final role = roleService.getCurrentRole();
+    
+    int? fixedBranchId;
+    String? fixedBranchName;
+    
+    if (role == AppUserRole.branchAdmin || role == AppUserRole.gator) {
+      fixedBranchId = roleService.getBranchId();
+      fixedBranchName = roleService.getBranchName();
+    }
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => sl<AdminQrScannerCubit>()),
-        BlocProvider(create: (_) => sl<AdminMyBranchesCubit>()..loadBranches()),
+        if (fixedBranchId == null)
+          BlocProvider(create: (_) => sl<AdminMyBranchesCubit>()..loadBranches()),
       ],
-      child: const AdminQrScannerBody(),
+      child: AdminQrScannerBody(
+        fixedBranchId: fixedBranchId,
+        branchName: fixedBranchName,
+      ),
     );
   }
 }

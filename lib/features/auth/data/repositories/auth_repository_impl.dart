@@ -167,29 +167,27 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
         userType: userType,
       );
-      if (response.user.emailConfirmed) {
-        await _saveSession(response);
-      } else {
-        _pendingLoginResponse = response;
-      }
+      await _saveSession(response);
       return Right(_mapToLoginResult(response));
+    } on EmailNotVerifiedException catch (e) {
+      return Left(EmailNotVerifiedFailure(message: e.message));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }
   }
 
   @override
-  Future<Either<Failure, LoginResultEntity>> loginWithGoogle(int userType) async {
+  Future<Either<Failure, LoginResultEntity>> loginWithGoogle(
+    int userType,
+  ) async {
     try {
       final response = await remoteDataSource.loginWithGoogle(userType);
-      if (response.user.emailConfirmed) {
-        await _saveSession(response);
-      } else {
-        _pendingLoginResponse = response;
-      }
+      await _saveSession(response);
       return Right(_mapToLoginResult(response));
     } on UserCancelledException {
       return const Left(UserCancelledFailure());
+    } on EmailNotVerifiedException catch (e) {
+      return Left(EmailNotVerifiedFailure(message: e.message));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     }
@@ -249,7 +247,7 @@ class AuthRepositoryImpl implements AuthRepository {
     networkService.addToken(response.accessToken);
 
     // Connect SignalR if admin/branch admin
-    if (response.user.role == AppUserRole.owner || 
+    if (response.user.role == AppUserRole.owner ||
         response.user.role == AppUserRole.branchAdmin) {
       await sl<SignalRService>().connect();
     }

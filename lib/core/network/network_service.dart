@@ -7,9 +7,9 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
+import 'package:gymbook/core/constants/strings.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-import '/core/constants/strings.dart';
 import '/core/di/services_locator.dart';
 import '/core/error/failure.dart';
 import '/core/network/endpoints.dart';
@@ -113,6 +113,20 @@ class NetworkService {
           }
           msg ??= body['message']?.toString() ?? body['title']?.toString();
         }
+
+        // Handle specific error codes if available
+        if (body is Map<String, dynamic> &&
+            body['errors'] is List &&
+            (body['errors'] as List).isNotEmpty) {
+          final first = (body['errors'] as List).first;
+          if (first is Map<String, dynamic> &&
+              first['code'] == 'EMAIL_NOT_VERIFIED') {
+            return Left(
+              EmailNotVerifiedFailure(message: msg ?? 'Email is not verified'),
+            );
+          }
+        }
+
         return Left(Failure(msg ?? 'Error ${response.statusCode}'));
       }
     } on SocketException {
@@ -391,9 +405,12 @@ class NetworkService {
         if (data['errors'] is List && (data['errors'] as List).isNotEmpty) {
           final firstError = (data['errors'] as List).first;
           if (firstError is Map<String, dynamic>) {
-            return Left(
-              Failure(firstError['description']?.toString() ?? 'Unknown error'),
-            );
+            final desc =
+                firstError['description']?.toString() ?? 'Unknown error';
+            if (firstError['code'] == 'EMAIL_NOT_VERIFIED') {
+              return Left(EmailNotVerifiedFailure(message: desc));
+            }
+            return Left(Failure(desc));
           }
         }
         // Handle top-level detail field (e.g. FluentValidation 500 errors)

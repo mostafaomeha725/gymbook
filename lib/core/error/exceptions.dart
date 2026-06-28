@@ -18,6 +18,10 @@ class FetchDataException extends ServerException {
   const FetchDataException(super.message);
 }
 
+class EmailNotVerifiedException extends ServerException {
+  const EmailNotVerifiedException(super.message);
+}
+
 class BadRequestException extends ServerException {
   const BadRequestException(super.message);
 }

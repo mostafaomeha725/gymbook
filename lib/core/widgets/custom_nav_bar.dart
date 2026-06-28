@@ -31,7 +31,7 @@ class _CustomNavBarState extends State<CustomNavBar> {
     super.initState();
     _navState = NavigationState();
     _initializeNavigation();
-    
+
     // Request permission and initialize notifications when the home screen is loaded
     sl<NotificationsCubit>().initNotifications();
   }

@@ -4,6 +4,7 @@ import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/core/services/google_sign_in_service.dart';
 import 'package:gymbook/features/auth/data/model/login_response.dart';
 import 'package:gymbook/features/auth/data/model/register_response.dart';
+import 'package:gymbook/core/error/failure.dart';
 
 abstract class AuthRemoteDataSource {
   Future<void> sendResetPasswordEmail({required String email});
@@ -171,7 +172,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     return result.fold(
-      (failure) => throw ServerException(failure.message),
+      (failure) {
+        if (failure is EmailNotVerifiedFailure) {
+          throw EmailNotVerifiedException(failure.message);
+        }
+        throw ServerException(failure.message);
+      },
       (data) => LoginResponse.fromJson(data),
     );
   }
@@ -185,7 +191,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: {'idToken': idToken, 'userType': userType},
     );
     return result.fold(
-      (failure) => throw ServerException(failure.message),
+      (failure) {
+        if (failure is EmailNotVerifiedFailure) {
+          throw EmailNotVerifiedException(failure.message);
+        }
+        throw ServerException(failure.message);
+      },
       (data) => LoginResponse.fromJson(data),
     );
   }

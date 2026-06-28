@@ -23,8 +23,12 @@ class LoginCubit extends Cubit<LoginState> {
     hideLoading();
 
     result.fold((failure) {
-      showError(failure.message);
-      emit(LoginFailure(failure.message));
+      if (failure is EmailNotVerifiedFailure) {
+        emit(const LoginEmailNotVerified());
+      } else {
+        showError(failure.message);
+        emit(LoginFailure(failure.message));
+      }
     }, (loginResult) => emit(LoginSuccess(loginResult)));
   }
 
@@ -42,6 +46,10 @@ class LoginCubit extends Cubit<LoginState> {
       if (failure is UserCancelledFailure) {
         showInfo('Google sign-in was cancelled.');
         emit(LoginInitial());
+        return;
+      }
+      if (failure is EmailNotVerifiedFailure) {
+        emit(const LoginEmailNotVerified());
         return;
       }
       showError(failure.message);

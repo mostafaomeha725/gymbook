@@ -16,6 +16,13 @@ class ServerFailure extends Failure {
   List<Object> get props => [message];
 }
 
+class EmailNotVerifiedFailure extends Failure {
+  const EmailNotVerifiedFailure({required String message}) : super(message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class CacheFailure extends Failure {
   const CacheFailure({required String message}) : super(message);
 

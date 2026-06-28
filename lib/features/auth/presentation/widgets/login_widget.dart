@@ -46,23 +46,22 @@ class _LoginWidgetState extends State<LoginWidget> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           hideLoading();
-          if (!state.loginResult.user.emailConfirmed) {
-            GoRouter.of(context).push(
-              Routes.otpScreen,
-              extra: OtpScreenArgs(
-                source: state.loginResult.user.userType == 2
-                    ? OtpSource.business
-                    : OtpSource.customer,
-                purpose: OtpPurpose.confirmEmail,
-                email: emailController.text.trim(),
-              ),
-            );
-          } else {
-            GoRouter.of(context).pushReplacement(
-              Routes.mainNavigationScreen,
-              extra: state.loginResult.user.isAdmin,
-            );
-          }
+          GoRouter.of(context).pushReplacement(
+            Routes.mainNavigationScreen,
+            extra: state.loginResult.user.isAdmin,
+          );
+        } else if (state is LoginEmailNotVerified) {
+          hideLoading();
+          GoRouter.of(context).push(
+            Routes.otpScreen,
+            extra: OtpScreenArgs(
+              source: selectedUserType == 2
+                  ? OtpSource.business
+                  : OtpSource.customer,
+              purpose: OtpPurpose.confirmEmail,
+              email: emailController.text.trim(),
+            ),
+          );
         }
       },
       child: Container(
