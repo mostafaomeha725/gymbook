@@ -6,6 +6,7 @@ import 'package:gymbook/features/notifications/data/models/notification_model.da
 abstract class NotificationsRemoteDataSource {
   Future<void> updateFcmToken(String token);
   Future<List<NotificationModel>> getInAppNotifications();
+  Future<int> getUnreadNotificationCount();
   Future<void> markNotificationAsRead(int id);
 }
 
@@ -43,6 +44,18 @@ class NotificationsRemoteDataSourceImpl
     await _networkService.putData(
       endPoint: EndPoints.markNotificationAsRead(id),
       data: {},
+    );
+  }
+
+  @override
+  Future<int> getUnreadNotificationCount() async {
+    final response = await _networkService.getData(
+      endPoint: EndPoints.getUnreadNotificationCount,
+    );
+
+    return response.fold(
+      (failure) => throw failure,
+      (data) => data['unreadCount'] ?? 0,
     );
   }
 }

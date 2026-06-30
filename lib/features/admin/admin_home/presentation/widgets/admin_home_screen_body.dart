@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/services/notification_refresh_service.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branches_list_cubit/branches_list_cubit.dart';
@@ -8,8 +10,32 @@ import 'package:gymbook/features/admin/admin_home/presentation/widgets/branches_
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/appbar_admin_home_widget.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
-class AdminHomeScreenBody extends StatelessWidget {
+class AdminHomeScreenBody extends StatefulWidget {
   const AdminHomeScreenBody({super.key});
+
+  @override
+  State<AdminHomeScreenBody> createState() => _AdminHomeScreenBodyState();
+}
+
+class _AdminHomeScreenBodyState extends State<AdminHomeScreenBody> {
+  StreamSubscription<int>? _refreshSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-refresh branch list on BranchUpdate (type 1) notification
+    _refreshSubscription = NotificationRefreshService().stream.listen((type) {
+      if (type == 1 && mounted) {
+        context.read<BranchesListCubit>().loadBranches(refresh: true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

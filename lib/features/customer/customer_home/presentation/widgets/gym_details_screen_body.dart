@@ -9,7 +9,6 @@ import 'package:gymbook/features/customer/customer_home/data/models/customer_bra
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/customer_branch_details_cubit/customer_branch_details_cubit.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/customer_branch_details_cubit/customer_branch_details_state.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gymbook/features/customer/customer_home/presentation/widgets/amenities_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_info_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/image_gym_details.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/opening_hours_card.dart';
@@ -122,8 +121,8 @@ class GymDetailsScreenBody extends StatelessWidget {
                 SizedBox(height: 16.h),
                 OpeningHoursCard(hours: state.workingHours),
                 SizedBox(height: 16.h),
-                const AmenitiesCard(),
-                SizedBox(height: 16.h),
+                // const AmenitiesCard(),
+                // SizedBox(height: 16.h),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: AppText(

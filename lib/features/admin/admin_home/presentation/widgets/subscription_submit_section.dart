@@ -8,7 +8,7 @@ import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_pac
 class SubscriptionSubmitSection extends StatelessWidget {
   final int? selectedPackageIndex;
   final int userTypeIndex;
-  final VoidCallback? Function(PackageEntity pkg) onSubmit;
+  final VoidCallback? Function(PackageEntity? pkg) onSubmit;
 
   const SubscriptionSubmitSection({
     super.key,
@@ -29,10 +29,6 @@ class SubscriptionSubmitSection extends StatelessWidget {
     return BlocBuilder<BranchPackagesListCubit, BranchPackagesListState>(
       builder: (context, packagesState) {
         final packages = _activePackages(packagesState);
-        final canSubmit =
-            selectedPackageIndex != null &&
-            packages.isNotEmpty &&
-            selectedPackageIndex! < packages.length;
 
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 22.w),
@@ -45,7 +41,13 @@ class SubscriptionSubmitSection extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [Color(0xFF0EA5E9), Color(0xFF0284C7)],
             ),
-            onTap: canSubmit ? onSubmit(packages[selectedPackageIndex!]) : null,
+            onTap: onSubmit(
+              (selectedPackageIndex != null &&
+                      packages.isNotEmpty &&
+                      selectedPackageIndex! < packages.length)
+                  ? packages[selectedPackageIndex!]
+                  : null,
+            ),
           ),
         );
       },

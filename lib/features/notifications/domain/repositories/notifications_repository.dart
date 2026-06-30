@@ -5,5 +5,6 @@ import 'package:gymbook/features/notifications/domain/entities/notification_enti
 abstract class NotificationsRepository {
   Future<Either<Failure, void>> updateFcmToken(String token);
   Future<Either<Failure, List<NotificationEntity>>> getInAppNotifications();
+  Future<Either<Failure, int>> getUnreadNotificationCount();
   Future<Either<Failure, void>> markNotificationAsRead(int id);
 }

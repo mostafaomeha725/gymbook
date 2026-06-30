@@ -13,7 +13,8 @@ class NotificationsScreenBody extends StatefulWidget {
   const NotificationsScreenBody({super.key});
 
   @override
-  State<NotificationsScreenBody> createState() => _NotificationsScreenBodyState();
+  State<NotificationsScreenBody> createState() =>
+      _NotificationsScreenBodyState();
 }
 
 class _NotificationsScreenBodyState extends State<NotificationsScreenBody> {
@@ -39,10 +40,7 @@ class _NotificationsScreenBodyState extends State<NotificationsScreenBody> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       color: Colors.white,
-      child: AppText(
-        title,
-        style: font18w700.copyWith(color: Colors.black),
-      ),
+      child: AppText(title, style: font18w700.copyWith(color: Colors.black)),
     );
   }
 
@@ -62,7 +60,7 @@ class _NotificationsScreenBodyState extends State<NotificationsScreenBody> {
             ),
           );
         }
-        
+
         if (state is NotificationsLoaded) {
           if (state.notifications.isEmpty) {
             return Center(
@@ -78,59 +76,66 @@ class _NotificationsScreenBodyState extends State<NotificationsScreenBody> {
                   AppText(
                     'No notifications yet',
                     style: font16w600.copyWith(color: Colors.grey.shade600),
+                    alignment: AlignmentDirectional.center,
                   ),
                 ],
               ),
             );
           }
-          
+
           // Group notifications
           final Map<String, List<NotificationEntity>> grouped = {
             'Today': [],
             'Yesterday': [],
             'Earlier': [],
           };
-          
+
           for (var notif in state.notifications) {
             final header = _getSectionHeader(notif.createdAt);
             grouped[header]!.add(notif);
           }
-          
+
           return ListView(
             padding: EdgeInsets.zero,
             children: [
               if (grouped['Today']!.isNotEmpty) ...[
                 _buildHeader('Today'),
-                ...grouped['Today']!.map((n) => NotificationItemWidget(
-                  notification: n,
-                  onTap: () {
-                    if (!n.isRead) _cubit.markAsRead(n.id);
-                  },
-                )),
+                ...grouped['Today']!.map(
+                  (n) => NotificationItemWidget(
+                    notification: n,
+                    onTap: () {
+                      if (!n.isRead) _cubit.markAsRead(n.id);
+                    },
+                  ),
+                ),
               ],
               if (grouped['Yesterday']!.isNotEmpty) ...[
                 _buildHeader('Yesterday'),
-                ...grouped['Yesterday']!.map((n) => NotificationItemWidget(
-                  notification: n,
-                  onTap: () {
-                    if (!n.isRead) _cubit.markAsRead(n.id);
-                  },
-                )),
+                ...grouped['Yesterday']!.map(
+                  (n) => NotificationItemWidget(
+                    notification: n,
+                    onTap: () {
+                      if (!n.isRead) _cubit.markAsRead(n.id);
+                    },
+                  ),
+                ),
               ],
               if (grouped['Earlier']!.isNotEmpty) ...[
                 _buildHeader('Earlier'),
-                ...grouped['Earlier']!.map((n) => NotificationItemWidget(
-                  notification: n,
-                  onTap: () {
-                    if (!n.isRead) _cubit.markAsRead(n.id);
-                  },
-                )),
+                ...grouped['Earlier']!.map(
+                  (n) => NotificationItemWidget(
+                    notification: n,
+                    onTap: () {
+                      if (!n.isRead) _cubit.markAsRead(n.id);
+                    },
+                  ),
+                ),
               ],
               SizedBox(height: 32.h),
             ],
           );
         }
-        
+
         return const SizedBox.shrink();
       },
     );

@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/custom_search.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/features/customer/customer_home/presentation/widgets/notification_icon.dart';
 
 class AppbarHomeWidget extends StatefulWidget {
   final String userName;
@@ -103,7 +102,6 @@ class _AppbarHomeWidgetState extends State<AppbarHomeWidget> {
                     ],
                   ),
                 ),
-                const NotificationIcon(),
               ],
             ),
 

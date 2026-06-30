@@ -43,11 +43,19 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     try {
       await _remoteDataSource.markNotificationAsRead(id);
       return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
-    } on Failure catch (f) {
-      return Left(f);
     } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, int>> getUnreadNotificationCount() async {
+    try {
+      final count = await _remoteDataSource.getUnreadNotificationCount();
+      return Right(count);
+    } catch (e) {
+      if (e is Failure) return Left(e);
       return Left(ServerFailure(message: e.toString()));
     }
   }

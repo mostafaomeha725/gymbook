@@ -235,6 +235,7 @@ class AuthRepositoryImpl implements AuthRepository {
       key: PreferencesKeys.email,
       value: response.user.email,
     );
+    await storage.saveUserName(response.user.firstName);
 
     // Save extended role details
     await storage.saveUserType(response.user.userType);
@@ -246,9 +247,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
     networkService.addToken(response.accessToken);
 
-    // Connect SignalR if admin/branch admin
-    if (response.user.role == AppUserRole.owner ||
-        response.user.role == AppUserRole.branchAdmin) {
+    // Connect SignalR if admin
+    if (response.user.role == AppUserRole.owner) {
       await sl<SignalRService>().connect();
     }
   }

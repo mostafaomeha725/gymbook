@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
+import 'package:gymbook/core/services/notification_refresh_service.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_statistics_entity.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
@@ -31,6 +33,7 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
   late BranchDetailsCubit _detailsCubit;
   late BranchSetupCubit _setupCubit;
   late BranchStatisticsCubit _statisticsCubit;
+  StreamSubscription<int>? _refreshSubscription;
 
   static const _timePeriods = [
     StatisticsTimePeriod.today,
@@ -55,10 +58,16 @@ class _AdminBranchScreenBodyState extends State<AdminBranchScreenBody> {
         branchId: currentBranch.id,
         timePeriod: StatisticsTimePeriod.today,
       );
+
+    // Auto-refresh on BranchUpdate (type 1) notification
+    _refreshSubscription = NotificationRefreshService().stream.listen((type) {
+      if (type == 1) _refreshCurrentBranch();
+    });
   }
 
   @override
   void dispose() {
+    _refreshSubscription?.cancel();
     _detailsCubit.close();
     _setupCubit.close();
     _statisticsCubit.close();

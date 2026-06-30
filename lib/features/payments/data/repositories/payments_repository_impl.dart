@@ -5,6 +5,7 @@ import 'package:gymbook/features/payments/data/data_sources/payments_remote_data
 import 'package:gymbook/features/payments/domain/entities/payment_intent_entity.dart';
 import 'package:gymbook/features/payments/domain/entities/payment_transaction_status_entity.dart';
 import 'package:gymbook/features/payments/domain/repositories/payments_repository.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 class PaymentsRepositoryImpl implements PaymentsRepository {
   final PaymentsRemoteDataSource remoteDataSource;
@@ -44,6 +45,8 @@ class PaymentsRepositoryImpl implements PaymentsRepository {
     try {
       await stripeService.initPaymentSheet(paymentIntentClientSecret: clientSecret);
       return const Right(null);
+    } on StripeException catch (e) {
+      return Left(ServerFailure(message: e.error.localizedMessage ?? 'Failed to initialize payment'));
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
@@ -54,6 +57,11 @@ class PaymentsRepositoryImpl implements PaymentsRepository {
     try {
       await stripeService.presentPaymentSheet();
       return const Right(null);
+    } on StripeException catch (e) {
+      if (e.error.code == FailureCode.Canceled) {
+        return const Left(ServerFailure(message: 'Payment canceled'));
+      }
+      return Left(ServerFailure(message: e.error.localizedMessage ?? 'Payment failed'));
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }

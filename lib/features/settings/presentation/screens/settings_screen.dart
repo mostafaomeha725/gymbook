@@ -13,7 +13,7 @@ class SettingsScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => sl<ProfileCubit>()..getProfile()),
-        BlocProvider(create: (context) => sl<NotificationsCubit>()..checkStatus()),
+        BlocProvider.value(value: sl<NotificationsCubit>()..checkStatus()),
       ],
       child: const SettingsScreenBody(),
     );

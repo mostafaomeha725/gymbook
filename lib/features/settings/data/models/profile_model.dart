@@ -2,23 +2,14 @@ class ProfileBranchModel {
   final int id;
   final String name;
 
-  ProfileBranchModel({
-    required this.id,
-    required this.name,
-  });
+  ProfileBranchModel({required this.id, required this.name});
 
   factory ProfileBranchModel.fromJson(Map<String, dynamic> json) {
-    return ProfileBranchModel(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-    );
+    return ProfileBranchModel(id: json['id'] ?? 0, name: json['name'] ?? '');
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }
 
@@ -61,8 +52,11 @@ class ProfileModel {
       emailConfirmed: json['emailConfirmed'] ?? false,
       userType: json['userType'] ?? 0,
       userRole: json['userRole'],
-      branches: (json['branches'] as List<dynamic>?)
-              ?.map((e) => ProfileBranchModel.fromJson(e as Map<String, dynamic>))
+      branches:
+          (json['branches'] as List<dynamic>?)
+              ?.map(
+                (e) => ProfileBranchModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
     );

@@ -6,8 +6,10 @@ import 'package:gymbook/features/notifications/domain/entities/notification_enti
 import 'package:gymbook/features/notifications/domain/usecases/get_in_app_notifications_usecase.dart';
 import 'package:gymbook/features/notifications/domain/usecases/mark_notification_as_read_usecase.dart';
 import 'package:gymbook/features/notifications/domain/usecases/update_fcm_token_usecase.dart';
+import 'package:gymbook/features/notifications/domain/usecases/get_unread_notification_count_usecase.dart';
 import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_state.dart';
 import 'package:gymbook/core/widgets/in_app_notification_popup/in_app_notification_popup.dart';
+import 'package:gymbook/core/services/notification_refresh_service.dart';
 
 class NotificationsCubit extends Cubit<NotificationsState> {
   final UpdateFcmTokenUseCase updateFcmTokenUseCase;
@@ -15,6 +17,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   final SignalRService signalRService;
   final GetInAppNotificationsUseCase getInAppNotificationsUseCase;
   final MarkNotificationAsReadUseCase markNotificationAsReadUseCase;
+  final GetUnreadNotificationCountUseCase getUnreadNotificationCountUseCase;
 
   StreamSubscription? _tokenSubscription;
   StreamSubscription? _signalRSubscription;
@@ -30,24 +33,31 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     required this.signalRService,
     required this.getInAppNotificationsUseCase,
     required this.markNotificationAsReadUseCase,
+    required this.getUnreadNotificationCountUseCase,
   }) : super(NotificationsInitial()) {
     _listenToSignalR();
   }
 
   void _listenToSignalR() {
-    _signalRSubscription = signalRService.notificationStream.listen((notification) {
+    _signalRSubscription = signalRService.notificationStream.listen((
+      notification,
+    ) {
       _notifications = [notification, ..._notifications];
       _badgeCount++;
       _emitLoaded();
       InAppNotificationPopup.show(notification);
+      // Notify relevant screens to refresh
+      NotificationRefreshService().notifyRefresh(notification.notificationType);
     });
   }
 
   void _emitLoaded() {
-    emit(NotificationsLoaded(
-      notifications: _notifications,
-      badgeCount: _badgeCount,
-    ));
+    emit(
+      NotificationsLoaded(
+        notifications: _notifications,
+        badgeCount: _badgeCount,
+      ),
+    );
   }
 
   Future<void> fetchNotifications() async {
@@ -58,12 +68,21 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     emit(NotificationsLoading());
     final result = await getInAppNotificationsUseCase();
+    result.fold((failure) => emit(NotificationsError(failure.message)), (
+      notifications,
+    ) {
+      _notifications = notifications;
+      _hasFetchedInitial = true;
+      _emitLoaded();
+    });
+  }
+
+  Future<void> fetchUnreadCount() async {
+    final result = await getUnreadNotificationCountUseCase();
     result.fold(
-      (failure) => emit(NotificationsError(failure.message)),
-      (notifications) {
-        _notifications = notifications;
-        _badgeCount = notifications.where((n) => !n.isRead).length;
-        _hasFetchedInitial = true;
+      (failure) => null,
+      (count) {
+        _badgeCount = count;
         _emitLoaded();
       },
     );
@@ -76,7 +95,6 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       if (_badgeCount > 0) _badgeCount--;
       _emitLoaded();
 
-      // Fire and forget API call
       await markNotificationAsReadUseCase(id);
     }
   }
@@ -98,7 +116,11 @@ class NotificationsCubit extends Cubit<NotificationsState> {
         emit(const NotificationsStatusLoaded(true));
       } else {
         isEnabled = false;
-        emit(const NotificationsError('Please enable notifications from device settings'));
+        emit(
+          const NotificationsError(
+            'Please enable notifications from device settings',
+          ),
+        );
         emit(const NotificationsStatusLoaded(false));
       }
     } else {
@@ -116,7 +138,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   Future<void> initNotifications() async {
     await notificationService.init();
-    
+
     // Get initial token and update backend
     final token = await notificationService.getToken();
     if (token != null) {
@@ -127,11 +149,16 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     _tokenSubscription = notificationService.onTokenRefresh.listen((newToken) {
       _updateToken(newToken);
     });
+
+    // Fetch initial unread count
+    await fetchUnreadCount();
   }
 
   Future<void> _updateToken(String token) async {
+    if (isClosed) return;
     emit(NotificationsTokenUpdating());
     final result = await updateFcmTokenUseCase(token);
+    if (isClosed) return;
     result.fold(
       (failure) => emit(NotificationsTokenUpdateError(failure.message)),
       (_) => emit(NotificationsTokenUpdated()),

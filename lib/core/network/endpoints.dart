@@ -37,6 +37,7 @@ class EndPoints {
   static const String getCurrentUser = 'Users/me';
   static const String updateFcmToken = 'Notifications/register-token';
   static const String getInAppNotifications = 'InAppNotifications';
+  static const String getUnreadNotificationCount = 'InAppNotifications/unread-count';
   static String markNotificationAsRead(int id) => 'InAppNotifications/$id/read';
 
   /// Owner endpoints

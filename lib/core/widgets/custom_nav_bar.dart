@@ -32,8 +32,11 @@ class _CustomNavBarState extends State<CustomNavBar> {
     _navState = NavigationState();
     _initializeNavigation();
 
-    // Request permission and initialize notifications when the home screen is loaded
-    sl<NotificationsCubit>().initNotifications();
+    // Request permission and initialize notifications when the home screen is loaded for admin only
+    final roleService = sl<UserRoleService>();
+    if (roleService.getCurrentRole() == AppUserRole.owner) {
+      sl<NotificationsCubit>().initNotifications();
+    }
   }
 
   void _initializeNavigation() {
@@ -54,13 +57,12 @@ class _CustomNavBarState extends State<CustomNavBar> {
         _screens = GatorNavData.screens;
         break;
       case AppUserRole.customer:
-      default:
         _navItems = CustomerNavData.items;
         _screens = CustomerNavData.screens;
         break;
     }
 
-    if (role == AppUserRole.owner || role == AppUserRole.branchAdmin) {
+    if (role == AppUserRole.owner) {
       sl<SignalRService>().connect();
     }
   }

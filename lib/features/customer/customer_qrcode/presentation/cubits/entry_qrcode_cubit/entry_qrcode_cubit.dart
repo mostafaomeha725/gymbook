@@ -5,8 +5,7 @@ import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:crypto/crypto.dart';
 import 'package:gymbook/core/cache/preferences_storage.dart';
-
-part 'entry_qrcode_state.dart';
+import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_state.dart';
 
 class EntryQrcodeCubit extends Cubit<EntryQrcodeState> {
   EntryQrcodeCubit({required this.preferencesStorage})

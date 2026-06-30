@@ -67,10 +67,7 @@ class WorksAtBranch {
 // ──────────────────────────────────────────────────────────
 
 /// Maps userType + optional roleId to [AppUserRole].
-AppUserRole resolveAppUserRole({
-  required int userType,
-  int? roleId,
-}) {
+AppUserRole resolveAppUserRole({required int userType, int? roleId}) {
   switch (userType) {
     case 2:
       return AppUserRole.owner;

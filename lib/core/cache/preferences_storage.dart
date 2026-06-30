@@ -140,6 +140,14 @@ class PreferencesStorage {
     return _preferences.getString(PreferencesKeys.branchName.name);
   }
 
+  Future<void> saveUserName(String name) async {
+    await _preferences.setString(PreferencesKeys.name.name, name);
+  }
+
+  String? getUserName() {
+    return _preferences.getString(PreferencesKeys.name.name);
+  }
+
   Future<void> saveUserProfile(String profileJson) async {
     await _preferences.setString(PreferencesKeys.userProfile.name, profileJson);
   }

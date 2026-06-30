@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
-import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/get_type_color.dart';
 
@@ -121,41 +120,49 @@ class GymInfoCard extends StatelessWidget {
           ),
 
           SizedBox(height: 16.h),
-
-          /// Buttons
-          Row(
-            children: [
-              Expanded(
-                child: BouncingSocialButton(
-                  text: 'Directions',
-                  borderColor: const Color(0XFF0EA5E9),
-                  icon: Icons.location_on_outlined,
-                  onTap: onDirectionsTap,
-                  textSize: 14.sp,
-                  textColor: const Color(0XFF0EA5E9),
-                ),
-              ),
-
-              SizedBox(width: 12.w),
-
-              /// View Plans
-              Expanded(
-                child: AppButton(
-                  text: 'View Plans',
-                  onPressed: () {},
-                  radius: 14.r,
-                  height: 48.h,
-                  textSize: 14.sp,
-                  textWeight: FontWeight.w600,
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xff0EA5E9), Color(0xff0284C7)],
-                  ),
-                ),
-              ),
-            ],
+          BouncingSocialButton(
+            text: 'Directions',
+            borderColor: const Color(0XFF0EA5E9),
+            icon: Icons.location_on_outlined,
+            onTap: onDirectionsTap,
+            textSize: 14.sp,
+            textColor: const Color(0XFF0EA5E9),
           ),
+
+          // /// Buttons
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: BouncingSocialButton(
+          //         text: 'Directions',
+          //         borderColor: const Color(0XFF0EA5E9),
+          //         icon: Icons.location_on_outlined,
+          //         onTap: onDirectionsTap,
+          //         textSize: 14.sp,
+          //         textColor: const Color(0XFF0EA5E9),
+          //       ),
+          //     ),
+
+          //     SizedBox(width: 12.w),
+
+          //     /// View Plans
+          //     Expanded(
+          //       child: AppButton(
+          //         text: 'View Plans',
+          //         onPressed: () {},
+          //         radius: 14.r,
+          //         height: 48.h,
+          //         textSize: 14.sp,
+          //         textWeight: FontWeight.w600,
+          //         gradient: const LinearGradient(
+          //           begin: Alignment.topCenter,
+          //           end: Alignment.bottomCenter,
+          //           colors: [Color(0xff0EA5E9), Color(0xff0284C7)],
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );

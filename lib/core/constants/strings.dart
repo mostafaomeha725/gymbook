@@ -1,7 +1,8 @@
 class AppStrings {
-  static const String baseUrl = 'http://localhost:44000/api/';
+  static const String baseUrl = 'https://primefit.runasp.net/api/';
+
   static const String notificationHubUrl =
-      'http://localhost:44000/hubs/notifications';
+      'https://primefit.runasp.net/hubs/notifications';
   static const String googleServerClientId =
       '127516870517-pidtbq98rf0lbkldl0bb2enm1l52aq70.apps.googleusercontent.com';
   static const String androidApplicationId = 'com.example.gymbook';

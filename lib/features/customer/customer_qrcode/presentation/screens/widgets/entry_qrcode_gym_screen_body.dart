@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:gymbook/features/auth/presentation/widgets/gymbook_card.dart';
 import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
+import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_state.dart';
 import 'package:gymbook/features/customer/customer_qrcode/presentation/widgets/brightness_hint_card.dart';
 import 'package:gymbook/features/customer/customer_qrcode/presentation/widgets/qrcode_scanner.dart';
 

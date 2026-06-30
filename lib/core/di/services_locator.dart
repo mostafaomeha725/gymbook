@@ -139,6 +139,7 @@ import 'package:gymbook/features/notifications/domain/usecases/update_fcm_token_
 import 'package:gymbook/features/notifications/presentation/cubits/notifications_cubit/notifications_cubit.dart';
 import 'package:gymbook/features/notifications/domain/usecases/get_in_app_notifications_usecase.dart';
 import 'package:gymbook/features/notifications/domain/usecases/mark_notification_as_read_usecase.dart';
+import 'package:gymbook/features/notifications/domain/usecases/get_unread_notification_count_usecase.dart';
 import 'package:gymbook/core/services/signalr_service.dart';
 import 'package:gymbook/features/settings/data/datasources/profile_remote_datasource.dart';
 import 'package:gymbook/features/settings/data/repositories/profile_repository_impl.dart';
@@ -275,7 +276,9 @@ class ServiceLocator {
       sl.registerFactory(() => ResetPasswordCubit(sl()));
     }
     if (!sl.isRegistered<ChangePasswordCubit>()) {
-      sl.registerFactory(() => ChangePasswordCubit(changePasswordUseCase: sl()));
+      sl.registerFactory(
+        () => ChangePasswordCubit(changePasswordUseCase: sl()),
+      );
     }
     if (!sl.isRegistered<ConfirmEmailCubit>()) {
       sl.registerFactory(() => ConfirmEmailCubit(sl()));
@@ -542,7 +545,9 @@ class ServiceLocator {
       sl.registerFactory(() => RolesCubit(getRolesUseCase: sl()));
     }
     if (!sl.isRegistered<BranchEmployeesCubit>()) {
-      sl.registerFactory(() => BranchEmployeesCubit(getBranchEmployeesUseCase: sl()));
+      sl.registerFactory(
+        () => BranchEmployeesCubit(getBranchEmployeesUseCase: sl()),
+      );
     }
     if (!sl.isRegistered<AddEditEmployeeCubit>()) {
       sl.registerFactory(
@@ -729,6 +734,10 @@ class ServiceLocator {
       sl.registerLazySingleton(() => MarkNotificationAsReadUseCase(sl()));
     }
 
+    if (!sl.isRegistered<GetUnreadNotificationCountUseCase>()) {
+      sl.registerLazySingleton(() => GetUnreadNotificationCountUseCase(sl()));
+    }
+
     if (!sl.isRegistered<NotificationsCubit>()) {
       sl.registerLazySingleton(
         () => NotificationsCubit(
@@ -737,6 +746,7 @@ class ServiceLocator {
           signalRService: sl(),
           getInAppNotificationsUseCase: sl(),
           markNotificationAsReadUseCase: sl(),
+          getUnreadNotificationCountUseCase: sl(),
         ),
       );
     }

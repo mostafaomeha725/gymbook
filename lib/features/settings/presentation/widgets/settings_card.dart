@@ -109,6 +109,10 @@ class SettingsCard extends StatelessWidget {
               showLoading();
 
               await sl<LogoutUseCase>()();
+
+              // Clear notifications cache so a new user won't see old data
+              sl<NotificationsCubit>().resetState();
+
               hideLoading();
 
               if (context.mounted) {

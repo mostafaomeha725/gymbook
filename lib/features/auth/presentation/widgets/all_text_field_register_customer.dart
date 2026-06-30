@@ -3,15 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
-import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/theme/light_colors.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/core/utils/validators.dart';
-import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
-import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/register_screen.dart';
 import 'package:gymbook/features/auth/presentation/cubits/register_cubit/register_cubit.dart';
+import 'package:gymbook/features/auth/presentation/utils/auth_validator.dart';
+import 'package:gymbook/features/auth/presentation/widgets/labeled_auth_field.dart';
 import 'package:gymbook/features/auth/presentation/widgets/password_condition_widget.dart';
 
 class AllTextFieldRegisterCustomer extends StatefulWidget {
@@ -29,8 +28,6 @@ class AllTextFieldRegisterCustomer extends StatefulWidget {
 
 class _AllTextFieldRegisterCustomerState
     extends State<AllTextFieldRegisterCustomer> {
-  final _formKey = GlobalKey<FormState>();
-
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -38,15 +35,6 @@ class _AllTextFieldRegisterCustomerState
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
-
-  bool obscurePassword = true;
-  bool obscureConfirmPassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-    passwordController.addListener(() => setState(() {}));
-  }
 
   @override
   void dispose() {
@@ -59,214 +47,127 @@ class _AllTextFieldRegisterCustomerState
     super.dispose();
   }
 
+  void _submitRegistration(BuildContext context) {
+    final firstName = firstNameController.text.trim();
+    final lastName = lastNameController.text.trim();
+    final email = emailController.text.trim();
+    final phone = phoneController.text.trim();
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
+
+    final isValid = AuthValidator.validateRegister(
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: phone,
+      password: password,
+      confirmPassword: confirmPassword,
+    );
+
+    if (isValid) {
+      context.read<RegisterCubit>().register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        phoneNumber: phone,
+        isOwner: widget.type == RegisterType.business,
+      );
+    }
+  }
+
+  void _onRegisterSuccess(BuildContext context, RegisterSuccess state) {
+    hideLoading();
+    showSuccess('Account created successfully!');
+    if (!state.user.emailConfirmed) {
+      GoRouter.of(context).push(
+        Routes.otpScreen,
+        extra: OtpScreenArgs(
+          source: widget.type == RegisterType.customer
+              ? OtpSource.customer
+              : OtpSource.business,
+          purpose: OtpPurpose.confirmEmail,
+          email: emailController.text.trim(),
+        ),
+      );
+    } else {
+      GoRouter.of(context).go(Routes.loginScreen);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<RegisterCubit, RegisterState>(
       listener: (context, state) {
         if (state is RegisterSuccess) {
-          hideLoading();
-          showSuccess('Account created successfully!');
-          if (!state.user.emailConfirmed) {
-            GoRouter.of(context).push(
-              Routes.otpScreen,
-              extra: OtpScreenArgs(
-                source: widget.type == RegisterType.customer
-                    ? OtpSource.customer
-                    : OtpSource.business,
-                purpose: OtpPurpose.confirmEmail,
-                email: emailController.text.trim(),
-              ),
-            );
-          } else {
-            GoRouter.of(context).go(Routes.loginScreen);
-          }
+          _onRegisterSuccess(context, state);
         }
       },
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 52.h),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppText(
-                'First Name',
-                style: font14w500.copyWith(color: const Color(0xff364153)),
-              ),
-              SizedBox(height: 8.h),
-              AppFormField(
-                controller: firstNameController,
-                hintText: 'Enter your first name',
-                maxLines: 1,
-                prefixIcon: Padding(
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: Icon(Icons.person_outline, size: 22.sp),
-                ),
-                radius: 22.r,
-                validator: (v) =>
-                    Validators.requiredField(v, fieldLabel: 'your first name'),
-              ),
-
-              SizedBox(height: 16.h),
-
-              AppText(
-                'Last Name',
-                style: font14w500.copyWith(color: const Color(0xff364153)),
-              ),
-              SizedBox(height: 8.h),
-              AppFormField(
-                controller: lastNameController,
-                hintText: 'Enter your last name',
-                maxLines: 1,
-                prefixIcon: Padding(
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: Icon(Icons.person_outline, size: 22.sp),
-                ),
-                radius: 22.r,
-                validator: (v) =>
-                    Validators.requiredField(v, fieldLabel: 'your last name'),
-              ),
-
-              SizedBox(height: 16.h),
-
-              AppText(
-                'Email',
-                style: font14w500.copyWith(color: const Color(0xff364153)),
-              ),
-              SizedBox(height: 8.h),
-              AppFormField(
-                controller: emailController,
-                hintText: 'Enter your email',
-                maxLines: 1,
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: Padding(
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: Icon(Icons.email_outlined, size: 22.sp),
-                ),
-                radius: 22.r,
-                validator: (v) => Validators.email(v),
-              ),
-
-              SizedBox(height: 16.h),
-
-              AppText(
-                'Phone Number',
-                style: font14w500.copyWith(color: const Color(0xff364153)),
-              ),
-              SizedBox(height: 8.h),
-              AppFormField(
-                controller: phoneController,
-                hintText: '+20 XXX XXX XXX',
-                maxLines: 1,
-                keyboardType: TextInputType.phone,
-                prefixIcon: Padding(
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: Icon(Icons.phone_outlined, size: 22.sp),
-                ),
-                radius: 22.r,
-                validator: (v) => Validators.requiredField(
-                  v,
-                  fieldLabel: 'your phone number',
-                ),
-              ),
-
-              SizedBox(height: 16.h),
-
-              AppText(
-                'Password',
-                style: font14w500.copyWith(color: const Color(0xff364153)),
-              ),
-              SizedBox(height: 8.h),
-              AppFormField(
-                controller: passwordController,
-                hintText: 'Create a password',
-                maxLines: 1,
-                obsecureText: obscurePassword,
-                prefixIcon: Padding(
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: Icon(Icons.lock_outline, size: 22.sp),
-                ),
-                radius: 22.r,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    obscurePassword
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                  ),
-                  onPressed: () =>
-                      setState(() => obscurePassword = !obscurePassword),
-                ),
-                validator: (v) => Validators.password(
-                  v,
-                  emptyMessage: 'Please enter a password',
-                ),
-              ),
-
-              SizedBox(height: 8.h),
-
-              PasswordConditionsWidget(password: passwordController.text),
-
-              SizedBox(height: 16.h),
-
-              AppText(
-                'Confirm Password',
-                style: font14w500.copyWith(color: const Color(0xff364153)),
-              ),
-              SizedBox(height: 8.h),
-              AppFormField(
-                controller: confirmPasswordController,
-                hintText: 'Confirm your password',
-                maxLines: 1,
-                obsecureText: obscureConfirmPassword,
-                prefixIcon: Padding(
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: Icon(Icons.lock_outline, size: 22.sp),
-                ),
-                radius: 22.r,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    obscureConfirmPassword
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                  ),
-                  onPressed: () => setState(
-                    () => obscureConfirmPassword = !obscureConfirmPassword,
-                  ),
-                ),
-                validator: (v) => Validators.confirmPassword(
-                  v,
-                  originalPassword: passwordController.text,
-                ),
-              ),
-
-              SizedBox(height: 24.h),
-
-              AppButton(
-                text: 'Continue',
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    context.read<RegisterCubit>().register(
-                      firstName: firstNameController.text.trim(),
-                      lastName: lastNameController.text.trim(),
-                      email: emailController.text.trim(),
-                      password: passwordController.text,
-                      confirmPassword: confirmPasswordController.text,
-                      phoneNumber: phoneController.text.trim(),
-                      isOwner: widget.type == RegisterType.business,
-                    );
-                  }
-                },
-                textSize: 16.sp,
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF0EA5E9), Color(0xFF0284C7)],
-                ),
-              ),
-
-              SizedBox(height: 24.h),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            LabeledAuthField(
+              label: 'First Name',
+              hintText: 'Enter your first name',
+              controller: firstNameController,
+              prefixIcon: Icons.person_outline,
+            ),
+            LabeledAuthField(
+              label: 'Last Name',
+              hintText: 'Enter your last name',
+              controller: lastNameController,
+              prefixIcon: Icons.person_outline,
+            ),
+            LabeledAuthField(
+              label: 'Email',
+              hintText: 'Enter your email',
+              controller: emailController,
+              prefixIcon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+            ),
+            LabeledAuthField(
+              label: 'Phone Number',
+              hintText: '+20 XXX XXX XXX',
+              controller: phoneController,
+              prefixIcon: Icons.phone_outlined,
+              keyboardType: TextInputType.phone,
+            ),
+            LabeledAuthField(
+              label: 'Password',
+              hintText: 'Create a password',
+              controller: passwordController,
+              prefixIcon: Icons.lock_outline,
+              isPassword: true,
+              hasBottomSpacing: false,
+            ),
+            SizedBox(height: 8.h),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: passwordController,
+              builder: (context, value, child) {
+                return PasswordConditionsWidget(password: value.text);
+              },
+            ),
+            SizedBox(height: 16.h),
+            LabeledAuthField(
+              label: 'Confirm Password',
+              hintText: 'Confirm your password',
+              controller: confirmPasswordController,
+              prefixIcon: Icons.lock_outline,
+              isPassword: true,
+              hasBottomSpacing: false,
+            ),
+            SizedBox(height: 24.h),
+            AppButton(
+              text: 'Continue',
+              onPressed: () => _submitRegistration(context),
+              textSize: 16.sp,
+              gradient: AppLightColors.buttonGradient,
+            ),
+            SizedBox(height: 24.h),
+          ],
         ),
       ),
     );

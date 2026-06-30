@@ -10,7 +10,6 @@ import 'package:gymbook/features/admin/admin_home/data/models/package_model.dart
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/create_package_cubit/create_package_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_buttom.dart';
-import 'package:gymbook/features/admin/admin_home/presentation/widgets/manage_package_status.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/package_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
@@ -74,13 +73,12 @@ class ManagePackageScreenBody extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
 
-                  ManagePackageStatus(
-                    totalCount: success?.meta.totalPackageCount ?? 0,
-                    activeCount: success?.meta.activePackagesCount ?? 0,
-                    averagePrice: success?.meta.averagePrice ?? 0.0,
-                  ),
-                  SizedBox(height: 24.h),
-
+                  // ManagePackageStatus(
+                  //   totalCount: success?.meta.totalPackageCount ?? 0,
+                  //   activeCount: success?.meta.activePackagesCount ?? 0,
+                  //   averagePrice: success?.meta.averagePrice ?? 0.0,
+                  // ),
+                  // SizedBox(height: 24.h),
                   BranchButtom(
                     text: 'Add New Package',
                     icon: Icons.add,

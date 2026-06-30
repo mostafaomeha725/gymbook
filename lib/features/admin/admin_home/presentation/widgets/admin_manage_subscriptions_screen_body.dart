@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
+import 'package:gymbook/core/services/notification_refresh_service.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_search.dart';
@@ -40,6 +42,7 @@ class _AdminManageSubscriptionsScreenBodyState
   int _currentPage = 1;
 
   late final BranchSubscriptionsListCubit _cubit;
+  StreamSubscription<int>? _refreshSubscription;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -67,10 +70,16 @@ class _AdminManageSubscriptionsScreenBodyState
     super.initState();
     _cubit = sl<BranchSubscriptionsListCubit>();
     _load(refresh: true);
+
+    // Auto-refresh on SubscriptionUpdate (type 2) notification
+    _refreshSubscription = NotificationRefreshService().stream.listen((type) {
+      if (type == 2) _load(refresh: true);
+    });
   }
 
   @override
   void dispose() {
+    _refreshSubscription?.cancel();
     _searchController.dispose();
     _cubit.close();
     super.dispose();

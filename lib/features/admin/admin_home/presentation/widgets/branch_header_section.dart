@@ -9,6 +9,7 @@ import 'package:gymbook/features/admin/admin_home/domain/repositories/branch_rep
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_details_cubit/branch_details_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_header_section_content.dart';
+import 'package:gymbook/features/admin/admin_home/domain/entities/governorate_entity.dart';
 
 part 'branch_header_section_actions.dart';
 
@@ -42,7 +43,14 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
   Widget build(BuildContext context) {
     final branch = widget.branch;
 
-    return BlocBuilder<BranchDetailsCubit, BranchDetailsState>(
+    return BlocConsumer<BranchDetailsCubit, BranchDetailsState>(
+      listener: (context, state) {
+        if (state is BranchDetailsSuccess) {
+          setState(() {
+            isActive = state.response.branchStatus == 1;
+          });
+        }
+      },
       builder: (context, detailsState) {
         final detailsImages = detailsState is BranchDetailsSuccess
             ? detailsState.response.images
@@ -78,8 +86,43 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
                 ? galleryUrls[selectedIndex]
                 : coverUrl;
 
+            final setupName = setupState.details?.businessDetails.name;
+            final detailsName = detailsState is BranchDetailsSuccess ? detailsState.response.name : null;
+            final String? updatedName = setupName ?? detailsName ?? branch.name;
+
+            final int? setupType = setupState.details?.businessDetails.branchType;
+            final int? detailsType = detailsState is BranchDetailsSuccess ? detailsState.response.branchType : null;
+            final int updatedType = setupType ?? detailsType ?? branch.branchType;
+
+            final int? detailsStatus = detailsState is BranchDetailsSuccess ? detailsState.response.branchStatus : null;
+            final int updatedStatus = detailsStatus ?? branch.branchStatus;
+
+            final setupGov = setupState.details?.location.governorate;
+            final detailsGov = detailsState is BranchDetailsSuccess ? detailsState.response.governorate : null;
+            final updatedGov = setupGov != null 
+                ? GovernorateEntity(id: setupGov.id, name: setupGov.name) 
+                : detailsGov ?? branch.governorate;
+
+            final updatedAddress = setupState.details?.location.address ?? (detailsState is BranchDetailsSuccess ? detailsState.response.address : branch.address);
+
+            final updatedBranch = BranchEntity(
+              id: branch.id,
+              name: updatedName,
+              email: setupState.details?.businessDetails.email ?? branch.email,
+              phoneNumber: setupState.details?.businessDetails.phoneNumber ?? branch.phoneNumber,
+              governorate: updatedGov,
+              address: updatedAddress,
+              latitude: setupState.details?.location.coordinates.latitude ?? branch.latitude,
+              longitude: setupState.details?.location.coordinates.longitude ?? branch.longitude,
+              branchType: updatedType,
+              branchStatus: updatedStatus,
+              logoImageId: branch.logoImageId,
+              logo: branch.logo,
+              subscriptionsCount: branch.subscriptionsCount,
+            );
+
             return BranchHeaderSectionContent(
-              branch: branch,
+              branch: updatedBranch,
               displayedCoverUrl: displayedCoverUrl,
               avatarUrl: avatarUrl,
               isActive: isActive,

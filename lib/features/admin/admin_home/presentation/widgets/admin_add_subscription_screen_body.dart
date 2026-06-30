@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/add_member_cubit/add_member_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/add_subscription_cubit/add_subscription_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
@@ -115,24 +116,60 @@ class _AdminAddSubscriptionScreenBodyState
                       setState(() => _selectedPackageIndex = index),
                 ),
 
-                // ── Submit button ────────────────────────────────────────
                 SubscriptionSubmitSection(
                   selectedPackageIndex: _selectedPackageIndex,
                   userTypeIndex: _userTypeIndex,
                   onSubmit: (pkg) => () {
+                    if (pkg == null) {
+                      showError('Please select a package');
+                      return;
+                    }
+
                     if (_userTypeIndex == 0) {
+                      if (_firstNameController.text.trim().isEmpty) {
+                        showError('Please enter first name');
+                        return;
+                      }
+                      if (_lastNameController.text.trim().isEmpty) {
+                        showError('Please enter last name');
+                        return;
+                      }
+                      if (_phoneController.text.trim().isEmpty) {
+                        showError('Please enter phone number');
+                        return;
+                      }
+                      final email = _newUserEmailController.text.trim();
+                      if (email.isEmpty) {
+                        showError('Please enter email address');
+                        return;
+                      }
+                      if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email)) {
+                        showError('Please enter a valid email address');
+                        return;
+                      }
+
                       context.read<AddMemberCubit>().addMember(
                         branchId: widget.branchId,
-                        firstName: _firstNameController.text,
-                        lastName: _lastNameController.text,
-                        phoneNumber: _phoneController.text,
-                        email: _newUserEmailController.text,
+                        firstName: _firstNameController.text.trim(),
+                        lastName: _lastNameController.text.trim(),
+                        phoneNumber: _phoneController.text.trim(),
+                        email: email,
                         packageId: pkg.id,
                       );
                     } else {
+                      final email = _emailController.text.trim();
+                      if (email.isEmpty) {
+                        showError('Please enter email address');
+                        return;
+                      }
+                      if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email)) {
+                        showError('Please enter a valid email address');
+                        return;
+                      }
+
                       context.read<AddSubscriptionCubit>().addSubscription(
                         branchId: widget.branchId,
-                        email: _emailController.text,
+                        email: email,
                         packageId: pkg.id,
                       );
                     }

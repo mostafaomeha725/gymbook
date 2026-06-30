@@ -1,5 +1,3 @@
-part of 'entry_qrcode_cubit.dart';
-
 class EntryQrcodeState {
   final int? userId;
   final String code;
