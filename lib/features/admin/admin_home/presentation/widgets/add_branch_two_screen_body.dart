@@ -5,8 +5,8 @@ import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_list_model.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/governorates_cubit/governorates_cubit.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/all_text_field_add_branch_two.dart';
-import 'package:gymbook/core/widgets/custom_snack_bar.dart';
 import 'package:gymbook/features/auth/presentation/widgets/appbar_auth_card.dart';
 
 class AddBranchTwoScreenBody extends StatelessWidget {
@@ -26,7 +26,7 @@ class AddBranchTwoScreenBody extends StatelessWidget {
             previous.errorMessage != current.errorMessage,
         listener: (context, state) {
           if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
-            CustomSnackBar.showError(context, message: state.errorMessage!);
+            showError(state.errorMessage!);
           }
         },
         builder: (context, setupState) {

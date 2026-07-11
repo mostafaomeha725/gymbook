@@ -25,7 +25,9 @@ class _AttendanceHistoryCardState extends State<AttendanceHistoryCard> {
 
   List<int> _yearOptions() {
     final now = DateTime.now().year;
-    return List<int>.generate(8, (index) => now - 5 + index);
+    const startYear = 2026;
+    final count = (now - startYear + 1).clamp(1, 50);
+    return List<int>.generate(count, (index) => startYear + index);
   }
 
   void _reloadHistory() {

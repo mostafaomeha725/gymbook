@@ -11,7 +11,7 @@ class GetBranchReviewsUseCase {
   Future<Either<Failure, BranchReviewsEntity>> call({
     required int branchId,
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     double? rating,
   }) {
     return repository.getBranchReviews(

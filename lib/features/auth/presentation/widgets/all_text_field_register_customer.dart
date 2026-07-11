@@ -51,7 +51,10 @@ class _AllTextFieldRegisterCustomerState
     final firstName = firstNameController.text.trim();
     final lastName = lastNameController.text.trim();
     final email = emailController.text.trim();
-    final phone = phoneController.text.trim();
+    String phone = phoneController.text.trim();
+    if (phone.isNotEmpty && !phone.startsWith('+')) {
+      phone = '+20$phone';
+    }
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
@@ -132,7 +135,14 @@ class _AllTextFieldRegisterCustomerState
               label: 'Phone Number',
               hintText: '+20 XXX XXX XXX',
               controller: phoneController,
-              prefixIcon: Icons.phone_outlined,
+              prefixWidget: Padding(
+                padding: EdgeInsets.only(left: 12.w, right: 8.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Text('🇪🇬', style: TextStyle(fontSize: 16.sp))],
+                ),
+              ),
               keyboardType: TextInputType.phone,
             ),
             LabeledAuthField(
@@ -141,16 +151,8 @@ class _AllTextFieldRegisterCustomerState
               controller: passwordController,
               prefixIcon: Icons.lock_outline,
               isPassword: true,
-              hasBottomSpacing: false,
+              hasBottomSpacing: true,
             ),
-            SizedBox(height: 8.h),
-            ValueListenableBuilder<TextEditingValue>(
-              valueListenable: passwordController,
-              builder: (context, value, child) {
-                return PasswordConditionsWidget(password: value.text);
-              },
-            ),
-            SizedBox(height: 16.h),
             LabeledAuthField(
               label: 'Confirm Password',
               hintText: 'Confirm your password',
@@ -158,6 +160,19 @@ class _AllTextFieldRegisterCustomerState
               prefixIcon: Icons.lock_outline,
               isPassword: true,
               hasBottomSpacing: false,
+            ),
+            SizedBox(height: 8.h),
+            AnimatedBuilder(
+              animation: Listenable.merge([
+                passwordController,
+                confirmPasswordController,
+              ]),
+              builder: (context, child) {
+                return PasswordConditionsWidget(
+                  password: passwordController.text,
+                  confirmPassword: confirmPasswordController.text,
+                );
+              },
             ),
             SizedBox(height: 24.h),
             AppButton(

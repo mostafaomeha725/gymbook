@@ -116,34 +116,47 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
         SizedBox(height: 24.h),
 
         // Password Conditions Widget
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF0F9FF),
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: const Color(0xFFE0F2FE)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        AnimatedBuilder(
+          animation: Listenable.merge([
+            newPasswordController,
+            confirmPasswordController,
+          ]),
+          builder: (context, child) {
+            return Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0F9FF),
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: const Color(0xFFE0F2FE)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.verified_user,
-                    color: const Color(0xFF0EA5E9),
-                    size: 18.sp,
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.verified_user,
+                        color: const Color(0xFF0EA5E9),
+                        size: 18.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      AppText(
+                        'Password must contain:',
+                        style: font14w700.copyWith(
+                          color: const Color(0xFF0EA5E9),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 8.w),
-                  AppText(
-                    'Password must contain:',
-                    style: font14w700.copyWith(color: const Color(0xFF0EA5E9)),
+                  SizedBox(height: 12.h),
+                  PasswordConditionsWidget(
+                    password: newPasswordController.text,
+                    confirmPassword: confirmPasswordController.text,
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
-              PasswordConditionsWidget(password: newPasswordController.text),
-            ],
-          ),
+            );
+          },
         ),
         SizedBox(height: 32.h),
 

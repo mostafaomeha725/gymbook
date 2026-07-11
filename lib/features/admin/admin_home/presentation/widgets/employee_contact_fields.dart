@@ -26,7 +26,6 @@ class EmployeeContactFields extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             prefixIcon: const Icon(Icons.email_outlined, size: 20),
             validator: (val) {
-              if (val == null || val.isEmpty) return 'Required';
               return null;
             },
           ),
@@ -38,9 +37,15 @@ class EmployeeContactFields extends StatelessWidget {
             controller: phoneController,
             hintText: '010-XXXX-XXXX',
             keyboardType: TextInputType.phone,
-            prefixIcon: const Icon(Icons.phone_outlined, size: 20),
+            prefixIcon: Padding(
+              padding: EdgeInsets.only(left: 12.w, right: 8.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Text('🇪🇬', style: TextStyle(fontSize: 16.sp))],
+              ),
+            ),
             validator: (val) {
-              if (val == null || val.isEmpty) return 'Required';
               return null;
             },
           ),

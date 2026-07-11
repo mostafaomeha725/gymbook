@@ -11,6 +11,7 @@ class EmployeeCard extends StatelessWidget {
   final String initials;
   final bool? status;
   final VoidCallback? onEdit;
+  final ValueChanged<bool>? onToggleStatus;
 
   const EmployeeCard({
     super.key,
@@ -20,6 +21,7 @@ class EmployeeCard extends StatelessWidget {
     required this.initials,
     this.status,
     this.onEdit,
+    this.onToggleStatus,
   });
 
   @override
@@ -76,6 +78,7 @@ class EmployeeCard extends StatelessWidget {
                   onEdit: onEdit,
                   hasStatus: status != null,
                   isActive: isActive,
+                  onToggleStatus: onToggleStatus,
                 ),
               ],
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
-import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -116,7 +115,7 @@ class QrcodeScanner extends StatelessWidget {
             ],
           ),
 
-          // SizedBox(height: 12.h),
+          SizedBox(height: 12.h),
 
           // AppText(
           //   'User ID: ${userId ?? '--'}',
@@ -129,18 +128,18 @@ class QrcodeScanner extends StatelessWidget {
           //   style: font14w500.copyWith(color: const Color(0xff334155)),
           //   alignment: AlignmentDirectional.center,
           // ),
-          SizedBox(height: 30.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 42.w),
-            child: BouncingSocialButton(
-              text: 'Refresh Code',
-              borderColor: const Color(0XFF0EA5E9),
-              icon: Icons.refresh,
-              onTap: onRefreshTap,
-              textSize: 14.sp,
-              textColor: const Color(0XFF0EA5E9),
-            ),
-          ),
+          // SizedBox(height: 30.h),
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 42.w),
+          //   child: BouncingSocialButton(
+          //     text: 'Refresh Code',
+          //     borderColor: const Color(0XFF0EA5E9),
+          //     icon: Icons.refresh,
+          //     onTap: onRefreshTap,
+          //     textSize: 14.sp,
+          //     textColor: const Color(0XFF0EA5E9),
+          //   ),
+          // ),
         ],
       ),
     );

@@ -15,10 +15,10 @@ class SubscriptionPlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 220.w,
-      padding: EdgeInsets.all(16.w),
+      width: 240.w,
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(24.r),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -26,8 +26,8 @@ class SubscriptionPlanCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 12,
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
@@ -36,9 +36,13 @@ class SubscriptionPlanCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// Title
-          AppText(plan.title, style: font18w700.copyWith(color: Colors.white)),
+          AppText(
+            plan.title,
+            style: font18w700.copyWith(color: Colors.white, height: 1.2),
+            maxLines: 2,
+          ),
 
-          SizedBox(height: 12.h),
+          SizedBox(height: 16.h),
 
           /// Price
           Row(
@@ -50,15 +54,34 @@ class SubscriptionPlanCard extends StatelessWidget {
               ),
             ],
           ),
-
           SizedBox(height: 4.h),
+          AppText(
+            plan.duration,
+            style: font14w400.copyWith(
+              color: Colors.white.withValues(alpha: 0.9),
+            ),
+          ),
 
-          /// Duration
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w),
-            child: AppText(
-              plan.duration,
-              style: font14w400.copyWith(color: Colors.white.withOpacity(0.9)),
+          SizedBox(height: 16.h),
+
+          /// Freeze Info
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.ac_unit_rounded, color: Colors.white, size: 18.sp),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: AppText(
+                    '${plan.numberOfFreezes} Freezes (${plan.freezeDurationInDays} Days)',
+                    style: font12w500.copyWith(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -83,11 +106,15 @@ class PlanModel {
   final String title;
   final double price;
   final String duration;
+  final int numberOfFreezes;
+  final int freezeDurationInDays;
 
   const PlanModel({
     required this.id,
     required this.title,
     required this.price,
     required this.duration,
+    this.numberOfFreezes = 0,
+    this.freezeDurationInDays = 0,
   });
 }

@@ -21,6 +21,42 @@ class TimePickerField extends StatefulWidget {
 }
 
 class _TimePickerFieldState extends State<TimePickerField> {
+  late TextEditingController _displayController;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayController = TextEditingController(
+      text: _formatToDisplayTime(widget.controller.text),
+    );
+    widget.controller.addListener(_onSourceControllerChanged);
+  }
+
+  void _onSourceControllerChanged() {
+    final newText = _formatToDisplayTime(widget.controller.text);
+    if (_displayController.text != newText) {
+      _displayController.text = newText;
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onSourceControllerChanged);
+    _displayController.dispose();
+    super.dispose();
+  }
+
+  String _formatToDisplayTime(String apiTime) {
+    if (apiTime.trim().isEmpty) return '';
+    final parts = apiTime.split(':');
+    if (parts.length < 2) return apiTime;
+    final h = int.tryParse(parts[0]);
+    if (h == null) return apiTime;
+    final isPM = h >= 12;
+    final h12 = h == 0 ? 12 : (h > 12 ? h - 12 : h);
+    return '${h12.toString().padLeft(2, '0')}:${parts[1].padLeft(2, '0')} ${isPM ? 'PM' : 'AM'}';
+  }
+
   TimeOfDay _parseControllerTime(String value) {
     final parts = value.split(':');
     if (parts.length < 2) {
@@ -74,7 +110,7 @@ class _TimePickerFieldState extends State<TimePickerField> {
         ),
         SizedBox(height: 4.h),
         AppFormField(
-          controller: widget.controller,
+          controller: _displayController,
           hintText: 'Select time',
           readOnly: true,
           onTap: _selectTime,

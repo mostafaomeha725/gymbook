@@ -11,7 +11,7 @@ class BranchesListCubit extends Cubit<BranchesListState> {
   final GetBranchesUseCase getBranchesUseCase;
 
   int _currentPage = 1;
-  static const int _pageSize = 3;
+  static const int _pageSize = 5;
   String? _currentSearch;
 
   StreamSubscription? _branchesSubscription;
@@ -50,20 +50,18 @@ class BranchesListCubit extends Cubit<BranchesListState> {
       emit(BranchesListLoading());
     }
 
-    _branchesSubscription = getBranchesUseCase(
-      pageNumber: _currentPage,
-      pageSize: _pageSize,
-      search: _currentSearch,
-    ).listen((result) {
-      result.fold(
-        (failure) {
-          if (state is! BranchesListSuccess) {
-            emit(BranchesListFailure(failure.message));
-          }
-        },
-        (entity) => emit(BranchesListSuccess(entity)),
-      );
-    });
+    _branchesSubscription =
+        getBranchesUseCase(
+          pageNumber: _currentPage,
+          pageSize: _pageSize,
+          search: _currentSearch,
+        ).listen((result) {
+          result.fold((failure) {
+            if (state is! BranchesListSuccess) {
+              emit(BranchesListFailure(failure.message));
+            }
+          }, (entity) => emit(BranchesListSuccess(entity)));
+        });
   }
 
   @override

@@ -73,6 +73,12 @@ class Validators {
     return RegExp(r'^\+[1-9]\d{8,14}$').hasMatch(value);
   }
 
+  /// Validates Egyptian phone number (without country code)
+  /// Must be 11 digits starting with 010, 011, 012, or 015
+  static bool isValidEgyptianPhoneNumber(String value) {
+    return RegExp(r'^(010|011|012|015)[0-9]{8}$').hasMatch(value);
+  }
+
   static bool isValidEmail(String email) {
     return RegExp(
       r'^[a-zA-Z]\w*([_.-]\w*)?@[a-zA-Z\d]+([.-][a-zA-Z\d]+)*\.[a-zA-Z]{2,}$',

@@ -8,7 +8,9 @@ class GetPaymentTransactionStatusUseCase {
 
   GetPaymentTransactionStatusUseCase(this.repository);
 
-  Future<Either<Failure, PaymentTransactionStatusEntity>> call(int transactionId) {
+  Future<Either<Failure, PaymentTransactionStatusEntity>> call(
+    int transactionId,
+  ) {
     return repository.getPaymentTransactionStatus(transactionId);
   }
 }

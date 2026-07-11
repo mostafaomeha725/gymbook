@@ -33,13 +33,13 @@ class SettingsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SettingsItem(
-            icon: Icons.language,
-            title: "Language",
-            subtitle: "English",
-            showArrow: true,
-          ),
-          _Divider(),
+          // const SettingsItem(
+          //   icon: Icons.language,
+          //   title: "Language",
+          //   subtitle: "English",
+          //   showArrow: true,
+          // ),
+          // _Divider(),
           BlocConsumer<NotificationsCubit, NotificationsState>(
             listener: (context, state) {
               if (state is NotificationsToggling ||

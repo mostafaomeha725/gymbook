@@ -89,7 +89,8 @@ class PackageRepositoryImpl implements PackageRepository {
     required int pageNumber,
     required int pageSize,
   }) async* {
-    final String cacheKey = 'branch_packages_${branchId}_page_${pageNumber}_size_$pageSize';
+    final String cacheKey =
+        'branch_packages_${branchId}_page_${pageNumber}_size_$pageSize';
     bool emittedCache = false;
 
     // 1. Emit Cache if valid
@@ -119,7 +120,9 @@ class PackageRepositoryImpl implements PackageRepository {
       // Retrieve current cache to compare
       bool shouldUpdateCacheAndEmit = true;
       if (emittedCache) {
-        final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+        final currentCachedJson = Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).get(cacheKey);
         if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
           try {
             final wrapper = jsonDecode(currentCachedJson);
@@ -136,7 +139,9 @@ class PackageRepositoryImpl implements PackageRepository {
           'timestamp': DateTime.now().millisecondsSinceEpoch,
           'data': remoteModel.toJson(),
         };
-        await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+        await Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).put(cacheKey, jsonEncode(newCacheWrapper));
         yield Right(_mapPackagesList(remoteModel));
       }
     } catch (e) {

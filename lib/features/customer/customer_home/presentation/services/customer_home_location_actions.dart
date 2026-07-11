@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,6 +17,8 @@ class CustomerHomeLocationActions {
     required ValueChanged<SavedLocation> onSelectSaved,
     required VoidCallback onUseCurrentLocation,
     required VoidCallback onChooseFromMap,
+    VoidCallback? onClearLocation,
+    ValueChanged<SavedLocation>? onDeleteLocation,
   }) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -39,6 +42,8 @@ class CustomerHomeLocationActions {
             Navigator.of(sheetContext).pop();
             onChooseFromMap();
           },
+          onClearLocation: onClearLocation,
+          onDeleteLocation: onDeleteLocation,
         );
       },
     );
@@ -58,9 +63,7 @@ class CustomerHomeLocationActions {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location service is disabled')),
-        );
+        showError('Location service is disabled');
         return;
       }
 
@@ -72,9 +75,7 @@ class CustomerHomeLocationActions {
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permission is required')),
-        );
+        showError('Location permission is required');
         return;
       }
 
@@ -92,9 +93,7 @@ class CustomerHomeLocationActions {
 
       if (position == null) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to get current location')),
-        );
+        showError('Unable to get current location');
         return;
       }
 

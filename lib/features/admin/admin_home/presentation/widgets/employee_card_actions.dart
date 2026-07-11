@@ -8,12 +8,14 @@ class EmployeeCardActions extends StatelessWidget {
   final VoidCallback? onEdit;
   final bool hasStatus;
   final bool isActive;
+  final ValueChanged<bool>? onToggleStatus;
 
   const EmployeeCardActions({
     super.key,
     this.onEdit,
     this.hasStatus = false,
     this.isActive = true,
+    this.onToggleStatus,
   });
 
   @override
@@ -71,7 +73,7 @@ class EmployeeCardActions extends StatelessWidget {
                 scale: 0.9,
                 child: OpenGymSwitch(
                   value: isActive,
-                  onChanged: (_) {},
+                  onChanged: onToggleStatus ?? (_) {},
                 ),
               ),
             ],

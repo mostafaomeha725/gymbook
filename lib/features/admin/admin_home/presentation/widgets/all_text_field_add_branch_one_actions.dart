@@ -3,10 +3,9 @@ part of 'all_text_field_add_branch_one.dart';
 extension _AllTextFieldAddBranchOneActions on _AllTextFieldAddBranchOneState {
   String get _branchNameHint => 'Enter branch name';
 
-  String get _phoneNumberHint => '+20 XXX XXX XXX';
+  String get _phoneNumberHint => '010XXXXXXXX';
 
   String get _emailHint => 'branch.email@example.com';
-
 
   GymType? get _existingGymType {
     final type = _existingBranchType;
@@ -110,17 +109,23 @@ extension _AllTextFieldAddBranchOneActions on _AllTextFieldAddBranchOneState {
     if (branch == null) return;
 
     _existingName = branch.name;
-    if (branch.name != null && branchNameController.text.isEmpty) {
+    if (branch.name != null) {
       branchNameController.text = branch.name!;
     }
 
     _existingPhoneNumber = branch.phoneNumber;
-    if (branch.phoneNumber != null && phoneNumberController.text.isEmpty) {
-      phoneNumberController.text = branch.phoneNumber!;
+    if (branch.phoneNumber != null) {
+      String displayPhone = branch.phoneNumber!;
+      if (displayPhone.startsWith('+20')) {
+        displayPhone = displayPhone.substring(
+          2,
+        ); // removes '+2', keeps '0...' → '010...'
+      }
+      phoneNumberController.text = displayPhone;
     }
 
     _existingEmail = branch.email;
-    if (branch.email != null && emailController.text.isEmpty) {
+    if (branch.email != null) {
       emailController.text = branch.email!;
     }
 
@@ -129,7 +134,7 @@ extension _AllTextFieldAddBranchOneActions on _AllTextFieldAddBranchOneState {
 
   void _applyExistingFromSetupDetails(BranchSetupDetailsEntity details) {
     _existingName = _pickBestText(_existingName, details.businessDetails.name);
-    if (_existingName != null && branchNameController.text.isEmpty) {
+    if (_existingName != null) {
       branchNameController.text = _existingName!;
     }
 
@@ -137,15 +142,21 @@ extension _AllTextFieldAddBranchOneActions on _AllTextFieldAddBranchOneState {
       _existingPhoneNumber,
       details.businessDetails.phoneNumber,
     );
-    if (_existingPhoneNumber != null && phoneNumberController.text.isEmpty) {
-      phoneNumberController.text = _existingPhoneNumber!;
+    if (_existingPhoneNumber != null) {
+      String displayPhone = _existingPhoneNumber!;
+      if (displayPhone.startsWith('+20')) {
+        displayPhone = displayPhone.substring(
+          2,
+        ); // removes '+2', keeps '0...' → '010...'
+      }
+      phoneNumberController.text = displayPhone;
     }
 
     _existingEmail = _pickBestText(
       _existingEmail,
       details.businessDetails.email,
     );
-    if (_existingEmail != null && emailController.text.isEmpty) {
+    if (_existingEmail != null) {
       emailController.text = _existingEmail!;
     }
 

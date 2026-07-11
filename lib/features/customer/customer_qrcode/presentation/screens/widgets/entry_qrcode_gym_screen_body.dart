@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 
 import 'package:gymbook/features/auth/presentation/widgets/gymbook_card.dart';
 import 'package:gymbook/features/customer/customer_qrcode/presentation/cubits/entry_qrcode_cubit/entry_qrcode_cubit.dart';
@@ -17,9 +18,7 @@ class EntryQrcodeGymScreenBody extends StatelessWidget {
       listener: (context, state) {
         if (state.errorMessage != null &&
             state.errorMessage!.trim().isNotEmpty) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+          showError(state.errorMessage!);
         }
       },
       builder: (context, state) {

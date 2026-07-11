@@ -13,6 +13,10 @@ class LoginUseCase {
     required String password,
     required int userType,
   }) {
-    return repository.login(email: email, password: password, userType: userType);
+    return repository.login(
+      email: email,
+      password: password,
+      userType: userType,
+    );
   }
 }

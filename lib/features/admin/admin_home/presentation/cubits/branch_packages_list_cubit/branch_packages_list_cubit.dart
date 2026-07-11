@@ -13,7 +13,7 @@ class BranchPackagesListCubit extends Cubit<BranchPackagesListState> {
   StreamSubscription? _subscription;
 
   int _currentPage = 1;
-  static const int _pageSize = 10;
+  static const int _pageSize = 5;
 
   Future<void> loadPackages({
     required int branchId,

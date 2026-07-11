@@ -32,9 +32,12 @@ class _CustomNavBarState extends State<CustomNavBar> {
     _navState = NavigationState();
     _initializeNavigation();
 
-    // Request permission and initialize notifications when the home screen is loaded for admin only
-    final roleService = sl<UserRoleService>();
-    if (roleService.getCurrentRole() == AppUserRole.owner) {
+    // For Customer role, initNotifications is handled by CustomerHomeScreenBody
+    // (it waits for the location permission sheet to dismiss first, then requests
+    // notification permission, so both dialogs never appear simultaneously).
+    // For all other roles (admin, gator, owner), init here immediately.
+    final role = sl<UserRoleService>().getCurrentRole();
+    if (role != AppUserRole.customer) {
       sl<NotificationsCubit>().initNotifications();
     }
   }

@@ -9,7 +9,7 @@ class UpdateProfileUseCase {
   Future<Either<Failure, ProfileModel>> call({
     required String firstName,
     required String lastName,
-    required String phoneNumber,
+    required String? phoneNumber,
   }) {
     return repository.updateProfile(
       firstName: firstName,

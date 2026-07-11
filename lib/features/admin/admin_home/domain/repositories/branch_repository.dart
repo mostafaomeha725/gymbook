@@ -46,7 +46,7 @@ abstract class BranchRepository {
 
   Stream<Either<Failure, BranchListEntity>> getBranches({
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     String? search,
   });
 
@@ -86,7 +86,7 @@ abstract class BranchRepository {
   Future<Either<Failure, BranchReviewsEntity>> getBranchReviews({
     required int branchId,
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     double? rating,
   });
 }

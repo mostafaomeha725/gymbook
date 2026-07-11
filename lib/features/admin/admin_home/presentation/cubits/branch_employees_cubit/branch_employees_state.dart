@@ -12,7 +12,7 @@ class BranchEmployeesInitial extends BranchEmployeesState {}
 
 class BranchEmployeesLoading extends BranchEmployeesState {
   final bool isPaginationLoading;
-  
+
   const BranchEmployeesLoading({this.isPaginationLoading = false});
 
   @override
@@ -35,4 +35,39 @@ class BranchEmployeesError extends BranchEmployeesState {
 
   @override
   List<Object> get props => [message];
+}
+
+class EmployeeStatusToggling extends BranchEmployeesState {
+  final int employeeId;
+
+  const EmployeeStatusToggling(this.employeeId);
+
+  @override
+  List<Object> get props => [employeeId];
+}
+
+class EmployeeStatusToggleSuccess extends BranchEmployeesState {
+  final int employeeId;
+  final bool newStatus;
+
+  const EmployeeStatusToggleSuccess({
+    required this.employeeId,
+    required this.newStatus,
+  });
+
+  @override
+  List<Object> get props => [employeeId, newStatus];
+}
+
+class EmployeeStatusToggleError extends BranchEmployeesState {
+  final String message;
+  final int employeeId;
+
+  const EmployeeStatusToggleError({
+    required this.message,
+    required this.employeeId,
+  });
+
+  @override
+  List<Object> get props => [message, employeeId];
 }

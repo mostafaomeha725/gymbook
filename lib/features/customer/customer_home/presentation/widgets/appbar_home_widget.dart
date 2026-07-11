@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'dart:async';
 import 'package:gymbook/core/widgets/custom_search.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 
@@ -24,9 +25,11 @@ class AppbarHomeWidget extends StatefulWidget {
 
 class _AppbarHomeWidgetState extends State<AppbarHomeWidget> {
   final TextEditingController searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     searchController.dispose();
     super.dispose();
   }
@@ -68,32 +71,42 @@ class _AppbarHomeWidgetState extends State<AppbarHomeWidget> {
                       SizedBox(height: 4.h),
                       InkWell(
                         onTap: widget.onLocationTap,
-                        borderRadius: BorderRadius.circular(8.r),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 2.h),
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 8.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.location_on_outlined,
+                                Icons.location_on,
                                 color: Colors.white,
-                                size: 16.sp,
+                                size: 20.sp,
                               ),
-                              SizedBox(width: 4.w),
+                              SizedBox(width: 6.w),
                               Flexible(
                                 child: AppText(
                                   widget.location,
-                                  maxLines: 3,
-                                  style: font14w500.copyWith(
-                                    // ignore: deprecated_member_use
-                                    color: Colors.white.withOpacity(0.9),
+                                  maxLines: 1,
+                                  style: font14w700.copyWith(
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 4.w),
+                              SizedBox(width: 6.w),
                               Icon(
                                 Icons.keyboard_arrow_down_rounded,
                                 color: Colors.white,
-                                size: 16.sp,
+                                size: 20.sp,
                               ),
                             ],
                           ),
@@ -105,12 +118,28 @@ class _AppbarHomeWidgetState extends State<AppbarHomeWidget> {
               ],
             ),
 
-            SizedBox(height: 24.h),
+            SizedBox(height: 20.h),
 
             CustomSearch(
               controller: searchController,
               hintText: "Find gyms near you...",
-              onChanged: widget.onSearchChanged,
+              onChanged: (value) {
+                final trimValue = value.trim();
+                if (trimValue.isNotEmpty && trimValue.length < 3) return;
+
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                _debounce = Timer(const Duration(milliseconds: 400), () {
+                  if (widget.onSearchChanged != null) {
+                    widget.onSearchChanged!(value);
+                  }
+                });
+              },
+              onSubmitted: (value) {
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                if (widget.onSearchChanged != null) {
+                  widget.onSearchChanged!(value);
+                }
+              },
             ),
 
             SizedBox(height: 24.h),

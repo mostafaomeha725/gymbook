@@ -25,7 +25,8 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   }
 
   @override
-  Future<Either<Failure, List<NotificationEntity>>> getInAppNotifications() async {
+  Future<Either<Failure, List<NotificationEntity>>>
+  getInAppNotifications() async {
     try {
       final models = await _remoteDataSource.getInAppNotifications();
       return Right(models.map((m) => m.toEntity()).toList());

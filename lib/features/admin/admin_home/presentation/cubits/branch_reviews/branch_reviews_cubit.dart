@@ -7,7 +7,8 @@ part 'branch_reviews_state.dart';
 class BranchReviewsCubit extends Cubit<BranchReviewsState> {
   final GetBranchReviewsUseCase _getBranchReviewsUseCase;
 
-  BranchReviewsCubit(this._getBranchReviewsUseCase) : super(BranchReviewsInitial());
+  BranchReviewsCubit(this._getBranchReviewsUseCase)
+    : super(BranchReviewsInitial());
 
   List<ReviewEntity> _allReviews = [];
   String _selectedRating = 'All';
@@ -34,7 +35,7 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
     final result = await _getBranchReviewsUseCase(
       branchId: branchId,
       pageNumber: _currentPage,
-      pageSize: 10,
+      pageSize: 5,
       rating: ratingFilter,
     );
 
@@ -48,21 +49,20 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
         } else {
           _allReviews.addAll(entity.data);
         }
-        
+
         _totalPages = entity.totalPages;
         _canReview = entity.canReview;
         _myReview = entity.myReview;
-        
-        final allItems = [
-          if (_myReview != null) _myReview!,
-          ..._allReviews
-        ];
+
+        final allItems = [if (_myReview != null) _myReview!, ..._allReviews];
 
         // The API already includes myReview in the total count
         _totalCount = entity.totalCount;
-        
+
         if (allItems.isNotEmpty) {
-           _averageRating = allItems.map((e) => e.rating).reduce((a, b) => a + b) / allItems.length;
+          _averageRating =
+              allItems.map((e) => e.rating).reduce((a, b) => a + b) /
+              allItems.length;
         } else {
           _averageRating = 0.0;
         }
@@ -79,7 +79,10 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
 
   void changePage(int page) {
     _currentPage = page;
-    loadReviews(_currentBranchId, isLoadMore: false); // According to UI, might need full reload on page change, not append
+    loadReviews(
+      _currentBranchId,
+      isLoadMore: false,
+    ); // According to UI, might need full reload on page change, not append
   }
 
   void _emitLoaded() {

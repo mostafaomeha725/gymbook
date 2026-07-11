@@ -38,6 +38,16 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
     await loadNearby();
   }
 
+  Future<void> clearLocation() async {
+    if (_latitude != null || _longitude != null) {
+      _latitude = null;
+      _longitude = null;
+      _currentPage = 1;
+      emit(NearbyBranchesLoading());
+    }
+    await loadNearby();
+  }
+
   Future<void> loadNearby({
     int? pageNumber,
     String? search,
@@ -72,25 +82,26 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
       emit(NearbyBranchesLoading());
     }
 
-    _subscription = getNearbyBranchesUseCase(
-      latitude: _latitude,
-      longitude: _longitude,
-      radiusInMeters: _radiusInMeters,
-      pageNumber: _currentPage,
-      pageSize: _pageSize,
-      search: _currentSearch,
-    ).listen((result) {
-      result.fold(
-        (failure) {
-          if (state is! NearbyBranchesSuccess) {
-            emit(NearbyBranchesFailure(failure.message));
-          }
-        },
-        (response) {
-          emit(NearbyBranchesSuccess(response));
-        },
-      );
-    });
+    _subscription =
+        getNearbyBranchesUseCase(
+          latitude: _latitude,
+          longitude: _longitude,
+          radiusInMeters: _radiusInMeters,
+          pageNumber: _currentPage,
+          pageSize: _pageSize,
+          search: _currentSearch,
+        ).listen((result) {
+          result.fold(
+            (failure) {
+              if (state is! NearbyBranchesSuccess) {
+                emit(NearbyBranchesFailure(failure.message));
+              }
+            },
+            (response) {
+              emit(NearbyBranchesSuccess(response));
+            },
+          );
+        });
   }
 
   @override

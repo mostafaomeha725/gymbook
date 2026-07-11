@@ -39,7 +39,6 @@ class AuthorizationInterceptor extends Interceptor {
     if (err.response?.statusCode == 401 &&
         !err.requestOptions.path.contains(EndPoints.refreshToken) &&
         err.requestOptions.extra['isRetry'] != true) {
-
       if (_isRefreshing) {
         final completer = Completer<bool>();
         _requestsQueue.add(completer);
@@ -155,4 +154,3 @@ class AuthorizationInterceptor extends Interceptor {
     handler.next(err);
   }
 }
-

@@ -15,12 +15,8 @@ class AddEditEmployeeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => sl<RolesCubit>()..getRoles(),
-        ),
-        BlocProvider(
-          create: (context) => sl<AddEditEmployeeCubit>(),
-        ),
+        BlocProvider(create: (context) => sl<RolesCubit>()..getRoles()),
+        BlocProvider(create: (context) => sl<AddEditEmployeeCubit>()),
       ],
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),

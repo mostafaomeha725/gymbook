@@ -8,7 +8,10 @@ class GetBranchEmployeesUseCase {
 
   GetBranchEmployeesUseCase(this.repository);
 
-  Stream<Either<Failure, BranchEmployeesResponse>> call(int branchId, int pageNumber) {
+  Stream<Either<Failure, BranchEmployeesResponse>> call(
+    int branchId,
+    int pageNumber,
+  ) {
     return repository.getBranchEmployees(branchId, pageNumber);
   }
 }

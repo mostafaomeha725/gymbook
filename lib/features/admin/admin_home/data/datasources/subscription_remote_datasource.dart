@@ -101,7 +101,9 @@ class SubscriptionRemoteDataSourceImpl implements SubscriptionRemoteDataSource {
     if (search != null && search.trim().isNotEmpty) {
       params['Search'] = search.trim();
     }
-    // Note: Status filtering is done client-side (API does not support it)
+    if (status != null) {
+      params['SubscriptionStatus'] = status;
+    }
     final response = await networkService.getData(
       endPoint: EndPoints.getBranchSubscriptions(branchId),
       queryParameters: params,

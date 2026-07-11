@@ -8,7 +8,10 @@ class UpdateEmployeeUseCase {
 
   UpdateEmployeeUseCase(this.repository);
 
-  Future<Either<Failure, EmployeeModel>> call(int employeeId, Map<String, dynamic> body) async {
+  Future<Either<Failure, EmployeeModel>> call(
+    int employeeId,
+    Map<String, dynamic> body,
+  ) async {
     return await repository.updateEmployee(employeeId, body);
   }
 }

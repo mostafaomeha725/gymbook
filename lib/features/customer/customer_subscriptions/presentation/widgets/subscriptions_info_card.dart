@@ -3,12 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/widgets/get_type_color.dart';
 
 class SubscriptionsInfoCard extends StatelessWidget {
   final String gymName;
   final String address;
   final int status;
   final VoidCallback onViewOnMapTap;
+  final VoidCallback onGymDetailsTap;
 
   const SubscriptionsInfoCard({
     super.key,
@@ -16,62 +18,15 @@ class SubscriptionsInfoCard extends StatelessWidget {
     required this.address,
     required this.status,
     required this.onViewOnMapTap,
+    required this.onGymDetailsTap,
   });
-
-  String _statusText(int statusValue) {
-    switch (statusValue) {
-      case 0:
-        return 'Scheduled';
-      case 1:
-        return 'Active';
-      case 2:
-        return 'Frozen';
-      case 3:
-        return 'Expired';
-      case 4:
-        return 'Cancelled';
-      default:
-        return 'Unknown';
-    }
-  }
-
-  Color _statusColor(int statusValue) {
-    switch (statusValue) {
-      case 0:
-        return const Color(0xFFF59E0B);
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.orange;
-      case 3:
-      case 4:
-        return Colors.red;
-      default:
-        return const Color(0xff64748B);
-    }
-  }
-
-  Color _statusBgColor(int statusValue) {
-    switch (statusValue) {
-      case 0:
-        return const Color(0xFFF59E0B).withOpacity(0.15);
-      case 1:
-        return Colors.green.withOpacity(0.15);
-      case 2:
-        return Colors.orange.withOpacity(0.15);
-      case 3:
-      case 4:
-        return Colors.red.withOpacity(0.12);
-      default:
-        return const Color(0xffE2E8F0);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final statusText = _statusText(status);
-    final statusColor = _statusColor(status);
-    final statusBgColor = _statusBgColor(status);
+    final typeColorHelper = GetTypeColor();
+    final statusText = typeColorHelper.getSubscriptionStatusText(status);
+    final statusColor = typeColorHelper.getSubscriptionStatusColor(status);
+    final statusBgColor = typeColorHelper.getSubscriptionStatusBgColor(status);
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -133,14 +88,30 @@ class SubscriptionsInfoCard extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
 
-          BouncingSocialButton(
-            text: 'View on Google Maps',
-            borderColor: const Color(0XFF0EA5E9),
-            icon: Icons.location_on_outlined,
-            onTap: onViewOnMapTap,
-            textSize: 14.sp,
-
-            textColor: const Color(0XFF0EA5E9),
+          Row(
+            children: [
+              Expanded(
+                child: BouncingSocialButton(
+                  text: 'Gym Details',
+                  borderColor: const Color(0XFF0EA5E9),
+                  icon: Icons.storefront_outlined,
+                  onTap: onGymDetailsTap,
+                  textSize: 14.sp,
+                  textColor: const Color(0XFF0EA5E9),
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: BouncingSocialButton(
+                  text: 'Maps',
+                  borderColor: const Color(0XFF0EA5E9),
+                  icon: Icons.location_on_outlined,
+                  onTap: onViewOnMapTap,
+                  textSize: 14.sp,
+                  textColor: const Color(0XFF0EA5E9),
+                ),
+              ),
+            ],
           ),
         ],
       ),

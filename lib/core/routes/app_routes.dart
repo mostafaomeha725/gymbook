@@ -37,6 +37,8 @@ import 'package:gymbook/features/customer/customer_home/presentation/screens/gym
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/full_image_viewer_args.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_details_screen_body.dart';
 import 'package:gymbook/features/notifications/presentation/screens/notifications_screen.dart';
+import 'package:gymbook/features/on_boarding/on_boarding_one_view.dart';
+import 'package:gymbook/features/splash/presentation/screens/splash_screen.dart';
 
 import 'package:gymbook/features/settings/presentation/screens/change_password_screen.dart';
 
@@ -53,12 +55,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final CustomGoRouterObserver customGoRouterObserver = CustomGoRouterObserver();
 
 String _getInitialLocation() {
-  final storage = sl<PreferencesStorage>();
-  final token = storage.getUserToken();
-  final isEmailConfirmed = storage.isUserEmailConfirmed();
-  return token != null && token.isNotEmpty
-      ? (isEmailConfirmed ? Routes.mainNavigationScreen : Routes.otpScreen)
-      : Routes.loginScreen;
+  return Routes.splashScreen;
 }
 
 GoRouter createRouter() {
@@ -86,11 +83,14 @@ GoRouter createRouter() {
               state.matchedLocation == Routes.resetPasswordScreen ||
               state.matchedLocation == Routes.registerScreen ||
               state.matchedLocation == Routes.otpScreen ||
+              state.matchedLocation == Routes.onBoardingScreen ||
               state.matchedLocation == Routes.joinusScreen)) {
         return Routes.mainNavigationScreen;
       }
 
       if (!isLoggedIn &&
+          state.matchedLocation != Routes.splashScreen &&
+          state.matchedLocation != Routes.onBoardingScreen &&
           state.matchedLocation != Routes.loginScreen &&
           state.matchedLocation != Routes.forgetPasswordScreen &&
           state.matchedLocation != Routes.resetPasswordScreen &&
@@ -107,6 +107,14 @@ GoRouter createRouter() {
       // customGoRouterObserver,
     ],
     routes: [
+      GoRoute(
+        path: Routes.splashScreen,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: Routes.onBoardingScreen,
+        builder: (context, state) => const OnBoardingOneView(),
+      ),
       GoRoute(
         path: Routes.joinusScreen,
         builder: (context, state) => const JoinUsScreen(),

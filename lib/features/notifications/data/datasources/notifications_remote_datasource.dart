@@ -30,13 +30,10 @@ class NotificationsRemoteDataSourceImpl
       endPoint: EndPoints.getInAppNotifications,
     );
 
-    return response.fold(
-      (failure) => throw failure,
-      (data) {
-        final List<dynamic> list = data['data'] ?? [];
-        return list.map((json) => NotificationModel.fromJson(json)).toList();
-      },
-    );
+    return response.fold((failure) => throw failure, (data) {
+      final List<dynamic> list = data['data'] ?? [];
+      return list.map((json) => NotificationModel.fromJson(json)).toList();
+    });
   }
 
   @override

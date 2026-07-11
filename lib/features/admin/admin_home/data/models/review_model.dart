@@ -13,9 +13,10 @@ class ReviewModel extends ReviewEntity {
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
-    final reviewedAt = DateTime.tryParse(json['reviewedAt'] ?? '') ?? DateTime.now();
+    final reviewedAt =
+        DateTime.tryParse(json['reviewedAt'] ?? '') ?? DateTime.now();
     final fullName = json['userFullName'] as String? ?? 'Unknown';
-    
+
     String initials = '';
     if (fullName.isNotEmpty) {
       final parts = fullName.split(' ');

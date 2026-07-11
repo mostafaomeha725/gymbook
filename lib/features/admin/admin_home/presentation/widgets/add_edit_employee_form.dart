@@ -7,6 +7,7 @@ import 'package:gymbook/features/admin/admin_home/data/models/employee_model.dar
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/add_edit_employee_cubit/add_edit_employee_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/add_edit_employee_cubit/add_edit_employee_state.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/models/add_edit_employee_screen_args.dart';
+import 'package:gymbook/features/auth/presentation/utils/auth_validator.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/add_edit_employee_buttons.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/employee_contact_fields.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/employee_name_fields.dart';
@@ -47,7 +48,13 @@ class _AddEditEmployeeFormState extends State<AddEditEmployeeForm> {
       _firstNameController.text = emp.firstName;
       _lastNameController.text = emp.lastName;
       _emailController.text = emp.email;
-      _phoneController.text = emp.phone;
+
+      String phone = emp.phone;
+      if (phone.startsWith('+20')) {
+        phone = '0${phone.substring(3)}';
+      }
+      _phoneController.text = phone;
+
       _roleController.text = emp.roleName;
       _selectedRoleId = emp.roleId;
       _isActive = emp.isActive;
@@ -68,9 +75,26 @@ class _AddEditEmployeeFormState extends State<AddEditEmployeeForm> {
 
   void _onSave() {
     if (_formKey.currentState?.validate() ?? false) {
-      if (_selectedRoleId == null) {
-        showError('Please select a role');
-        return;
+      final isValid = AuthValidator.validateEmployee(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        roleId: _selectedRoleId,
+        password: _passwordController.text,
+        confirmPassword: _confirmPasswordController.text,
+        isEditMode: widget.args.isEditMode,
+      );
+
+      if (!isValid) return;
+
+      String phoneToSubmit = _phoneController.text.trim();
+      if (phoneToSubmit.isNotEmpty && !phoneToSubmit.startsWith('+')) {
+        if (phoneToSubmit.startsWith('0')) {
+          phoneToSubmit = '+20${phoneToSubmit.substring(1)}';
+        } else {
+          phoneToSubmit = '+20$phoneToSubmit';
+        }
       }
 
       final body = <String, dynamic>{
@@ -79,17 +103,13 @@ class _AddEditEmployeeFormState extends State<AddEditEmployeeForm> {
         'firstName': _firstNameController.text.trim(),
         'lastName': _lastNameController.text.trim(),
         'email': _emailController.text.trim(),
-        'phoneNumber': _phoneController.text.trim(),
+        'phoneNumber': phoneToSubmit,
       };
 
       if (widget.args.isEditMode) {
         body['Active'] = _isActive;
         context.read<AddEditEmployeeCubit>().updateEmployee(_employeeId!, body);
       } else {
-        if (_passwordController.text != _confirmPasswordController.text) {
-          showError('Passwords do not match');
-          return;
-        }
         body['password'] = _passwordController.text;
         body['confirmPassword'] = _confirmPasswordController.text;
         context.read<AddEditEmployeeCubit>().addEmployee(body);

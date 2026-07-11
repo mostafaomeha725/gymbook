@@ -1,4 +1,6 @@
 class Routes {
+  static const splashScreen = '/splash';
+  static const onBoardingScreen = '/on-boarding-screen';
   static const joinusScreen = '/join';
   static const loginScreen = '/login';
   static const forgetPasswordScreen = '/forget-password';

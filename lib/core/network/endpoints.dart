@@ -37,7 +37,8 @@ class EndPoints {
   static const String getCurrentUser = 'Users/me';
   static const String updateFcmToken = 'Notifications/register-token';
   static const String getInAppNotifications = 'InAppNotifications';
-  static const String getUnreadNotificationCount = 'InAppNotifications/unread-count';
+  static const String getUnreadNotificationCount =
+      'InAppNotifications/unread-count';
   static String markNotificationAsRead(int id) => 'InAppNotifications/$id/read';
 
   /// Owner endpoints
@@ -61,6 +62,9 @@ class EndPoints {
 
   static String getBranchPackages(int branchId) =>
       'Owner/Branches/$branchId/packages';
+
+  static String getPublicBranchPackages(int branchId) =>
+      'Branches/$branchId/packages';
 
   static String updatePackage(int branchId, int packageId) =>
       'Owner/Branches/$branchId/packages/$packageId';
@@ -142,5 +146,6 @@ class EndPoints {
 
   /// Payment endpoints
   static const String initializePayment = 'payments/initialize';
-  static String getPaymentTransactionStatus(int transactionId) => 'payments/$transactionId';
+  static String getPaymentTransactionStatus(int transactionId) =>
+      'payments/$transactionId';
 }

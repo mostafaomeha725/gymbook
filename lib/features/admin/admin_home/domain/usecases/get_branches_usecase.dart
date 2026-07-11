@@ -10,7 +10,7 @@ class GetBranchesUseCase {
 
   Stream<Either<Failure, BranchListEntity>> call({
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     String? search,
   }) {
     return repository.getBranches(

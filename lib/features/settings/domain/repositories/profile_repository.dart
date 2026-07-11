@@ -8,6 +8,6 @@ abstract class ProfileRepository {
   Future<Either<Failure, ProfileModel>> updateProfile({
     required String firstName,
     required String lastName,
-    required String phoneNumber,
+    required String? phoneNumber,
   });
 }

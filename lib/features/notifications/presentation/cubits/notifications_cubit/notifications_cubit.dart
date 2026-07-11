@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gymbook/core/services/notification_service.dart';
 import 'package:gymbook/core/services/signalr_service.dart';
@@ -79,13 +80,10 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   Future<void> fetchUnreadCount() async {
     final result = await getUnreadNotificationCountUseCase();
-    result.fold(
-      (failure) => null,
-      (count) {
-        _badgeCount = count;
-        _emitLoaded();
-      },
-    );
+    result.fold((failure) => null, (count) {
+      _badgeCount = count;
+      _emitLoaded();
+    });
   }
 
   Future<void> markAsRead(int id) async {
@@ -160,8 +158,14 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     final result = await updateFcmTokenUseCase(token);
     if (isClosed) return;
     result.fold(
-      (failure) => emit(NotificationsTokenUpdateError(failure.message)),
-      (_) => emit(NotificationsTokenUpdated()),
+      (failure) {
+        log("Failed to send FCM token to backend: ${failure.message}");
+        emit(NotificationsTokenUpdateError(failure.message));
+      },
+      (_) {
+        log("✅ FCM Token sent to backend successfully: $token");
+        emit(NotificationsTokenUpdated());
+      },
     );
   }
 

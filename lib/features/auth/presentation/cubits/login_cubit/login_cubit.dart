@@ -18,7 +18,11 @@ class LoginCubit extends Cubit<LoginState> {
     emit(LoginLoading());
     showLoading();
 
-    final result = await loginUseCase(email: email, password: password, userType: userType);
+    final result = await loginUseCase(
+      email: email,
+      password: password,
+      userType: userType,
+    );
 
     hideLoading();
 

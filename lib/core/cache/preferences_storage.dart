@@ -160,6 +160,20 @@ class PreferencesStorage {
     await _preferences.remove(PreferencesKeys.userProfile.name);
   }
 
+  Future<void> saveNeedsLocationPrompt(bool needsPrompt) async {
+    await putBoolean(
+      key: PreferencesKeys.needsLocationPrompt,
+      value: needsPrompt,
+    );
+  }
+
+  bool getNeedsLocationPrompt() {
+    return getBoolean(
+      key: PreferencesKeys.needsLocationPrompt,
+      defaultValue: false,
+    );
+  }
+
   /// ================= LANGUAGE =================
   String getCurrentLanguage() {
     return _preferences.getString(PreferencesKeys.currentLanguage.name) ?? "en";

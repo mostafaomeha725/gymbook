@@ -28,12 +28,14 @@ class PaymentsRepositoryImpl implements PaymentsRepository {
       return Left(ServerFailure(message: e.toString()));
     }
   }
+
   @override
-  Future<Either<Failure, PaymentTransactionStatusEntity>> getPaymentTransactionStatus(
-    int transactionId,
-  ) async {
+  Future<Either<Failure, PaymentTransactionStatusEntity>>
+  getPaymentTransactionStatus(int transactionId) async {
     try {
-      final model = await remoteDataSource.getPaymentTransactionStatus(transactionId);
+      final model = await remoteDataSource.getPaymentTransactionStatus(
+        transactionId,
+      );
       return Right(model);
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
@@ -43,10 +45,16 @@ class PaymentsRepositoryImpl implements PaymentsRepository {
   @override
   Future<Either<Failure, void>> initPaymentSheet(String clientSecret) async {
     try {
-      await stripeService.initPaymentSheet(paymentIntentClientSecret: clientSecret);
+      await stripeService.initPaymentSheet(
+        paymentIntentClientSecret: clientSecret,
+      );
       return const Right(null);
     } on StripeException catch (e) {
-      return Left(ServerFailure(message: e.error.localizedMessage ?? 'Failed to initialize payment'));
+      return Left(
+        ServerFailure(
+          message: e.error.localizedMessage ?? 'Failed to initialize payment',
+        ),
+      );
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
@@ -61,7 +69,9 @@ class PaymentsRepositoryImpl implements PaymentsRepository {
       if (e.error.code == FailureCode.Canceled) {
         return const Left(ServerFailure(message: 'Payment canceled'));
       }
-      return Left(ServerFailure(message: e.error.localizedMessage ?? 'Payment failed'));
+      return Left(
+        ServerFailure(message: e.error.localizedMessage ?? 'Payment failed'),
+      );
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }

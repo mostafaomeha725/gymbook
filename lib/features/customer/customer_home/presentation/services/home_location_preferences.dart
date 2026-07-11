@@ -15,7 +15,7 @@ class HomeLocationPreferences {
   static const String _savedLocationsKey = 'customer_home_saved_locations_v1';
   static const String _selectedLocationKey =
       'customer_home_selected_location_v1';
-  static const int maxSavedLocations = 3;
+  static const int maxSavedLocations = 5;
 
   Future<HomeLocationPreferencesState> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -37,7 +37,7 @@ class HomeLocationPreferences {
 
   Future<void> save({
     required List<SavedLocation> savedLocations,
-    required String selectedLocationId,
+    required String? selectedLocationId,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
@@ -47,6 +47,10 @@ class HomeLocationPreferences {
           .map((item) => item.toRawJson())
           .toList(),
     );
-    await prefs.setString(_selectedLocationKey, selectedLocationId);
+    if (selectedLocationId != null) {
+      await prefs.setString(_selectedLocationKey, selectedLocationId);
+    } else {
+      await prefs.remove(_selectedLocationKey);
+    }
   }
 }

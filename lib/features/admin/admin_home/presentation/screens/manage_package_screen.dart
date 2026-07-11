@@ -52,4 +52,3 @@ class _ManagePackageScreenState extends State<ManagePackageScreen> {
     );
   }
 }
-

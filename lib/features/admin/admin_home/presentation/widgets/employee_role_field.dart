@@ -26,7 +26,9 @@ class EmployeeRoleField extends StatelessWidget {
             hintText: 'Choose a role...',
             isLoading: state is RolesLoading,
             roles: state is RolesLoaded ? state.roles : [],
-            initialValue: roleController.text.isNotEmpty ? roleController.text : null,
+            initialValue: roleController.text.isNotEmpty
+                ? roleController.text
+                : null,
             onChanged: onChanged,
           );
         },

@@ -19,6 +19,7 @@ class BranchHeaderSectionContent extends StatelessWidget {
   final VoidCallback? onPreviousTap;
   final VoidCallback? onNextTap;
   final ValueChanged<int> onSelectImage;
+  final bool showBackButton;
 
   const BranchHeaderSectionContent({
     super.key,
@@ -33,6 +34,7 @@ class BranchHeaderSectionContent extends StatelessWidget {
     required this.onPreviousTap,
     required this.onNextTap,
     required this.onSelectImage,
+    this.showBackButton = true,
   });
 
   @override
@@ -42,12 +44,73 @@ class BranchHeaderSectionContent extends StatelessWidget {
         Stack(
           clipBehavior: Clip.none,
           children: [
-            AppImage(
-              imageUrl: displayedCoverUrl,
-              height: 320.h,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            displayedCoverUrl.isNotEmpty
+                ? AppImage(
+                    imageUrl: displayedCoverUrl,
+                    height: 320.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+                : Container(
+                    height: 320.h,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xff0EA5E9), Color(0xff0284C7)],
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          right: -50.w,
+                          top: -50.h,
+                          child: CircleAvatar(
+                            radius: 100.r,
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.1,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: -30.w,
+                          bottom: -30.h,
+                          child: CircleAvatar(
+                            radius: 75.r,
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.1,
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.storefront_outlined,
+                                  size: 48.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 12.h),
+                              AppText(
+                                'No Cover Image Available',
+                                style: font14w500.copyWith(color: Colors.white),
+                                alignment: AlignmentDirectional.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
             if (onPreviousTap != null)
               Positioned(
                 left: 12.w,
@@ -72,27 +135,62 @@ class BranchHeaderSectionContent extends StatelessWidget {
                   ),
                 ),
               ),
-            Positioned(
-              top: 28.h,
-              left: 16.w,
-              child: GestureDetector(
-                onTap: onBackTap,
-                child: const CircleAvatar(
-                  backgroundColor: Colors.black45,
-                  child: Icon(Icons.arrow_back, color: Colors.white),
+            if (showBackButton)
+              Positioned(
+                top: 28.h,
+                left: 16.w,
+                child: GestureDetector(
+                  onTap: onBackTap,
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.black45,
+                    child: Icon(Icons.arrow_back, color: Colors.white),
+                  ),
                 ),
               ),
-            ),
             Positioned(
               bottom: -40.h,
               left: 24.w,
               child: CircleAvatar(
                 radius: 43.r,
                 backgroundColor: Colors.white,
-                child: CircleAvatar(
-                  radius: 40.r,
-                  backgroundImage: NetworkImage(avatarUrl),
-                ),
+                child: avatarUrl.isNotEmpty
+                    ? CircleAvatar(
+                        radius: 40.r,
+                        backgroundImage: NetworkImage(avatarUrl),
+                      )
+                    : CircleAvatar(
+                        radius: 40.r,
+                        backgroundColor: Colors.transparent,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              colors: [Color(0xff334155), Color(0xff0F172A)],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: AppText(
+                              (branch.name?.trim().isNotEmpty == true)
+                                  ? branch.name!.trim()[0].toUpperCase()
+                                  : 'B',
+                              style: font20w700.copyWith(
+                                color: Colors.white,
+                                fontSize: 32.sp,
+                              ),
+                              alignment: AlignmentDirectional.center,
+                            ),
+                          ),
+                        ),
+                      ),
               ),
             ),
           ],
@@ -161,41 +259,42 @@ class BranchHeaderSectionContent extends StatelessWidget {
             ],
           ),
         ),
-        if (galleryUrls.isNotEmpty) ...[
-          SizedBox(height: 14.h),
-          SizedBox(
-            height: 82.h,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 22.w),
-              itemCount: galleryUrls.length,
-              separatorBuilder: (_, __) => SizedBox(width: 8.w),
-              itemBuilder: (_, index) => GestureDetector(
-                onTap: () => onSelectImage(index),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: selectedIndex == index
-                          ? const Color(0xff0EA5E9)
-                          : Colors.transparent,
-                      width: 2,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: AppImage(
-                      imageUrl: galleryUrls[index],
-                      width: 110.w,
-                      height: 82.h,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+
+        // if (galleryUrls.isNotEmpty) ...[
+        //   SizedBox(height: 14.h),
+        //   SizedBox(
+        //     height: 82.h,
+        //     child: ListView.separated(
+        //       scrollDirection: Axis.horizontal,
+        //       padding: EdgeInsets.symmetric(horizontal: 22.w),
+        //       itemCount: galleryUrls.length,
+        //       separatorBuilder: (_, __) => SizedBox(width: 8.w),
+        //       itemBuilder: (_, index) => GestureDetector(
+        //         onTap: () => onSelectImage(index),
+        //         child: Container(
+        //           decoration: BoxDecoration(
+        //             borderRadius: BorderRadius.circular(12.r),
+        //             border: Border.all(
+        //               color: selectedIndex == index
+        //                   ? const Color(0xff0EA5E9)
+        //                   : Colors.transparent,
+        //               width: 2,
+        //             ),
+        //           ),
+        //           child: ClipRRect(
+        //             borderRadius: BorderRadius.circular(10.r),
+        //             child: AppImage(
+        //               imageUrl: galleryUrls[index],
+        //               width: 110.w,
+        //               height: 82.h,
+        //               fit: BoxFit.cover,
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ],
     );
   }

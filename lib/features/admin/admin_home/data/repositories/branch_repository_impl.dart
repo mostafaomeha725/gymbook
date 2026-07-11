@@ -150,7 +150,7 @@ class BranchRepositoryImpl implements BranchRepository {
   @override
   Stream<Either<Failure, BranchListEntity>> getBranches({
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     String? search,
   }) async* {
     final String cacheKey =
@@ -705,7 +705,7 @@ class BranchRepositoryImpl implements BranchRepository {
   Future<Either<Failure, BranchReviewsEntity>> getBranchReviews({
     required int branchId,
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     double? rating,
   }) async {
     try {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/utils/url_launcher_util.dart';
@@ -12,7 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_info_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/image_gym_details.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/opening_hours_card.dart';
-import 'package:gymbook/features/customer/customer_home/presentation/widgets/subscription_plans_horizontal_list.dart';
+import 'package:gymbook/features/customer/customer_home/presentation/widgets/membership_plans_section.dart';
 
 class GymDetailsScreenBody extends StatelessWidget {
   final GymDetailsArgs args;
@@ -34,9 +35,7 @@ class GymDetailsScreenBody extends StatelessWidget {
     CustomerBranchDetailsModel details,
   ) async {
     if (!_hasValidCoordinates(details)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gym location is not available yet')),
-      );
+      showError('Gym location is not available yet');
       return;
     }
 
@@ -46,9 +45,7 @@ class GymDetailsScreenBody extends StatelessWidget {
     );
 
     if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open Google Maps')),
-      );
+      showError('Unable to open Google Maps');
     }
   }
 
@@ -101,6 +98,8 @@ class GymDetailsScreenBody extends StatelessWidget {
                   rating: details.averageRating,
                   reviewsCount: details.totalRatings,
                   type: details.branchTypeName,
+
+                  isOpenNow: details.isOpenNow,
                   address: details.address,
                   onDirectionsTap: () => _openDirections(context, details),
                   onReviewsTap: () async {
@@ -131,10 +130,7 @@ class GymDetailsScreenBody extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                SubscriptionPlansHorizontalList(
-                  branchId: args.branchId,
-                  plans: state.plans,
-                ),
+                MembershipPlansSection(branchId: args.branchId),
                 SizedBox(height: 32.h),
               ],
             ),

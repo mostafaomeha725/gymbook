@@ -8,7 +8,7 @@ abstract class ProfileRemoteDataSource {
   Future<ProfileModel> updateProfile({
     required String firstName,
     required String lastName,
-    required String phoneNumber,
+    required String? phoneNumber,
   });
 }
 
@@ -33,7 +33,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<ProfileModel> updateProfile({
     required String firstName,
     required String lastName,
-    required String phoneNumber,
+    required String? phoneNumber,
   }) async {
     final response = await networkService.patchData(
       endPoint: EndPoints.getCurrentUser,

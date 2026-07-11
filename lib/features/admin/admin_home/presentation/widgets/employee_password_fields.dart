@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/labeled_form_field.dart';
+import 'package:gymbook/features/auth/presentation/widgets/password_condition_widget.dart';
 
 class EmployeePasswordFields extends StatefulWidget {
   final TextEditingController passwordController;
@@ -32,14 +33,11 @@ class _EmployeePasswordFieldsState extends State<EmployeePasswordFields> {
           label: 'Password',
           input: AppFormField(
             controller: widget.passwordController,
-            hintText: 'Min. 6 characters',
+            hintText: 'Enter your password',
             obsecureText: _isPasswordObscure,
             maxLines: 1,
             prefixIcon: const Icon(Icons.lock_outline, size: 20),
             validator: (val) {
-              if (!widget.isEdit && (val == null || val.isEmpty)) {
-                return 'Required';
-              }
               return null;
             },
             suffixIcon: GestureDetector(
@@ -65,9 +63,6 @@ class _EmployeePasswordFieldsState extends State<EmployeePasswordFields> {
             obsecureText: _isConfirmPasswordObscure,
             prefixIcon: const Icon(Icons.lock_outline, size: 20),
             validator: (val) {
-              if (!widget.isEdit && (val == null || val.isEmpty)) {
-                return 'Required';
-              }
               return null;
             },
             suffixIcon: GestureDetector(
@@ -82,6 +77,19 @@ class _EmployeePasswordFieldsState extends State<EmployeePasswordFields> {
               ),
             ),
           ),
+        ),
+        SizedBox(height: 8.h),
+        AnimatedBuilder(
+          animation: Listenable.merge([
+            widget.passwordController,
+            widget.confirmPasswordController,
+          ]),
+          builder: (context, child) {
+            return PasswordConditionsWidget(
+              password: widget.passwordController.text,
+              confirmPassword: widget.confirmPasswordController.text,
+            );
+          },
         ),
       ],
     );

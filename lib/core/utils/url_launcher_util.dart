@@ -54,7 +54,10 @@ class UrlLauncherUtil {
     }
   }
 
-  static Future<bool> launchMap({required double latitude, required double longitude}) async {
+  static Future<bool> launchMap({
+    required double latitude,
+    required double longitude,
+  }) async {
     final destination = '$latitude,$longitude';
     final appUri = Uri.parse('google.navigation:q=$destination&mode=d');
     final webUri = Uri.parse(

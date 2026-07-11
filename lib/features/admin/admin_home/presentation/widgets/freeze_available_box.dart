@@ -40,14 +40,6 @@ class FreezeAvailableBox extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 16.h),
-
-          AppText(
-            "No freeze history yet",
-            style: font14w500.copyWith(color: const Color(0xff6B7280)),
-            alignment: AlignmentDirectional.center,
-          ),
         ],
       ),
     );

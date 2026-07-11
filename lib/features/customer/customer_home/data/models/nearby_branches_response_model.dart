@@ -84,7 +84,7 @@ class NearbyBranchItemModel {
   factory NearbyBranchItemModel.fromJson(Map<String, dynamic> json) {
     final rawDistance = json['distanceInMeters'];
     final distance = _asInt(rawDistance);
-    
+
     final bool hasDistance;
     if (json.containsKey('hasDistance') && json['hasDistance'] != null) {
       hasDistance = _asBool(json['hasDistance']);

@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gymbook/core/constants/app_assets.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/features/settings/presentation/cubits/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:gymbook/features/settings/presentation/cubits/edit_profile_cubit/edit_profile_state.dart';
-import 'package:gymbook/features/settings/presentation/widgets/editable_profile_image.dart';
-import 'package:gymbook/features/settings/presentation/widgets/editable_text_field.dart';
+import 'package:gymbook/features/settings/presentation/widgets/edit_profile_avatar.dart';
+import 'package:gymbook/features/settings/presentation/widgets/edit_profile_form_fields.dart';
 
 class EditProfileScreenBody extends StatefulWidget {
   const EditProfileScreenBody({super.key});
@@ -26,20 +25,24 @@ class _EditProfileScreenBodyState extends State<EditProfileScreenBody> {
   final FocusNode _firstNameFocus = FocusNode();
   final FocusNode _lastNameFocus = FocusNode();
   final FocusNode _phoneFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void dispose() {
     _firstNameFocus.dispose();
     _lastNameFocus.dispose();
     _phoneFocus.dispose();
+    _emailFocus.dispose();
 
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -51,7 +54,36 @@ class _EditProfileScreenBodyState extends State<EditProfileScreenBody> {
   ) {
     _firstNameController.text = firstName;
     _lastNameController.text = lastName;
-    _phoneController.text = phone;
+    _emailController.text = email;
+
+    String displayPhone = phone;
+    if (displayPhone.startsWith('+20')) {
+      displayPhone = '0${displayPhone.substring(3)}';
+    } else if (displayPhone.startsWith('20')) {
+      displayPhone = '0${displayPhone.substring(2)}';
+    }
+    _phoneController.text = displayPhone;
+  }
+
+  void _onUpdateProfile() {
+    FocusScope.of(context).unfocus();
+
+    String? phoneToSubmit = _phoneController.text.trim();
+    if (phoneToSubmit.isEmpty) {
+      phoneToSubmit = null;
+    } else {
+      if (phoneToSubmit.startsWith('0')) {
+        phoneToSubmit = '+20${phoneToSubmit.substring(1)}';
+      } else if (!phoneToSubmit.startsWith('+')) {
+        phoneToSubmit = '+20$phoneToSubmit';
+      }
+    }
+
+    context.read<EditProfileCubit>().updateProfile(
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      phoneNumber: phoneToSubmit,
+    );
   }
 
   @override
@@ -102,49 +134,38 @@ class _EditProfileScreenBodyState extends State<EditProfileScreenBody> {
               ),
               SizedBox(height: 32.h),
 
-              const EditableProfileImage(image: Assets.gym1),
+              EditProfileAvatar(
+                firstName: _firstNameController.text,
+                lastName: _lastNameController.text,
+                isLoading: state is EditProfileUpdating,
+              ),
               SizedBox(height: 32.h),
 
-              EditableTextField(
-                label: "First Name",
-                controller: _firstNameController,
-                icon: Icons.person_outline,
-                inputType: TextInputType.name,
-                isEditable: _isFirstNameEditable,
-                focusNode: _firstNameFocus,
-                onEditTap: () {
+              EditProfileFormFields(
+                firstNameController: _firstNameController,
+                lastNameController: _lastNameController,
+                phoneController: _phoneController,
+                emailController: _emailController,
+                isFirstNameEditable: _isFirstNameEditable,
+                isLastNameEditable: _isLastNameEditable,
+                isPhoneEditable: _isPhoneEditable,
+                firstNameFocus: _firstNameFocus,
+                lastNameFocus: _lastNameFocus,
+                phoneFocus: _phoneFocus,
+                emailFocus: _emailFocus,
+                onFirstNameEditTap: () {
                   setState(() {
                     _isFirstNameEditable = !_isFirstNameEditable;
                     if (_isFirstNameEditable) _firstNameFocus.requestFocus();
                   });
                 },
-              ),
-              SizedBox(height: 16.h),
-
-              EditableTextField(
-                label: "Last Name",
-                controller: _lastNameController,
-                icon: Icons.person_outline,
-                inputType: TextInputType.name,
-                isEditable: _isLastNameEditable,
-                focusNode: _lastNameFocus,
-                onEditTap: () {
+                onLastNameEditTap: () {
                   setState(() {
                     _isLastNameEditable = !_isLastNameEditable;
                     if (_isLastNameEditable) _lastNameFocus.requestFocus();
                   });
                 },
-              ),
-              SizedBox(height: 16.h),
-
-              EditableTextField(
-                label: "Phone Number",
-                controller: _phoneController,
-                icon: Icons.phone_outlined,
-                inputType: TextInputType.phone,
-                isEditable: _isPhoneEditable,
-                focusNode: _phoneFocus,
-                onEditTap: () {
+                onPhoneEditTap: () {
                   setState(() {
                     _isPhoneEditable = !_isPhoneEditable;
                     if (_isPhoneEditable) _phoneFocus.requestFocus();
@@ -159,15 +180,7 @@ class _EditProfileScreenBodyState extends State<EditProfileScreenBody> {
                 color: const Color(0xFF0EA5E9),
                 height: 50.h,
                 textSize: 16.sp,
-                onPressed: () {
-                  FocusScope.of(context).unfocus();
-
-                  context.read<EditProfileCubit>().updateProfile(
-                    firstName: _firstNameController.text.trim(),
-                    lastName: _lastNameController.text.trim(),
-                    phoneNumber: _phoneController.text.trim(),
-                  );
-                },
+                onPressed: _onUpdateProfile,
                 margin: EdgeInsets.symmetric(horizontal: 12.w),
               ),
               SizedBox(height: 32.h),

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
-import 'package:gymbook/core/widgets/custom_snack_bar.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_images_cubit/branch_images_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
 import 'package:image_picker/image_picker.dart';
@@ -69,13 +68,7 @@ class AddBranchFourScreenActions {
     required BuildContext context,
     required String message,
   }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    showError(message);
   }
 
   static void handleSetupStateChanges({
@@ -122,7 +115,7 @@ class AddBranchFourScreenActions {
 
     if (imagesState.successMessage != null &&
         imagesState.successMessage!.isNotEmpty) {
-      CustomSnackBar.showSuccess(context, message: imagesState.successMessage!);
+      showSuccess(imagesState.successMessage!);
     }
 
     if (imagesState.activationSuccess) {

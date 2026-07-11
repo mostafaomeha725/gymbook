@@ -17,7 +17,9 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = NotificationStyle.getStyleForType(notification.notificationType);
+    final style = NotificationStyle.getStyleForType(
+      notification.notificationType,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -51,11 +53,7 @@ class NotificationCard extends StatelessWidget {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
-                        child: Icon(
-                          style.icon,
-                          color: style.color,
-                          size: 24.w,
-                        ),
+                        child: Icon(style.icon, color: style.color, size: 24.w),
                       ),
                       Positioned(
                         top: -4.w,
@@ -88,9 +86,7 @@ class NotificationCard extends StatelessWidget {
                             Expanded(
                               child: AppText(
                                 notification.title,
-                                style: font14w700.copyWith(
-                                  color: Colors.white,
-                                ),
+                                style: font14w700.copyWith(color: Colors.white),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

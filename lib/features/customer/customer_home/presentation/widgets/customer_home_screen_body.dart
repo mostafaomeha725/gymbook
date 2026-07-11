@@ -27,15 +27,16 @@ class _CustomerHomeScreenBodyState extends State<CustomerHomeScreenBody>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
+
     final name = sl<PreferencesStorage>().getUserName();
     if (name != null && name.isNotEmpty) {
       _userName = name;
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       restoreLocationsAndLoad();
+      await checkAndShowLocationSheet();
     });
   }
 
@@ -103,4 +104,3 @@ class _CustomerHomeScreenBodyState extends State<CustomerHomeScreenBody>
     );
   }
 }
-

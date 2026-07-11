@@ -30,6 +30,8 @@ enum PreferencesKeys {
   branchName,
   branchId,
   userProfile,
+  hasSeenOnBoarding,
+  needsLocationPrompt,
 }
 
 /// Roles:

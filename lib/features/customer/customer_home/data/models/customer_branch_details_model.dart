@@ -73,10 +73,7 @@ class CustomerBranchDetailsModel {
       'images': images.map((e) => e.toJson()).toList(),
       'location': {
         'address': address,
-        'coordinates': {
-          'latitude': latitude,
-          'longitude': longitude,
-        },
+        'coordinates': {'latitude': latitude, 'longitude': longitude},
       },
       'totalRatings': totalRatings,
       'averageRating': averageRating,
@@ -140,11 +137,7 @@ class CustomerBranchImageModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type,
-      'url': url,
-    };
+    return {'id': id, 'type': type, 'url': url};
   }
 }
 
@@ -185,23 +178,33 @@ class CustomerPackageModel {
   final String name;
   final double price;
   final int durationInMonths;
+  final int numberOfFreezes;
+  final int freezeDurationInDays;
 
   CustomerPackageModel({
     required this.id,
     required this.name,
     required this.price,
     required this.durationInMonths,
+    required this.numberOfFreezes,
+    required this.freezeDurationInDays,
   });
 
   factory CustomerPackageModel.fromJson(Map<String, dynamic> json) {
     return CustomerPackageModel(
-      id: json['id'] is int ? json['id'] as int : 0,
+      id: _parseId(json['id'] ?? json['packageId']),
       name: (json['name'] ?? '').toString(),
       price: json['price'] is num
           ? (json['price'] as num).toDouble()
           : double.tryParse(json['price']?.toString() ?? '') ?? 0,
       durationInMonths: json['durationInMonths'] is int
           ? json['durationInMonths'] as int
+          : 0,
+      numberOfFreezes: json['numberOfFreezes'] is int
+          ? json['numberOfFreezes'] as int
+          : 0,
+      freezeDurationInDays: json['freezeDurationInDays'] is int
+          ? json['freezeDurationInDays'] as int
           : 0,
     );
   }
@@ -212,6 +215,15 @@ class CustomerPackageModel {
       'name': name,
       'price': price,
       'durationInMonths': durationInMonths,
+      'numberOfFreezes': numberOfFreezes,
+      'freezeDurationInDays': freezeDurationInDays,
     };
+  }
+
+  static int _parseId(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
   }
 }

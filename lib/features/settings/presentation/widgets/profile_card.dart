@@ -22,8 +22,10 @@ class ProfileCard extends StatelessWidget {
 
         if (state is ProfileLoaded) {
           final profile = state.profile;
-              
-          fullName = profile.fullName.isNotEmpty ? profile.fullName : "${profile.firstName} ${profile.lastName}";
+
+          fullName = profile.fullName.isNotEmpty
+              ? profile.fullName
+              : "${profile.firstName} ${profile.lastName}";
           phone = profile.phoneNumber;
           if (profile.firstName.isNotEmpty) {
             initials += profile.firstName[0].toUpperCase();
@@ -62,13 +64,13 @@ class ProfileCard extends StatelessWidget {
                       ),
                     ),
                     alignment: Alignment.center,
-                    child: state is ProfileLoading 
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : AppText(
-                          initials,
-                          style: font20w500.copyWith(color: Colors.white),
-                          alignment: AlignmentDirectional.center,
-                        ),
+                    child: state is ProfileLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : AppText(
+                            initials,
+                            style: font20w500.copyWith(color: Colors.white),
+                            alignment: AlignmentDirectional.center,
+                          ),
                   ),
 
                   SizedBox(width: 16.w),

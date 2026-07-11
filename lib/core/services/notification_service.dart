@@ -23,7 +23,8 @@ class NotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       log('User granted permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       log('User granted provisional permission');
     } else {
       log('User declined or has not accepted permission');
@@ -35,7 +36,9 @@ class NotificationService {
       log('Message data: ${message.data}');
 
       if (message.notification != null) {
-        log('Message also contained a notification: ${message.notification?.title}');
+        log(
+          'Message also contained a notification: ${message.notification?.title}',
+        );
       }
     });
 

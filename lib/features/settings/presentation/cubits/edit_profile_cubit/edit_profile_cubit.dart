@@ -7,7 +7,8 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   final GetProfileUseCase getProfileUseCase;
   final UpdateProfileUseCase updateProfileUseCase;
 
-  EditProfileCubit(this.getProfileUseCase, this.updateProfileUseCase) : super(EditProfileInitial());
+  EditProfileCubit(this.getProfileUseCase, this.updateProfileUseCase)
+    : super(EditProfileInitial());
 
   Future<void> loadProfile() async {
     emit(EditProfileLoading());
@@ -21,7 +22,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   Future<void> updateProfile({
     required String firstName,
     required String lastName,
-    required String phoneNumber,
+    required String? phoneNumber,
   }) async {
     emit(EditProfileUpdating());
     final result = await updateProfileUseCase(
@@ -29,12 +30,11 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       lastName: lastName,
       phoneNumber: phoneNumber,
     );
-    result.fold(
-      (failure) => emit(EditProfileUpdateError(failure.message)),
-      (profile) {
-        emit(EditProfileUpdated(profile));
-        emit(EditProfileLoaded(profile));
-      },
-    );
+    result.fold((failure) => emit(EditProfileUpdateError(failure.message)), (
+      profile,
+    ) {
+      emit(EditProfileUpdated(profile));
+      emit(EditProfileLoaded(profile));
+    });
   }
 }

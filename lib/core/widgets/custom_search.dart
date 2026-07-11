@@ -8,12 +8,14 @@ class CustomSearch extends StatelessWidget {
     required this.controller,
     this.hintText = "Search...",
     this.onChanged,
+    this.onSubmitted,
     this.borderColor,
   });
 
   final TextEditingController controller;
   final String hintText;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final Color? borderColor;
 
   @override
@@ -31,6 +33,8 @@ class CustomSearch extends StatelessWidget {
       maxLines: 1,
       contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 10.w),
       onChanged: onChanged,
+      onFieldSubmitted: onSubmitted,
+      textInputAction: TextInputAction.search,
     );
   }
 }

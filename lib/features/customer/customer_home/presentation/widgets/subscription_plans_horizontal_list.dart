@@ -64,7 +64,7 @@ class SubscriptionPlansHorizontalList extends StatelessWidget {
           );
         } else if (state is PaymentStatusSuccess) {
           EasyLoading.showSuccess(
-            'Payment Successful!\nSubscription Activated 🎉',
+            'Payment Successful!\nSubscription Activated',
             duration: const Duration(seconds: 3),
             dismissOnTap: true,
           );
@@ -74,7 +74,7 @@ class SubscriptionPlansHorizontalList extends StatelessWidget {
       },
       builder: (context, state) {
         return SizedBox(
-          height: 210.h,
+          height: 275.h,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -83,9 +83,9 @@ class SubscriptionPlansHorizontalList extends StatelessWidget {
                 plan: plans[index],
                 onSubscribe: () {
                   context.read<PaymentCubit>().processPayment(
-                        branchId: branchId,
-                        packageId: plans[index].id,
-                      );
+                    branchId: branchId,
+                    packageId: plans[index].id,
+                  );
                 },
               );
             },

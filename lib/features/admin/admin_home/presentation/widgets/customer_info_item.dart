@@ -6,12 +6,14 @@ import 'package:gymbook/core/theme/styles.dart';
 class CustomerInfoItem extends StatelessWidget {
   const CustomerInfoItem({
     super.key,
-    required this.icon,
+    this.icon,
+    this.iconWidget,
     required this.title,
     required this.value,
   });
 
-  final IconData icon;
+  final IconData? icon;
+  final Widget? iconWidget;
   final String title;
   final String value;
 
@@ -33,7 +35,13 @@ class CustomerInfoItem extends StatelessWidget {
               color: const Color(0xffE2E8F0),
               borderRadius: BorderRadius.circular(14.r),
             ),
-            child: Icon(icon, size: 22.sp, color: const Color(0xff1D9BF0)),
+            child: Center(
+              child:
+                  iconWidget ??
+                  (icon != null
+                      ? Icon(icon, size: 16.sp, color: const Color(0xff1D9BF0))
+                      : null),
+            ),
           ),
 
           SizedBox(width: 14.w),

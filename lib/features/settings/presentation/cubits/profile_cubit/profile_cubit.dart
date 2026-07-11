@@ -7,7 +7,8 @@ class ProfileCubit extends Cubit<ProfileState> {
   final GetProfileUseCase getProfileUseCase;
   final GetCachedProfileUseCase getCachedProfileUseCase;
 
-  ProfileCubit(this.getProfileUseCase, this.getCachedProfileUseCase) : super(ProfileInitial());
+  ProfileCubit(this.getProfileUseCase, this.getCachedProfileUseCase)
+    : super(ProfileInitial());
 
   Future<void> getProfile() async {
     // 1. Instantly load from cache if available
@@ -19,14 +20,11 @@ class ProfileCubit extends Cubit<ProfileState> {
 
     // 2. Fetch fresh data from network in background
     final result = await getProfileUseCase();
-    result.fold(
-      (failure) {
-        // Only emit error if we don't have a cached profile loaded
-        if (state is! ProfileLoaded) {
-          emit(ProfileError(failure.message));
-        }
-      },
-      (profile) => emit(ProfileLoaded(profile)),
-    );
+    result.fold((failure) {
+      // Only emit error if we don't have a cached profile loaded
+      if (state is! ProfileLoaded) {
+        emit(ProfileError(failure.message));
+      }
+    }, (profile) => emit(ProfileLoaded(profile)));
   }
 }

@@ -65,10 +65,7 @@ class BranchSetupGovernorateModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }
 
@@ -163,12 +160,7 @@ class BranchSetupImageModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type,
-      'url': url,
-      'displayOrder': displayOrder,
-    };
+    return {'id': id, 'type': type, 'url': url, 'displayOrder': displayOrder};
   }
 }
 

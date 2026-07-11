@@ -39,10 +39,7 @@ class AdminQrScannerCameraSection extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16.r),
-                    child: MobileScanner(
-                      fit: BoxFit.cover,
-                      onDetect: onDetect,
-                    ),
+                    child: MobileScanner(fit: BoxFit.cover, onDetect: onDetect),
                   ),
                 ],
               ),

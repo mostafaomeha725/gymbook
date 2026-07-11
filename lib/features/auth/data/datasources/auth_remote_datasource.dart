@@ -84,7 +84,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> confirmEmail({required String email, required String code}) async {
+  Future<void> confirmEmail({
+    required String email,
+    required String code,
+  }) async {
     final result = await networkService.postData(
       endPoint: EndPoints.confirmEmail,
       data: {'email': email, 'code': code},
@@ -171,15 +174,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: {'email': email, 'password': password, 'userType': userType},
     );
 
-    return result.fold(
-      (failure) {
-        if (failure is EmailNotVerifiedFailure) {
-          throw EmailNotVerifiedException(failure.message);
-        }
-        throw ServerException(failure.message);
-      },
-      (data) => LoginResponse.fromJson(data),
-    );
+    return result.fold((failure) {
+      if (failure is EmailNotVerifiedFailure) {
+        throw EmailNotVerifiedException(failure.message);
+      }
+      throw ServerException(failure.message);
+    }, (data) => LoginResponse.fromJson(data));
   }
 
   @override
@@ -190,15 +190,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       endPoint: EndPoints.googleLogin,
       data: {'idToken': idToken, 'userType': userType},
     );
-    return result.fold(
-      (failure) {
-        if (failure is EmailNotVerifiedFailure) {
-          throw EmailNotVerifiedException(failure.message);
-        }
-        throw ServerException(failure.message);
-      },
-      (data) => LoginResponse.fromJson(data),
-    );
+    return result.fold((failure) {
+      if (failure is EmailNotVerifiedFailure) {
+        throw EmailNotVerifiedException(failure.message);
+      }
+      throw ServerException(failure.message);
+    }, (data) => LoginResponse.fromJson(data));
   }
 
   @override

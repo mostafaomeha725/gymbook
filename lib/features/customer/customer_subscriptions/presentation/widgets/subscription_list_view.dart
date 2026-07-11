@@ -61,7 +61,6 @@ class SubscriptionListView extends StatelessWidget {
 
         final totalDuration = item.totalDurationInDays;
         final daysLeft = item.daysLeft;
-        final sessionsUsed = (totalDuration - daysLeft).clamp(0, totalDuration);
         final isExpired = status == 3;
 
         return Padding(
@@ -70,7 +69,7 @@ class SubscriptionListView extends StatelessWidget {
             image: item.branchLogoUrl,
             title: item.branchName,
             plan: item.packageName,
-            sessionsUsed: sessionsUsed,
+            sessionsUsed: daysLeft,
             sessionsTotal: totalDuration,
             daysLeft: isExpired ? null : daysLeft,
             expiredDate: null,

@@ -14,10 +14,10 @@ class AdminQrScannerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final roleService = sl<UserRoleService>();
     final role = roleService.getCurrentRole();
-    
+
     int? fixedBranchId;
     String? fixedBranchName;
-    
+
     if (role == AppUserRole.branchAdmin || role == AppUserRole.gator) {
       fixedBranchId = roleService.getBranchId();
       fixedBranchName = roleService.getBranchName();
@@ -27,7 +27,9 @@ class AdminQrScannerScreen extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => sl<AdminQrScannerCubit>()),
         if (fixedBranchId == null)
-          BlocProvider(create: (_) => sl<AdminMyBranchesCubit>()..loadBranches()),
+          BlocProvider(
+            create: (_) => sl<AdminMyBranchesCubit>()..loadBranches(),
+          ),
       ],
       child: AdminQrScannerBody(
         fixedBranchId: fixedBranchId,

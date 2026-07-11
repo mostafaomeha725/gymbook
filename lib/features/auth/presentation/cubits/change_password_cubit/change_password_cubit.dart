@@ -6,7 +6,7 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
   final ChangePasswordUseCase changePasswordUseCase;
 
   ChangePasswordCubit({required this.changePasswordUseCase})
-      : super(ChangePasswordInitial());
+    : super(ChangePasswordInitial());
 
   Future<void> changePassword({
     required String currentPassword,

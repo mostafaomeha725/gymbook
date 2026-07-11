@@ -4,8 +4,12 @@ import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/utils/subscription_date_formatter.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscription_info_row.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscription_sessions_progress.dart';
 
 class SubscriptionsDetailsInfoCard extends StatefulWidget {
   final int subscriptionId;
@@ -66,24 +70,17 @@ class _SubscriptionsDetailsInfoCardState
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message), backgroundColor: Colors.red),
-        );
+        showError(message);
       },
       (_) {
         setState(() {
           _isLoading = false;
         });
         widget.onStatusChanged(wasFrozen ? 1 : 2);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              wasFrozen
-                  ? 'Subscription unfrozen successfully'
-                  : 'Subscription frozen successfully',
-            ),
-            backgroundColor: Colors.green,
-          ),
+        showSuccess(
+          wasFrozen
+              ? 'Subscription unfrozen successfully'
+              : 'Subscription frozen successfully',
         );
       },
     );
@@ -91,10 +88,6 @@ class _SubscriptionsDetailsInfoCardState
 
   @override
   Widget build(BuildContext context) {
-    final safeDuration = widget.durationInDays <= 0 ? 1 : widget.durationInDays;
-    final safeCheckIns = widget.checkInsCount.clamp(0, safeDuration);
-    final progress = (safeCheckIns / safeDuration).clamp(0.0, 1.0);
-
     return Container(
       padding: EdgeInsets.all(20.w),
       margin: EdgeInsets.symmetric(horizontal: 24.w),
@@ -120,19 +113,28 @@ class _SubscriptionsDetailsInfoCardState
 
           SizedBox(height: 24.h),
 
-          _buildRow("Plan", widget.packageName),
+          SubscriptionInfoRow(title: "Plan", value: widget.packageName),
 
           SizedBox(height: 18.h),
 
-          _buildRow("Price", '${widget.price.toStringAsFixed(2)} EGP'),
+          SubscriptionInfoRow(
+            title: "Price",
+            value: '${widget.price.toStringAsFixed(2)} EGP',
+          ),
 
           SizedBox(height: 18.h),
 
-          _buildRow("Start Date", _formatDate(widget.activationDate)),
+          SubscriptionInfoRow(
+            title: "Start Date",
+            value: SubscriptionDateFormatter.formatDate(widget.activationDate),
+          ),
 
           SizedBox(height: 18.h),
 
-          _buildRow("Expires On", _formatDate(widget.endDate)),
+          SubscriptionInfoRow(
+            title: "Expires On",
+            value: SubscriptionDateFormatter.formatDate(widget.endDate),
+          ),
 
           SizedBox(height: 24.h),
 
@@ -140,30 +142,9 @@ class _SubscriptionsDetailsInfoCardState
 
           SizedBox(height: 20.h),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              AppText(
-                "Sessions Used",
-                style: font16w500.copyWith(color: Colors.grey[700]),
-              ),
-              AppText(
-                '$safeCheckIns/${widget.durationInDays <= 0 ? 0 : widget.durationInDays}',
-                style: font16w700.copyWith(color: const Color(0xff2E3A46)),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 12.h),
-
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8.h,
-              backgroundColor: Colors.grey.shade300,
-              valueColor: const AlwaysStoppedAnimation(Color(0xff0A0A1A)),
-            ),
+          SubscriptionSessionsProgress(
+            checkInsCount: widget.checkInsCount,
+            durationInDays: widget.durationInDays,
           ),
 
           SizedBox(height: 28.h),
@@ -183,59 +164,6 @@ class _SubscriptionsDetailsInfoCardState
             ),
         ],
       ),
-    );
-  }
-
-  String _formatDate(String value) {
-    if (value.trim().isEmpty) return '--';
-    final parsed = DateTime.tryParse(value);
-    if (parsed == null) return value;
-    final month = _monthName(parsed.month);
-    final day = parsed.day.toString().padLeft(2, '0');
-    return '$month $day, ${parsed.year}';
-  }
-
-  String _monthName(int month) {
-    switch (month) {
-      case 1:
-        return 'January';
-      case 2:
-        return 'February';
-      case 3:
-        return 'March';
-      case 4:
-        return 'April';
-      case 5:
-        return 'May';
-      case 6:
-        return 'June';
-      case 7:
-        return 'July';
-      case 8:
-        return 'August';
-      case 9:
-        return 'September';
-      case 10:
-        return 'October';
-      case 11:
-        return 'November';
-      case 12:
-        return 'December';
-      default:
-        return '';
-    }
-  }
-
-  Widget _buildRow(String title, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        AppText(title, style: font16w400.copyWith(color: Colors.grey[600])),
-        AppText(
-          value,
-          style: font16w700.copyWith(color: const Color(0xff2E3A46)),
-        ),
-      ],
     );
   }
 }

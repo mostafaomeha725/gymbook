@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/di/services_locator.dart';
@@ -35,44 +35,30 @@ class AdminSubscriptionDetailsScreenBody extends StatelessWidget {
           BlocListener<CancelSubscriptionCubit, CancelSubscriptionState>(
             listener: (context, state) {
               if (state is CancelSubscriptionLoading) {
-                EasyLoading.show(status: 'Cancelling...');
+                showLoading();
               } else if (state is CancelSubscriptionSuccess) {
-                EasyLoading.dismiss();
+                hideLoading();
+                showSuccess('Subscription cancelled successfully');
                 GoRouter.of(context).pop(true);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Subscription cancelled successfully'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
               } else if (state is CancelSubscriptionFailure) {
-                EasyLoading.dismiss();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                hideLoading();
+                showError(state.message);
               }
             },
           ),
           BlocListener<FreezeSubscriptionCubit, FreezeSubscriptionState>(
             listener: (context, state) {
               if (state is FreezeSubscriptionLoading) {
-                EasyLoading.show(status: 'Processing...');
+                showLoading();
               } else if (state is FreezeSubscriptionSuccess) {
-                EasyLoading.dismiss();
+                hideLoading();
+                showSuccess('Done successfully');
                 context.read<SubscriptionDetailsCubit>().loadDetails(
                   subscriptionId,
                 );
               } else if (state is FreezeSubscriptionFailure) {
-                EasyLoading.dismiss();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                hideLoading();
+                showError(state.message);
               }
             },
           ),

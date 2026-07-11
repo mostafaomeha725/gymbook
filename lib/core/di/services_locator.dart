@@ -107,6 +107,8 @@ import 'package:gymbook/features/customer/customer_home/data/repositories/custom
 import 'package:gymbook/features/customer/customer_home/domain/repositories/customer_branch_details_repository.dart';
 import 'package:gymbook/features/customer/customer_home/domain/usecases/get_customer_branch_details_usecase.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/customer_branch_details_cubit/customer_branch_details_cubit.dart';
+import 'package:gymbook/features/customer/customer_home/data/datasources/public_branch_packages_remote_datasource.dart';
+import 'package:gymbook/features/customer/customer_home/presentation/cubits/public_branch_packages_cubit/public_branch_packages_cubit.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/subscription_attendance_history_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/customer_subscription_details_remote_datasource.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/add_review_remote_datasource.dart';
@@ -546,7 +548,10 @@ class ServiceLocator {
     }
     if (!sl.isRegistered<BranchEmployeesCubit>()) {
       sl.registerFactory(
-        () => BranchEmployeesCubit(getBranchEmployeesUseCase: sl()),
+        () => BranchEmployeesCubit(
+          getBranchEmployeesUseCase: sl(),
+          updateEmployeeUseCase: sl(),
+        ),
       );
     }
     if (!sl.isRegistered<AddEditEmployeeCubit>()) {
@@ -601,6 +606,16 @@ class ServiceLocator {
 
     if (!sl.isRegistered<CustomerBranchDetailsCubit>()) {
       sl.registerFactory(() => CustomerBranchDetailsCubit(sl()));
+    }
+
+    if (!sl.isRegistered<PublicBranchPackagesRemoteDataSource>()) {
+      sl.registerLazySingleton<PublicBranchPackagesRemoteDataSource>(
+        () => PublicBranchPackagesRemoteDataSourceImpl(sl()),
+      );
+    }
+
+    if (!sl.isRegistered<PublicBranchPackagesCubit>()) {
+      sl.registerFactory(() => PublicBranchPackagesCubit(sl()));
     }
   }
 

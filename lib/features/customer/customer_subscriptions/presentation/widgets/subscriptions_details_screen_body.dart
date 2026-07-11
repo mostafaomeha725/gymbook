@@ -8,7 +8,11 @@ import 'package:gymbook/features/customer/customer_subscriptions/presentation/cu
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/customer_subscription_details_cubit/customer_subscription_details_state.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/screens/subscriptions_details_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/routes/route_paths.dart';
+import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_details_screen_body.dart';
 
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/attendance_history_card.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscriptions_details_info_card.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscriptions_info_card.dart';
@@ -58,9 +62,7 @@ class _SubscriptionsDetailsScreenBodyState
   ) async {
     if (!_hasValidCoordinates(details)) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gym location is not available yet')),
-      );
+      showError('Gym location is not available yet');
       return;
     }
 
@@ -80,9 +82,7 @@ class _SubscriptionsDetailsScreenBodyState
     }
 
     if (!launched && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open Google Maps')),
-      );
+      showError('Unable to open Google Maps');
     }
   }
 
@@ -156,6 +156,18 @@ class _SubscriptionsDetailsScreenBodyState
                       address: details.address,
                       status: currentStatus,
                       onViewOnMapTap: () => _openGoogleMaps(details),
+                      onGymDetailsTap: () {
+                        context.push(
+                          Routes.gymDetailsScreen,
+                          extra: GymDetailsArgs(
+                            branchId: details.branchId,
+                            gymName: details.branchName,
+                            rating: 0,
+                            reviewsCount: 0,
+                            type: '',
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(height: 16.h),
                     SubscriptionsDetailsInfoCard(

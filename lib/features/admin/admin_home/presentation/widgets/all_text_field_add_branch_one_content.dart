@@ -69,8 +69,12 @@ class AllTextFieldAddBranchOneContent extends StatelessWidget {
             maxLines: 1,
             keyboardType: TextInputType.phone,
             prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 8.w),
-              child: Icon(Icons.phone_outlined, size: 22.sp),
+              padding: EdgeInsets.only(left: 12.w, right: 8.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Text('🇪🇬', style: TextStyle(fontSize: 16.sp))],
+              ),
             ),
             radius: 22.r,
             validator: (value) {

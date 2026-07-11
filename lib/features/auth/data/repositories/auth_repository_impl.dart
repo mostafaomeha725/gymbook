@@ -145,6 +145,12 @@ class AuthRepositoryImpl implements AuthRepository {
     networkService.removeToken();
     await storage.clear(); // Clear all SharedPreferences
 
+    // Restore the onboarding flag so the user goes to Login (not Onboarding) next time
+    await storage.putBoolean(
+      key: PreferencesKeys.hasSeenOnBoarding,
+      value: true,
+    );
+
     try {
       // 1. Wipe everything from disk (all boxes, all data)
       await Hive.deleteFromDisk();

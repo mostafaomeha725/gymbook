@@ -61,7 +61,9 @@ class _RoleDropdownState extends State<RoleDropdown> {
         customButton: IgnorePointer(
           child: AppFormField(
             controller: _controller,
-            hintText: widget.isLoading ? 'Loading roles...' : (widget.hintText ?? 'Choose a role...'),
+            hintText: widget.isLoading
+                ? 'Loading roles...'
+                : (widget.hintText ?? 'Choose a role...'),
             readOnly: true,
             prefixIcon: const Icon(Icons.shield_outlined, size: 20),
             suffixIcon: const Icon(Icons.keyboard_arrow_down, size: 20),

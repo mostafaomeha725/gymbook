@@ -9,7 +9,7 @@ import 'package:gymbook/features/notifications/data/models/notification_model.da
 class SignalRService {
   final PreferencesStorage _storage;
   HubConnection? _hubConnection;
-  
+
   final StreamController<NotificationEntity> _notificationController =
       StreamController<NotificationEntity>.broadcast();
 
@@ -28,13 +28,16 @@ class SignalRService {
     safePrint("SignalR Connecting...");
 
     _hubConnection = HubConnectionBuilder()
-        .withUrl(AppStrings.notificationHubUrl, options: HttpConnectionOptions(
-          accessTokenFactory: () async {
-            // SignalR automatically uses this to get the token for connections and reconnections
-            final token = _storage.getUserToken();
-            return token ?? "";
-          },
-        ))
+        .withUrl(
+          AppStrings.notificationHubUrl,
+          options: HttpConnectionOptions(
+            accessTokenFactory: () async {
+              // SignalR automatically uses this to get the token for connections and reconnections
+              final token = _storage.getUserToken();
+              return token ?? "";
+            },
+          ),
+        )
         .withAutomaticReconnect()
         .build();
 
@@ -78,7 +81,10 @@ class SignalRService {
   Future<void> disconnect() async {
     if (_hubConnection != null) {
       safePrint("SignalR Disconnecting...");
-      _hubConnection?.off("ReceiveNotification", method: _onReceiveNotification);
+      _hubConnection?.off(
+        "ReceiveNotification",
+        method: _onReceiveNotification,
+      );
       await _hubConnection?.stop();
       safePrint("Logout -> SignalR Disconnected");
     }

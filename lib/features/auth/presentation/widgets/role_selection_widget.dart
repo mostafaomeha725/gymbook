@@ -20,7 +20,7 @@ class RoleSelectionWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildRoleCard(
-            title: 'Admin',
+            title: 'Partner\nAdmin',
             icon: Icons.groups,
             iconColor: const Color(0xff0EA5E9),
             value: 2,
@@ -59,8 +59,7 @@ class RoleSelectionWidget extends StatelessWidget {
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
             color: isSelected
-                // ignore: deprecated_member_use
-                ? const Color(0xff0EA5E9).withOpacity(0.05)
+                ? const Color(0xff0EA5E9).withValues(alpha: 0.05)
                 : Colors.white,
             border: Border.all(
               color: isSelected

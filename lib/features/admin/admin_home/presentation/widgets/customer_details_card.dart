@@ -84,7 +84,7 @@ class CustomerDetailsCard extends StatelessWidget {
             value: email,
           ),
           CustomerInfoItem(
-            icon: Icons.phone_outlined,
+            iconWidget: Text('🇪🇬', style: TextStyle(fontSize: 16.sp)),
             title: "Phone Number",
             value: phone,
           ),

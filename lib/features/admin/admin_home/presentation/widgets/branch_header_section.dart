@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/di/services_locator.dart';
+import 'package:gymbook/core/enums/app_enums.dart';
+import 'package:gymbook/core/services/user_role_service.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_details_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_entity.dart';
@@ -23,8 +25,7 @@ class BranchHeaderSection extends StatefulWidget {
 }
 
 class _BranchHeaderSectionState extends State<BranchHeaderSection> {
-  static const String _placeholderImage =
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+  static const String _placeholderImage = '';
 
   late bool isActive;
   int _selectedGalleryIndex = 0;
@@ -77,8 +78,7 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
                 ? setupLogo
                 : detailsLogo.isNotEmpty
                 ? detailsLogo
-                : (branch.logo ??
-                      'https://randomuser.me/api/portraits/men/32.jpg');
+                : (branch.logo ?? '');
 
             final galleryUrls = _setupGalleryUrls(setupState);
             final selectedIndex = _resolveSelectedIndex(galleryUrls.length);
@@ -87,33 +87,53 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
                 : coverUrl;
 
             final setupName = setupState.details?.businessDetails.name;
-            final detailsName = detailsState is BranchDetailsSuccess ? detailsState.response.name : null;
+            final detailsName = detailsState is BranchDetailsSuccess
+                ? detailsState.response.name
+                : null;
             final String? updatedName = setupName ?? detailsName ?? branch.name;
 
-            final int? setupType = setupState.details?.businessDetails.branchType;
-            final int? detailsType = detailsState is BranchDetailsSuccess ? detailsState.response.branchType : null;
-            final int updatedType = setupType ?? detailsType ?? branch.branchType;
+            final int? setupType =
+                setupState.details?.businessDetails.branchType;
+            final int? detailsType = detailsState is BranchDetailsSuccess
+                ? detailsState.response.branchType
+                : null;
+            final int updatedType =
+                setupType ?? detailsType ?? branch.branchType;
 
-            final int? detailsStatus = detailsState is BranchDetailsSuccess ? detailsState.response.branchStatus : null;
+            final int? detailsStatus = detailsState is BranchDetailsSuccess
+                ? detailsState.response.branchStatus
+                : null;
             final int updatedStatus = detailsStatus ?? branch.branchStatus;
 
             final setupGov = setupState.details?.location.governorate;
-            final detailsGov = detailsState is BranchDetailsSuccess ? detailsState.response.governorate : null;
-            final updatedGov = setupGov != null 
-                ? GovernorateEntity(id: setupGov.id, name: setupGov.name) 
+            final detailsGov = detailsState is BranchDetailsSuccess
+                ? detailsState.response.governorate
+                : null;
+            final updatedGov = setupGov != null
+                ? GovernorateEntity(id: setupGov.id, name: setupGov.name)
                 : detailsGov ?? branch.governorate;
 
-            final updatedAddress = setupState.details?.location.address ?? (detailsState is BranchDetailsSuccess ? detailsState.response.address : branch.address);
+            final updatedAddress =
+                setupState.details?.location.address ??
+                (detailsState is BranchDetailsSuccess
+                    ? detailsState.response.address
+                    : branch.address);
 
             final updatedBranch = BranchEntity(
               id: branch.id,
               name: updatedName,
               email: setupState.details?.businessDetails.email ?? branch.email,
-              phoneNumber: setupState.details?.businessDetails.phoneNumber ?? branch.phoneNumber,
+              phoneNumber:
+                  setupState.details?.businessDetails.phoneNumber ??
+                  branch.phoneNumber,
               governorate: updatedGov,
               address: updatedAddress,
-              latitude: setupState.details?.location.coordinates.latitude ?? branch.latitude,
-              longitude: setupState.details?.location.coordinates.longitude ?? branch.longitude,
+              latitude:
+                  setupState.details?.location.coordinates.latitude ??
+                  branch.latitude,
+              longitude:
+                  setupState.details?.location.coordinates.longitude ??
+                  branch.longitude,
               branchType: updatedType,
               branchStatus: updatedStatus,
               logoImageId: branch.logoImageId,
@@ -128,6 +148,9 @@ class _BranchHeaderSectionState extends State<BranchHeaderSection> {
               isActive: isActive,
               onStatusChanged: _updateStatus,
               onBackTap: () => GoRouter.of(context).pop(),
+              showBackButton:
+                  sl<UserRoleService>().getCurrentRole() !=
+                  AppUserRole.branchAdmin,
               galleryUrls: galleryUrls,
               selectedIndex: selectedIndex,
               onPreviousTap: galleryUrls.length > 1

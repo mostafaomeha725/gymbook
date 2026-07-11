@@ -11,28 +11,32 @@ class CustomerSubscriptionsCubit extends Cubit<CustomerSubscriptionsState> {
 
   StreamSubscription? _subscription;
 
-  Future<void> loadSubscriptions({int pageNumber = 1, int pageSize = 50}) async {
+  Future<void> loadSubscriptions({
+    int pageNumber = 1,
+    int pageSize = 5,
+  }) async {
     await _subscription?.cancel();
 
     if (state is! CustomerSubscriptionsLoaded) {
       emit(CustomerSubscriptionsLoading());
     }
 
-    _subscription = getCustomerSubscriptionsUseCase(
-      pageNumber: pageNumber,
-      pageSize: pageSize,
-    ).listen((result) {
-      result.fold(
-        (failure) {
-          if (state is! CustomerSubscriptionsLoaded) {
-            emit(CustomerSubscriptionsError(failure.message));
-          }
-        },
-        (data) {
-          emit(CustomerSubscriptionsLoaded(data));
-        },
-      );
-    });
+    _subscription =
+        getCustomerSubscriptionsUseCase(
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+        ).listen((result) {
+          result.fold(
+            (failure) {
+              if (state is! CustomerSubscriptionsLoaded) {
+                emit(CustomerSubscriptionsError(failure.message));
+              }
+            },
+            (data) {
+              emit(CustomerSubscriptionsLoaded(data));
+            },
+          );
+        });
   }
 
   @override

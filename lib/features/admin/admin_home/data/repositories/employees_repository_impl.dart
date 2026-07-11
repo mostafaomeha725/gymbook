@@ -27,7 +27,10 @@ class EmployeesRepositoryImpl implements EmployeesRepository {
   }
 
   @override
-  Stream<Either<Failure, BranchEmployeesResponse>> getBranchEmployees(int branchId, int pageNumber) async* {
+  Stream<Either<Failure, BranchEmployeesResponse>> getBranchEmployees(
+    int branchId,
+    int pageNumber,
+  ) async* {
     final String cacheKey = 'branch_employees_${branchId}_page_$pageNumber';
     bool emittedCache = false;
 
@@ -48,13 +51,18 @@ class EmployeesRepositoryImpl implements EmployeesRepository {
 
     // 2. Fetch from Network
     try {
-      final remoteModel = await remoteDataSource.getBranchEmployees(branchId, pageNumber);
+      final remoteModel = await remoteDataSource.getBranchEmployees(
+        branchId,
+        pageNumber,
+      );
       final remoteJsonString = jsonEncode(remoteModel.toJson());
 
       // Retrieve current cache to compare
       bool shouldUpdateCacheAndEmit = true;
       if (emittedCache) {
-        final currentCachedJson = Hive.box<String>(HiveBoxes.cacheBox).get(cacheKey);
+        final currentCachedJson = Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).get(cacheKey);
         if (currentCachedJson != null && currentCachedJson.isNotEmpty) {
           try {
             final wrapper = jsonDecode(currentCachedJson);
@@ -71,7 +79,9 @@ class EmployeesRepositoryImpl implements EmployeesRepository {
           'timestamp': DateTime.now().millisecondsSinceEpoch,
           'data': remoteModel.toJson(),
         };
-        await Hive.box<String>(HiveBoxes.cacheBox).put(cacheKey, jsonEncode(newCacheWrapper));
+        await Hive.box<String>(
+          HiveBoxes.cacheBox,
+        ).put(cacheKey, jsonEncode(newCacheWrapper));
         yield Right(remoteModel);
       }
     } catch (e) {
@@ -86,7 +96,9 @@ class EmployeesRepositoryImpl implements EmployeesRepository {
   }
 
   @override
-  Future<Either<Failure, EmployeeModel>> addEmployee(Map<String, dynamic> body) async {
+  Future<Either<Failure, EmployeeModel>> addEmployee(
+    Map<String, dynamic> body,
+  ) async {
     try {
       final response = await remoteDataSource.addEmployee(body);
       return Right(response);
@@ -98,7 +110,10 @@ class EmployeesRepositoryImpl implements EmployeesRepository {
   }
 
   @override
-  Future<Either<Failure, EmployeeModel>> updateEmployee(int employeeId, Map<String, dynamic> body) async {
+  Future<Either<Failure, EmployeeModel>> updateEmployee(
+    int employeeId,
+    Map<String, dynamic> body,
+  ) async {
     try {
       final response = await remoteDataSource.updateEmployee(employeeId, body);
       return Right(response);

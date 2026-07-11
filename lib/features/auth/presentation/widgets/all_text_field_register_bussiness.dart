@@ -23,6 +23,12 @@ class _AllTextFieldRegisterBussinessState
   final TextEditingController emailcontroller = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    phoneNumbercontroller.text = '+20';
+  }
+
+  @override
   void dispose() {
     phoneNumbercontroller.dispose();
     emailcontroller.dispose();
@@ -69,8 +75,12 @@ class _AllTextFieldRegisterBussinessState
             hintText: '+20 XXX XXX XXX',
             maxLines: 1,
             prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 8.w),
-              child: Icon(Icons.phone_outlined, size: 22.sp),
+              padding: EdgeInsets.only(left: 12.w, right: 8.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Text('🇪🇬', style: TextStyle(fontSize: 16.sp))],
+              ),
             ),
             radius: 22.r,
           ),

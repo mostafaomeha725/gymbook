@@ -33,7 +33,7 @@ class DetailsContent extends StatelessWidget {
       'Nov',
       'Dec',
     ];
-    return '${dt.day} ${months[dt.month - 1]}';
+    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
   }
 
   @override
@@ -112,12 +112,6 @@ class DetailsContent extends StatelessWidget {
                     ? 'Freeze Subscription'
                     : 'Un Freeze Subscription',
                 icon: Icons.ac_unit,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                ),
-                iconGradient: const LinearGradient(
-                  colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
-                ),
                 onTap: isLoading
                     ? () {}
                     : () => context.read<FreezeSubscriptionCubit>().submit(

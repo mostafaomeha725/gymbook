@@ -99,4 +99,53 @@ class GetTypeColor {
     if (initials == 'KS') return const Color(0xFF16A34A);
     return Colors.black;
   }
+
+  String getSubscriptionStatusText(int statusValue) {
+    switch (statusValue) {
+      case 0:
+        return 'Scheduled';
+      case 1:
+        return 'Active';
+      case 2:
+        return 'Frozen';
+      case 3:
+        return 'Expired';
+      case 4:
+        return 'Cancelled';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Color getSubscriptionStatusColor(int statusValue) {
+    switch (statusValue) {
+      case 0:
+        return const Color(0xFFF59E0B);
+      case 1:
+        return Colors.green;
+      case 2:
+        return Colors.orange;
+      case 3:
+      case 4:
+        return Colors.red;
+      default:
+        return const Color(0xff64748B);
+    }
+  }
+
+  Color getSubscriptionStatusBgColor(int statusValue) {
+    switch (statusValue) {
+      case 0:
+        return const Color(0xFFF59E0B).withOpacity(0.15);
+      case 1:
+        return Colors.green.withOpacity(0.15);
+      case 2:
+        return Colors.orange.withOpacity(0.15);
+      case 3:
+      case 4:
+        return Colors.red.withOpacity(0.12);
+      default:
+        return const Color(0xffE2E8F0);
+    }
+  }
 }

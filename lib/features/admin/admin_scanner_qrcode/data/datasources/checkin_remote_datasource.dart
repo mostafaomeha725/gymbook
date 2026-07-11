@@ -1,9 +1,10 @@
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/network/endpoints.dart';
 import 'package:gymbook/core/network/network_service.dart';
+import 'package:gymbook/features/admin/admin_scanner_qrcode/data/models/checkin_result_model.dart';
 
 abstract class CheckInRemoteDataSource {
-  Future<void> addCheckIn({
+  Future<CheckInResultModel> addCheckIn({
     required int customerId,
     required String code,
     required int branchId,
@@ -16,7 +17,7 @@ class CheckInRemoteDataSourceImpl implements CheckInRemoteDataSource {
   CheckInRemoteDataSourceImpl(this.networkService);
 
   @override
-  Future<void> addCheckIn({
+  Future<CheckInResultModel> addCheckIn({
     required int customerId,
     required String code,
     required int branchId,
@@ -26,6 +27,18 @@ class CheckInRemoteDataSourceImpl implements CheckInRemoteDataSource {
       data: {'customerId': customerId, 'code': code, 'branchId': branchId},
     );
 
-    response.fold((failure) => throw ServerException(failure.message), (_) {});
+    return response.fold((failure) => throw ServerException(failure.message), (
+      data,
+    ) {
+      if (data is Map<String, dynamic>) {
+        return CheckInResultModel.fromJson(data);
+      }
+      // Fallback if API returns something unexpected
+      return const CheckInResultModel(
+        memberName: '',
+        packageName: '',
+        lastCheckIn: '',
+      );
+    });
   }
 }

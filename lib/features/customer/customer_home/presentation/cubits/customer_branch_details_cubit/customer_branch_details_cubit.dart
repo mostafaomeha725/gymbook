@@ -23,39 +23,39 @@ class CustomerBranchDetailsCubit extends Cubit<CustomerBranchDetailsState> {
       emit(CustomerBranchDetailsLoading());
     }
 
-    _subscription = getBranchDetailsUseCase(branchId: branchId).listen(
-      (result) {
-        result.fold(
-          (failure) {
-            // Only emit error if we don't already have data displayed.
-            if (state is! CustomerBranchDetailsLoaded) {
-              emit(CustomerBranchDetailsError(failure.message));
-            }
-          },
-          (details) {
-            final images = details.images
-                .map((item) => item.url)
-                .where((url) => url.trim().isNotEmpty)
-                .toList();
-            final displayImages = images.isEmpty
-                ? <String>[Assets.gym3, Assets.gym2, Assets.gym3]
-                : images;
+    _subscription = getBranchDetailsUseCase(branchId: branchId).listen((
+      result,
+    ) {
+      result.fold(
+        (failure) {
+          // Only emit error if we don't already have data displayed.
+          if (state is! CustomerBranchDetailsLoaded) {
+            emit(CustomerBranchDetailsError(failure.message));
+          }
+        },
+        (details) {
+          final images = details.images
+              .map((item) => item.url)
+              .where((url) => url.trim().isNotEmpty)
+              .toList();
+          final displayImages = images.isEmpty
+              ? <String>[Assets.gym3, Assets.gym2, Assets.gym3]
+              : images;
 
-            final workingHours = _mapWorkingHours(details.workingHours);
-            final plans = _mapPlans(details.packages);
+          final workingHours = _mapWorkingHours(details.workingHours);
+          final plans = _mapPlans(details.packages);
 
-            emit(
-              CustomerBranchDetailsLoaded(
-                details: details,
-                displayImages: displayImages,
-                workingHours: workingHours,
-                plans: plans,
-              ),
-            );
-          },
-        );
-      },
-    );
+          emit(
+            CustomerBranchDetailsLoaded(
+              details: details,
+              displayImages: displayImages,
+              workingHours: workingHours,
+              plans: plans,
+            ),
+          );
+        },
+      );
+    });
   }
 
   @override
@@ -68,7 +68,14 @@ class CustomerBranchDetailsCubit extends Cubit<CustomerBranchDetailsState> {
     if (value.trim().isEmpty) return '--:--';
     final split = value.split(':');
     if (split.length < 2) return value;
-    return '${split[0].padLeft(2, '0')}:${split[1].padLeft(2, '0')}';
+    final hourInt = int.tryParse(split[0]);
+    if (hourInt == null) return value;
+
+    final isPM = hourInt >= 12;
+    final hour12 = hourInt == 0 ? 12 : (hourInt > 12 ? hourInt - 12 : hourInt);
+    final period = isPM ? 'PM' : 'AM';
+
+    return '${hour12.toString().padLeft(2, '0')}:${split[1].padLeft(2, '0')} $period';
   }
 
   List<WorkingHourViewModel> _mapWorkingHours(
@@ -110,6 +117,8 @@ class CustomerBranchDetailsCubit extends Cubit<CustomerBranchDetailsState> {
             price: item.price,
             duration:
                 '${item.durationInMonths} month${item.durationInMonths == 1 ? '' : 's'}',
+            numberOfFreezes: item.numberOfFreezes,
+            freezeDurationInDays: item.freezeDurationInDays,
           ),
         )
         .toList();

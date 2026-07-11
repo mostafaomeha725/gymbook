@@ -74,6 +74,14 @@ class NewUserForm extends StatelessWidget {
               borderColor: Colors.transparent,
               radius: 14.r,
               keyboardType: TextInputType.phone,
+              prefixIcon: Padding(
+                padding: EdgeInsets.only(left: 12.w, right: 8.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Text('🇪🇬', style: TextStyle(fontSize: 16.sp))],
+                ),
+              ),
             ),
             SizedBox(height: 12.h),
             _fieldLabel('Email'),

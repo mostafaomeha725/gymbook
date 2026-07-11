@@ -12,7 +12,8 @@ class AdminEmployeesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<BranchEmployeesCubit>()..getBranchEmployees(branchId),
+      create: (context) =>
+          sl<BranchEmployeesCubit>()..getBranchEmployees(branchId),
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         body: AdminEmployeesScreenBody(branchId: branchId),

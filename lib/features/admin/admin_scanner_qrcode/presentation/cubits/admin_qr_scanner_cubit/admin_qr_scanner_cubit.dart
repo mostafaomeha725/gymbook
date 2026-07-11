@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
+import 'package:gymbook/features/admin/admin_scanner_qrcode/data/models/checkin_result_model.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/domain/usecases/add_checkin_usecase.dart';
 
 part 'admin_qr_scanner_state.dart';
@@ -28,7 +29,13 @@ class AdminQrScannerCubit extends Cubit<AdminQrScannerState> {
     }
 
     _isBusy = true;
-    emit(state.copyWith(isSubmitting: true, clearMessages: true));
+    emit(
+      state.copyWith(
+        isSubmitting: true,
+        clearMessages: true,
+        clearScanResult: true,
+      ),
+    );
 
     final result = await addCheckInUseCase(
       customerId: payload.customerId,
@@ -40,10 +47,11 @@ class AdminQrScannerCubit extends Cubit<AdminQrScannerState> {
       (failure) => emit(
         state.copyWith(isSubmitting: false, errorMessage: failure.message),
       ),
-      (_) => emit(
+      (checkInResult) => emit(
         state.copyWith(
           isSubmitting: false,
           successMessage: 'Check-in added successfully',
+          scanResult: checkInResult,
         ),
       ),
     );
@@ -54,6 +62,10 @@ class AdminQrScannerCubit extends Cubit<AdminQrScannerState> {
 
   void clearMessage() {
     emit(state.copyWith(clearMessages: true));
+  }
+
+  void clearScanResult() {
+    emit(state.copyWith(clearScanResult: true));
   }
 
   _ScannedPayload? _parsePayload(String rawValue) {

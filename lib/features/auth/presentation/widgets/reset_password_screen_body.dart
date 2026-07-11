@@ -90,7 +90,7 @@ class _ResetPasswordScreenBodyState extends State<ResetPasswordScreenBody> {
 
                   AppText(
                     'New Password',
-                    style: font32w700.copyWith(color: const Color(0xFF2C3E50)),
+                    style: font24w700.copyWith(color: const Color(0xFF2C3E50)),
                     alignment: AlignmentDirectional.center,
                   ),
 

@@ -49,10 +49,7 @@ class NotificationIcon extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.red,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 1.5,
-                      ),
+                      border: Border.all(color: Colors.white, width: 1.5),
                     ),
                     child: AppText(
                       badgeCount > 9 ? '+9' : badgeCount.toString(),

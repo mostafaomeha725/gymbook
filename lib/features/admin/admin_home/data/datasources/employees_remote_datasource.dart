@@ -6,9 +6,15 @@ import 'package:gymbook/features/admin/admin_home/data/models/employee_model.dar
 
 abstract class EmployeesRemoteDataSource {
   Future<List<RoleModel>> getRoles();
-  Future<BranchEmployeesResponse> getBranchEmployees(int branchId, int pageNumber);
+  Future<BranchEmployeesResponse> getBranchEmployees(
+    int branchId,
+    int pageNumber,
+  );
   Future<EmployeeModel> addEmployee(Map<String, dynamic> body);
-  Future<EmployeeModel> updateEmployee(int employeeId, Map<String, dynamic> body);
+  Future<EmployeeModel> updateEmployee(
+    int employeeId,
+    Map<String, dynamic> body,
+  );
 }
 
 class EmployeesRemoteDataSourceImpl implements EmployeesRemoteDataSource {
@@ -18,22 +24,23 @@ class EmployeesRemoteDataSourceImpl implements EmployeesRemoteDataSource {
 
   @override
   Future<List<RoleModel>> getRoles() async {
-    final response = await networkService.getData(
-      endPoint: EndPoints.getRoles,
-    );
+    final response = await networkService.getData(endPoint: EndPoints.getRoles);
 
-    return response.fold(
-      (failure) => throw ServerException(failure.message),
-      (data) {
-        return (data as List<dynamic>)
-            .whereType<Map>()
-            .map((item) => RoleModel.fromJson(Map<String, dynamic>.from(item)))
-            .toList();
-      },
-    );
+    return response.fold((failure) => throw ServerException(failure.message), (
+      data,
+    ) {
+      return (data as List<dynamic>)
+          .whereType<Map>()
+          .map((item) => RoleModel.fromJson(Map<String, dynamic>.from(item)))
+          .toList();
+    });
   }
+
   @override
-  Future<BranchEmployeesResponse> getBranchEmployees(int branchId, int pageNumber) async {
+  Future<BranchEmployeesResponse> getBranchEmployees(
+    int branchId,
+    int pageNumber,
+  ) async {
     final response = await networkService.getData(
       endPoint: EndPoints.getBranchEmployees(branchId),
       queryParameters: {'PageNumber': pageNumber, 'PageSize': 10},
@@ -59,7 +66,10 @@ class EmployeesRemoteDataSourceImpl implements EmployeesRemoteDataSource {
   }
 
   @override
-  Future<EmployeeModel> updateEmployee(int employeeId, Map<String, dynamic> body) async {
+  Future<EmployeeModel> updateEmployee(
+    int employeeId,
+    Map<String, dynamic> body,
+  ) async {
     final response = await networkService.patchData(
       endPoint: EndPoints.updateEmployee(employeeId),
       data: body,

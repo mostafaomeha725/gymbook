@@ -19,11 +19,11 @@ class PaymentTransactionStatusEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        transactionId,
-        status,
-        paidAt,
-        amount,
-        currency,
-        packageId,
-      ];
+    transactionId,
+    status,
+    paidAt,
+    amount,
+    currency,
+    packageId,
+  ];
 }

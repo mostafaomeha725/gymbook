@@ -22,6 +22,9 @@ TextStyle get font12w500 =>
 TextStyle get font12w700 =>
     TextStyle(fontWeight: FontWeight.w700, fontSize: 12.sp);
 
+TextStyle get font13w600 =>
+    TextStyle(fontWeight: FontWeight.w600, fontSize: 13.sp);
+
 TextStyle get font14w400 =>
     TextStyle(fontWeight: FontWeight.w400, fontSize: 14.sp);
 

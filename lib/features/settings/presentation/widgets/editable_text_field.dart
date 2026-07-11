@@ -6,9 +6,10 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 class EditableTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? prefixWidget;
   final TextInputType? inputType;
-  final VoidCallback onEditTap;
+  final VoidCallback? onEditTap;
   final bool isEditable;
   final FocusNode focusNode;
 
@@ -16,8 +17,9 @@ class EditableTextField extends StatelessWidget {
     super.key,
     required this.label,
     required this.controller,
-    required this.icon,
-    required this.onEditTap,
+    this.icon,
+    this.prefixWidget,
+    this.onEditTap,
     required this.isEditable,
     required this.focusNode,
     this.inputType,
@@ -41,16 +43,22 @@ class EditableTextField extends StatelessWidget {
               color: isEditable ? Colors.black87 : Colors.black54,
             ),
             decoration: InputDecoration(
-              prefixIcon: Icon(icon, size: 22.sp),
-              suffixIcon: IconButton(
-                onPressed: onEditTap,
-                icon: Icon(
-                  isEditable ? Icons.check_circle : Icons.edit_square,
-                  color: isEditable ? Colors.green : const Color(0xFF134FA2),
-                  size: isEditable ? 24.sp : 20.sp,
-                ),
-                splashRadius: 24,
-              ),
+              prefixIcon:
+                  prefixWidget ??
+                  (icon != null ? Icon(icon, size: 22.sp) : null),
+              suffixIcon: onEditTap != null
+                  ? IconButton(
+                      onPressed: onEditTap,
+                      icon: Icon(
+                        isEditable ? Icons.check_circle : Icons.edit_square,
+                        color: isEditable
+                            ? Colors.green
+                            : const Color(0xFF134FA2),
+                        size: isEditable ? 24.sp : 20.sp,
+                      ),
+                      splashRadius: 24,
+                    )
+                  : null,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 16.w,
                 vertical: 14.h,

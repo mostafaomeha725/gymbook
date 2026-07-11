@@ -9,9 +9,8 @@ abstract class PaymentsRepository {
     required int packageId,
   });
 
-  Future<Either<Failure, PaymentTransactionStatusEntity>> getPaymentTransactionStatus(
-    int transactionId,
-  );
+  Future<Either<Failure, PaymentTransactionStatusEntity>>
+  getPaymentTransactionStatus(int transactionId);
 
   Future<Either<Failure, void>> initPaymentSheet(String clientSecret);
 

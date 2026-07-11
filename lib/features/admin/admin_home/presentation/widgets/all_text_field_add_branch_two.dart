@@ -6,7 +6,7 @@ import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
-import 'package:gymbook/core/widgets/custom_snack_bar.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/governorate_dropdown.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/branch_list_model.dart';
@@ -76,10 +76,7 @@ class _AllTextFieldAddBranchTwoState extends State<AllTextFieldAddBranchTwo> {
     return BlocListener<BranchLocationCubit, BranchLocationState>(
       listener: (context, state) {
         if (state is BranchLocationSuccess) {
-          CustomSnackBar.showSuccess(
-            context,
-            message: 'Location saved successfully',
-          );
+          showSuccess('Location saved successfully');
           if (widget.args?.isEditMode == true) {
             GoRouter.of(context).pop(true);
           } else {

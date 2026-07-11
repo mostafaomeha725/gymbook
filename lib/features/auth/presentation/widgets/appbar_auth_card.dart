@@ -44,16 +44,21 @@ class AppbarAuthCard extends StatelessWidget {
             Row(
               children: [
                 GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () {
                     GoRouter.of(context).pop();
                   },
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 24.sp,
+                  child: Container(
+                    height: 40.h,
+                    padding: EdgeInsets.only(right: 16.w),
+                    alignment: Alignment.centerLeft,
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 24.sp,
+                    ),
                   ),
                 ),
-                SizedBox(width: 16.w),
                 AppText(title, style: font20w700.copyWith(color: Colors.white)),
               ],
             ),

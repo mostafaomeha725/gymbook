@@ -33,7 +33,7 @@ class AddBranchOneScreenBody extends StatelessWidget {
                   GoRouter.of(context).pop(true);
                 } else {
                   showSuccess('Branch created successfully!');
-                  GoRouter.of(context).go(
+                  GoRouter.of(context).push(
                     '${Routes.addBranchTwoScreen}?branchId=${state.branchResponse.id}',
                   );
                 }

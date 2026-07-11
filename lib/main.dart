@@ -31,8 +31,6 @@ Future<void> main() async {
 
   await ServiceLocator().init();
 
-
-
   configureEasyLoading();
 
   runApp(const GymbookApp());

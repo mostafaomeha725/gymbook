@@ -14,7 +14,8 @@ class BranchReviewsModel extends BranchReviewsEntity {
 
   factory BranchReviewsModel.fromJson(Map<String, dynamic> json) {
     return BranchReviewsModel(
-      data: (json['data'] as List<dynamic>?)
+      data:
+          (json['data'] as List<dynamic>?)
               ?.map((e) => ReviewModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

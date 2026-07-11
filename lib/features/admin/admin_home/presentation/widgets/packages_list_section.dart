@@ -80,22 +80,30 @@ class PackagesListSection extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 22.w),
-              child: Column(
-                children: List.generate(packages.length, (index) {
-                  final pkg = packages[index];
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12.h),
-                    child: PackageSelectCard(
-                      title: pkg.name,
-                      duration: _formatDuration(pkg.durationInMonths),
-                      price: _formatPrice(pkg.price),
-                      freezes: '${pkg.numberOfFreezes}',
-                      icon: Icons.inventory_2_outlined,
-                      isActive: selectedPackageIndex == index,
-                      onTap: () => onPackageSelected(index),
-                    ),
-                  );
-                }),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: 360.h, // Height for approx 3 packages
+                ),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: packages.length,
+                  itemBuilder: (context, index) {
+                    final pkg = packages[index];
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 12.h),
+                      child: PackageSelectCard(
+                        title: pkg.name,
+                        duration: _formatDuration(pkg.durationInMonths),
+                        price: _formatPrice(pkg.price),
+                        freezes: '${pkg.numberOfFreezes}',
+                        icon: Icons.inventory_2_outlined,
+                        isActive: selectedPackageIndex == index,
+                        onTap: () => onPackageSelected(index),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
 

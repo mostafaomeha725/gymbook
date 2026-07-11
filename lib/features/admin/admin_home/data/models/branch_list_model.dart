@@ -155,10 +155,7 @@ class BranchItem {
       'phoneNumber': phoneNumber,
       'location': {
         'address': address,
-        'coordinates': {
-          'latitude': latitude,
-          'longitude': longitude,
-        },
+        'coordinates': {'latitude': latitude, 'longitude': longitude},
         'governorate': governorate?.toJson(),
       },
       'branchType': branchType,
@@ -201,10 +198,7 @@ class BranchGovernorate {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }
 

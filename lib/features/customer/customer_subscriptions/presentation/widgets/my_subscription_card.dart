@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/app_image.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/widgets/get_type_color.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/status_badge.dart';
 
 class MySubscriptionCard extends StatelessWidget {
@@ -31,40 +32,17 @@ class MySubscriptionCard extends StatelessWidget {
     this.onTap,
   });
 
-  Color _getStatusColor() {
-    switch (status) {
-      case 0:
-        return const Color(0xFFF59E0B);
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.orange;
-      case 3:
-      case 4:
-        return Colors.red;
-      default:
-        return const Color(0xff64748B);
-    }
-  }
-
-  Color _getStatusBgColor() {
-    switch (status) {
-      case 0:
-        return const Color(0xFFF59E0B).withOpacity(.15);
-      case 1:
-        return Colors.green.withOpacity(.15);
-      case 2:
-        return Colors.orange.withOpacity(.15);
-      case 3:
-      case 4:
-        return Colors.red.withOpacity(.12);
-      default:
-        return const Color(0xffE2E8F0);
-    }
+  Color _getProgressColor(double progress, bool isExpired) {
+    if (isExpired) return Colors.grey;
+    if (progress >= 0.70) return const Color(0xFF16A34A); // Green
+    if (progress >= 0.40) return const Color(0xFF3B82F6); // Blue
+    if (progress >= 0.20) return const Color(0xFFF59E0B); // Orange
+    return const Color(0xFFEF4444); // Red
   }
 
   @override
   Widget build(BuildContext context) {
+    final typeColor = GetTypeColor();
     final safeSessionsTotal = sessionsTotal <= 0 ? 1 : sessionsTotal;
     final progress = (sessionsUsed / safeSessionsTotal).clamp(0.0, 1.0);
 
@@ -115,11 +93,11 @@ class MySubscriptionCard extends StatelessWidget {
 
             SizedBox(height: 16.h),
 
-            /// Sessions
+            /// Days Left
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AppText("Sessions", style: font14w500),
+                AppText("DAYS LEFT", style: font14w500),
                 AppText("$sessionsUsed/$sessionsTotal", style: font14w700),
               ],
             ),
@@ -134,7 +112,7 @@ class MySubscriptionCard extends StatelessWidget {
                 minHeight: 6.h,
                 backgroundColor: Colors.grey.shade300,
                 valueColor: AlwaysStoppedAnimation(
-                  isExpired ? Colors.grey : Colors.black,
+                  _getProgressColor(progress, isExpired),
                 ),
               ),
             ),
@@ -145,11 +123,11 @@ class MySubscriptionCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (!isExpired && daysLeft != null)
+                if (!isExpired)
                   StatusBadge(
-                    text: "$daysLeft days left",
-                    color: _getStatusColor(),
-                    bgColor: _getStatusBgColor(),
+                    text: typeColor.getSubscriptionStatusText(status),
+                    color: typeColor.getSubscriptionStatusColor(status),
+                    bgColor: typeColor.getSubscriptionStatusBgColor(status),
                   ),
                 if (isExpired && expiredDate != null)
                   StatusBadge(

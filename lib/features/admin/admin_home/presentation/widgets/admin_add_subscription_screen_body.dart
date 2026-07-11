@@ -143,16 +143,24 @@ class _AdminAddSubscriptionScreenBodyState
                         showError('Please enter email address');
                         return;
                       }
-                      if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email)) {
+                      if (!RegExp(
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                      ).hasMatch(email)) {
                         showError('Please enter a valid email address');
                         return;
+                      }
+
+                      String phoneToSubmit = _phoneController.text.trim();
+                      if (phoneToSubmit.isNotEmpty &&
+                          !phoneToSubmit.startsWith('+')) {
+                        phoneToSubmit = '+20$phoneToSubmit';
                       }
 
                       context.read<AddMemberCubit>().addMember(
                         branchId: widget.branchId,
                         firstName: _firstNameController.text.trim(),
                         lastName: _lastNameController.text.trim(),
-                        phoneNumber: _phoneController.text.trim(),
+                        phoneNumber: phoneToSubmit,
                         email: email,
                         packageId: pkg.id,
                       );
@@ -162,7 +170,9 @@ class _AdminAddSubscriptionScreenBodyState
                         showError('Please enter email address');
                         return;
                       }
-                      if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email)) {
+                      if (!RegExp(
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                      ).hasMatch(email)) {
                         showError('Please enter a valid email address');
                         return;
                       }

@@ -11,6 +11,7 @@ class GymInfoCard extends StatelessWidget {
   final double rating;
   final int reviewsCount;
   final String type; // mixed | men | women
+  final bool isOpenNow;
   final VoidCallback onDirectionsTap;
   final VoidCallback onReviewsTap;
 
@@ -21,6 +22,7 @@ class GymInfoCard extends StatelessWidget {
     required this.rating,
     required this.reviewsCount,
     required this.type,
+    required this.isOpenNow,
     required this.onDirectionsTap,
     required this.onReviewsTap,
   });
@@ -104,17 +106,45 @@ class GymInfoCard extends StatelessWidget {
                 ),
               ),
 
-              /// Type Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: typeBgColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: AppText(
-                  type,
-                  style: font12w500.copyWith(color: typeColor),
-                ),
+              /// Badges (Open/Close + Type)
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 4.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isOpenNow
+                          ? const Color(0xffDCFCE7)
+                          : const Color(0xffFEE2E2),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: AppText(
+                      isOpenNow ? 'Open Now' : 'Closed',
+                      style: font12w500.copyWith(
+                        color: isOpenNow
+                            ? const Color(0xff16A34A)
+                            : const Color(0xffDC2626),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 4.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: typeBgColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: AppText(
+                      type,
+                      style: font12w500.copyWith(color: typeColor),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

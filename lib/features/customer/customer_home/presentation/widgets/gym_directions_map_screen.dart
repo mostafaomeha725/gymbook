@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:latlong2/latlong.dart';
 
 class GymDirectionsMapScreen extends StatefulWidget {
@@ -54,9 +55,7 @@ class _GymDirectionsMapScreenState extends State<GymDirectionsMapScreen> {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location service is disabled')),
-        );
+        showError('Location service is disabled');
         setState(() => _loading = false);
         return;
       }
@@ -69,9 +68,7 @@ class _GymDirectionsMapScreenState extends State<GymDirectionsMapScreen> {
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permission is required')),
-        );
+        showError('Location permission is required');
         setState(() => _loading = false);
         return;
       }
@@ -133,9 +130,7 @@ class _GymDirectionsMapScreenState extends State<GymDirectionsMapScreen> {
 
   void _toggleRoute() {
     if (_userLocation == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Current location is not available yet')),
-      );
+      showError('Current location is not available yet');
       return;
     }
 

@@ -15,6 +15,7 @@ import 'package:gymbook/features/auth/domain/repositories/auth_repository.dart';
 import 'package:gymbook/features/auth/presentation/cubits/confirm_email_cubit/confirm_email_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/confirm_email_cubit/confirm_email_state.dart';
 import 'package:gymbook/features/auth/presentation/cubits/resend_confirmation_email_cubit/resend_confirmation_email_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/forget_password_cubit/forget_password_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/validate_reset_password_code_cubit/validate_reset_password_code_cubit.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/screens/reset_password_screen.dart';
@@ -96,7 +97,13 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
       return;
     }
 
-    context.read<ResendConfirmationEmailCubit>().resendConfirmationEmail(email);
+    if (widget.purpose == OtpPurpose.resetPassword) {
+      context.read<ForgetPasswordCubit>().sendResetPasswordEmail(email);
+    } else {
+      context.read<ResendConfirmationEmailCubit>().resendConfirmationEmail(
+        email,
+      );
+    }
   }
 
   void _onVerifyPressed() {
@@ -130,7 +137,7 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
       await sl<AuthRepository>().confirmPendingSession();
       sl<PreferencesStorage>().saveUserEmailConfirmed(true);
       showSuccess('Email confirmed successfully!');
-      
+
       if (widget.source == OtpSource.customer) {
         if (!mounted) return;
         GoRouter.of(context).go(Routes.mainNavigationScreen);
@@ -173,10 +180,7 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
             }
           },
         ),
-        BlocListener<
-          ConfirmEmailCubit,
-          ConfirmEmailState
-        >(
+        BlocListener<ConfirmEmailCubit, ConfirmEmailState>(
           listener: (context, state) {
             if (state is ConfirmEmailFailure) {
               showError(state.message);
@@ -195,6 +199,13 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
             }
           },
         ),
+        BlocListener<ForgetPasswordCubit, ForgetPasswordState>(
+          listener: (context, state) {
+            if (state is ForgetPasswordSuccess) {
+              _startTimer();
+            }
+          },
+        ),
       ],
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -202,7 +213,9 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
           child: Column(
             children: [
               AppbarAuthCard(
-                title: 'Verify account',
+                title: widget.purpose == OtpPurpose.resetPassword
+                    ? 'Forgot Password'
+                    : 'Verify account',
                 currentStep: 2,
                 totalSteps: widget.totalSteps,
               ),
@@ -255,7 +268,9 @@ class _OtpScreenBodyState extends State<OtpScreenBody> {
               SizedBox(height: 16.h),
 
               AppButton(
-                text: 'Verify',
+                text: widget.purpose == OtpPurpose.resetPassword
+                    ? 'Verify Code'
+                    : 'Verify Account',
                 onPressed: _onVerifyPressed,
                 textSize: 18.sp,
                 gradient: const LinearGradient(

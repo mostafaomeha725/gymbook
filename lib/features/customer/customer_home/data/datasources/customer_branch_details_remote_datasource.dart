@@ -7,7 +7,8 @@ abstract class CustomerBranchDetailsRemoteDataSource {
   Future<CustomerBranchDetailsModel> getBranchDetails(int branchId);
 }
 
-class CustomerBranchDetailsRemoteDataSourceImpl implements CustomerBranchDetailsRemoteDataSource {
+class CustomerBranchDetailsRemoteDataSourceImpl
+    implements CustomerBranchDetailsRemoteDataSource {
   final NetworkService networkService;
 
   CustomerBranchDetailsRemoteDataSourceImpl(this.networkService);
@@ -20,7 +21,8 @@ class CustomerBranchDetailsRemoteDataSourceImpl implements CustomerBranchDetails
 
     return response.fold(
       (failure) => throw ServerException(failure.message),
-      (data) => CustomerBranchDetailsModel.fromJson(data as Map<String, dynamic>),
+      (data) =>
+          CustomerBranchDetailsModel.fromJson(data as Map<String, dynamic>),
     );
   }
 }

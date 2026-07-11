@@ -54,6 +54,6 @@ abstract class AuthRepository {
   });
 
   Future<void> confirmPendingSession();
-  
+
   void clearPendingSession();
 }

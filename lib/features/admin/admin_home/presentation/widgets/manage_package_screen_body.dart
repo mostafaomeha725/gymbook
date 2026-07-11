@@ -10,6 +10,7 @@ import 'package:gymbook/features/admin/admin_home/data/models/package_model.dart
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/create_package_cubit/create_package_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_buttom.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/package_card.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
@@ -51,170 +52,181 @@ class ManagePackageScreenBody extends StatelessWidget {
           );
         }
       },
-      child: BlocBuilder<BranchPackagesListCubit, BranchPackagesListState>(
-        builder: (context, state) {
-          final success = state is BranchPackagesListSuccess
-              ? state.response
-              : null;
+      child: BlocListener<BranchPackagesListCubit, BranchPackagesListState>(
+        listener: (context, state) {
+          if (state is BranchPackagesListSuccess ||
+              state is BranchPackagesListFailure) {
+            hideLoading();
+          }
+        },
+        child: BlocBuilder<BranchPackagesListCubit, BranchPackagesListState>(
+          builder: (context, state) {
+            final success = state is BranchPackagesListSuccess
+                ? state.response
+                : null;
 
-          return RefreshIndicator(
-            onRefresh: () => context
-                .read<BranchPackagesListCubit>()
-                .loadPackages(branchId: branchId, refresh: true),
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: const AppbarSubscriptionWidget(
-                      text: 'Manage Packages',
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-
-                  // ManagePackageStatus(
-                  //   totalCount: success?.meta.totalPackageCount ?? 0,
-                  //   activeCount: success?.meta.activePackagesCount ?? 0,
-                  //   averagePrice: success?.meta.averagePrice ?? 0.0,
-                  // ),
-                  // SizedBox(height: 24.h),
-                  BranchButtom(
-                    text: 'Add New Package',
-                    icon: Icons.add,
-                    onTap: () => _navigateAndRefresh(
-                      context,
-                      PackageScreenArgs(branchId: branchId),
-                    ),
-                  ),
-
-                  SizedBox(height: 48.h),
-
-                  AppText(
-                    success != null
-                        ? 'All Packages (${success.totalCount})'
-                        : 'All Packages',
-                    style: font18w700,
-                    textPadding: EdgeInsets.symmetric(horizontal: 22.w),
-                  ),
-
-                  SizedBox(height: 16.h),
-
-                  if (state is BranchPackagesListFailure)
+            return RefreshIndicator(
+              onRefresh: () => context
+                  .read<BranchPackagesListCubit>()
+                  .loadPackages(branchId: branchId, refresh: true),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 32.w,
-                        vertical: 40.h,
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: const AppbarSubscriptionWidget(
+                        text: 'Manage Packages',
                       ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 48.sp,
-                            color: Colors.red[300],
-                          ),
-                          SizedBox(height: 12.h),
-                          AppText(
-                            state.message,
-                            style: font14w500.copyWith(color: Colors.red[400]),
-                          ),
-                          SizedBox(height: 16.h),
-                          TextButton(
-                            onPressed: () => context
-                                .read<BranchPackagesListCubit>()
-                                .loadPackages(
-                                  branchId: branchId,
-                                  refresh: true,
-                                ),
-                            child: const Text('Try Again'),
-                          ),
-                        ],
+                    ),
+                    SizedBox(height: 24.h),
+
+                    // ManagePackageStatus(
+                    //   totalCount: success?.meta.totalPackageCount ?? 0,
+                    //   activeCount: success?.meta.activePackagesCount ?? 0,
+                    //   averagePrice: success?.meta.averagePrice ?? 0.0,
+                    // ),
+                    // SizedBox(height: 24.h),
+                    BranchButtom(
+                      text: 'Add New Package',
+                      icon: Icons.add,
+                      onTap: () => _navigateAndRefresh(
+                        context,
+                        PackageScreenArgs(branchId: branchId),
                       ),
-                    )
-                  else if (success != null)
-                    if (success.data.isEmpty)
+                    ),
+
+                    SizedBox(height: 48.h),
+
+                    AppText(
+                      success != null
+                          ? 'All Packages (${success.totalCount})'
+                          : 'All Packages',
+                      style: font18w700,
+                      textPadding: EdgeInsets.symmetric(horizontal: 22.w),
+                    ),
+
+                    SizedBox(height: 16.h),
+
+                    if (state is BranchPackagesListFailure)
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 40.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 32.w,
+                          vertical: 40.h,
+                        ),
                         child: Column(
                           children: [
                             Icon(
-                              Icons.inventory_2_outlined,
-                              size: 64.sp,
-                              color: Colors.grey.shade300,
+                              Icons.error_outline,
+                              size: 48.sp,
+                              color: Colors.red[300],
+                            ),
+                            SizedBox(height: 12.h),
+                            AppText(
+                              state.message,
+                              style: font14w500.copyWith(
+                                color: Colors.red[400],
+                              ),
                             ),
                             SizedBox(height: 16.h),
-                            AppText(
-                              'No packages found',
-                              style: font16w600.copyWith(
-                                color: const Color(0xff475569),
-                              ),
-                              alignment: AlignmentDirectional.center,
-                            ),
-                            SizedBox(height: 8.h),
-                            AppText(
-                              'Add a new package to get started.',
-                              style: font14w400.copyWith(
-                                color: const Color(0xff94A3B8),
-                              ),
-                              alignment: AlignmentDirectional.center,
+                            TextButton(
+                              onPressed: () => context
+                                  .read<BranchPackagesListCubit>()
+                                  .loadPackages(
+                                    branchId: branchId,
+                                    refresh: true,
+                                  ),
+                              child: const Text('Try Again'),
                             ),
                           ],
                         ),
                       )
-                    else
-                      ...success.data.map(
-                        (pkg) => PackageCard(
-                          onEdit: () => _navigateAndRefresh(
-                            context,
-                            PackageScreenArgs(
-                              branchId: branchId,
-                              packageItem: pkg,
-                            ),
+                    else if (success != null)
+                      if (success.data.isEmpty)
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 40.h),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.inventory_2_outlined,
+                                size: 64.sp,
+                                color: Colors.grey.shade300,
+                              ),
+                              SizedBox(height: 16.h),
+                              AppText(
+                                'No packages found',
+                                style: font16w600.copyWith(
+                                  color: const Color(0xff475569),
+                                ),
+                                alignment: AlignmentDirectional.center,
+                              ),
+                              SizedBox(height: 8.h),
+                              AppText(
+                                'Add a new package to get started.',
+                                style: font14w400.copyWith(
+                                  color: const Color(0xff94A3B8),
+                                ),
+                                alignment: AlignmentDirectional.center,
+                              ),
+                            ],
                           ),
-                          onToggle: (newValue) {
-                            context
-                                .read<CreatePackageCubit>()
-                                .togglePackageStatus(
-                                  branchId: branchId,
-                                  packageId: pkg.id,
-                                  isActive: newValue,
-                                );
-                          },
-                          onDelete: () {
-                            context.read<CreatePackageCubit>().deletePackage(
-                              branchId: branchId,
-                              packageId: pkg.id,
-                            );
-                          },
-                          title: pkg.name,
-                          months: pkg.durationInMonths,
-                          freezes: pkg.numberOfFreezes,
-                          price: _formatPrice(pkg.price),
-                          isActive: pkg.isActive,
-                          sideColor: pkg.isActive ? Colors.green : Colors.red,
+                        )
+                      else
+                        ...success.data.map(
+                          (pkg) => PackageCard(
+                            onEdit: () => _navigateAndRefresh(
+                              context,
+                              PackageScreenArgs(
+                                branchId: branchId,
+                                packageItem: pkg,
+                              ),
+                            ),
+                            onToggle: (newValue) {
+                              context
+                                  .read<CreatePackageCubit>()
+                                  .togglePackageStatus(
+                                    branchId: branchId,
+                                    packageId: pkg.id,
+                                    isActive: newValue,
+                                  );
+                            },
+                            onDelete: () {
+                              context.read<CreatePackageCubit>().deletePackage(
+                                branchId: branchId,
+                                packageId: pkg.id,
+                              );
+                            },
+                            title: pkg.name,
+                            months: pkg.durationInMonths,
+                            freezes: pkg.numberOfFreezes,
+                            price: _formatPrice(pkg.price),
+                            isActive: pkg.isActive,
+                            sideColor: pkg.isActive ? Colors.green : Colors.red,
+                          ),
                         ),
+
+                    SizedBox(height: 20.h),
+
+                    if (success != null && success.totalPages > 1)
+                      GymPaginationWidget(
+                        totalPages: success.totalPages,
+                        currentPage: success.currentPage,
+                        onPageChanged: (page) {
+                          showLoading();
+                          context.read<BranchPackagesListCubit>().loadPackages(
+                            branchId: branchId,
+                            pageNumber: page,
+                          );
+                        },
                       ),
 
-                  SizedBox(height: 20.h),
-
-                  if (success != null && success.totalPages > 1)
-                    GymPaginationWidget(
-                      totalPages: success.totalPages,
-                      currentPage: success.currentPage,
-                      onPageChanged: (page) {
-                        context.read<BranchPackagesListCubit>().loadPackages(
-                          branchId: branchId,
-                          pageNumber: page,
-                        );
-                      },
-                    ),
-
-                  SizedBox(height: 40.h),
-                ],
+                    SizedBox(height: 40.h),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

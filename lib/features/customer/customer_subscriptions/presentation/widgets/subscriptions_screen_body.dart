@@ -47,45 +47,47 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
           ),
           SizedBox(height: 32.h),
           Expanded(
-            child: BlocBuilder<CustomerSubscriptionsCubit,
-                CustomerSubscriptionsState>(
-              builder: (context, state) {
-                if (state is CustomerSubscriptionsLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is CustomerSubscriptionsError) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AppText(state.message),
-                        SizedBox(height: 12.h),
-                        ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<CustomerSubscriptionsCubit>()
-                                .loadSubscriptions();
-                          },
-                          child: const Text('Retry'),
+            child:
+                BlocBuilder<
+                  CustomerSubscriptionsCubit,
+                  CustomerSubscriptionsState
+                >(
+                  builder: (context, state) {
+                    if (state is CustomerSubscriptionsLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is CustomerSubscriptionsError) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AppText(state.message),
+                            SizedBox(height: 12.h),
+                            ElevatedButton(
+                              onPressed: () {
+                                context
+                                    .read<CustomerSubscriptionsCubit>()
+                                    .loadSubscriptions();
+                              },
+                              child: const Text('Retry'),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                } else if (state is CustomerSubscriptionsLoaded) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: SubscriptionListView(
-                      selectedTab: selectedTab,
-                      subscriptions: state.subscriptions,
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+                      );
+                    } else if (state is CustomerSubscriptionsLoaded) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        child: SubscriptionListView(
+                          selectedTab: selectedTab,
+                          subscriptions: state.subscriptions,
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
           ),
         ],
       ),
     );
   }
 }
-

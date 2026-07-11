@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
+import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
-import 'package:gymbook/core/widgets/custom_snack_bar.dart';
 import 'package:gymbook/features/admin/admin_home/domain/entities/branch_setup_details_entity.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_setup_cubit/branch_setup_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_working_hours_cubit/branch_working_hours_cubit.dart';
@@ -70,10 +70,7 @@ class _AddBranchThreeScreenBodyState extends State<AddBranchThreeScreenBody> {
     if (!mounted) return;
 
     if (success) {
-      CustomSnackBar.showSuccess(
-        context,
-        message: 'Working hours saved successfully',
-      );
+      showSuccess('Working hours saved successfully');
       if (widget.isEditMode) {
         GoRouter.of(context).pop(true);
       } else {
@@ -91,7 +88,7 @@ class _AddBranchThreeScreenBodyState extends State<AddBranchThreeScreenBody> {
           previous.errorMessage != current.errorMessage,
       listener: (context, state) {
         if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
-          CustomSnackBar.showError(context, message: state.errorMessage!);
+          showError(state.errorMessage!);
         }
       },
       builder: (context, setupState) {

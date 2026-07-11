@@ -8,7 +8,11 @@ class AdminBranchReviewsScreen extends StatelessWidget {
   final int branchId;
   final String? branchName;
 
-  const AdminBranchReviewsScreen({super.key, required this.branchId, this.branchName});
+  const AdminBranchReviewsScreen({
+    super.key,
+    required this.branchId,
+    this.branchName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +20,10 @@ class AdminBranchReviewsScreen extends StatelessWidget {
       create: (context) => sl<BranchReviewsCubit>(),
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
-        body: AdminBranchReviewsBody(branchId: branchId, branchName: branchName),
+        body: AdminBranchReviewsBody(
+          branchId: branchId,
+          branchName: branchName,
+        ),
       ),
     );
   }

@@ -10,6 +10,8 @@ import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_scanner_snackbar.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_qr_scanner_header.dart';
 import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/admin_qr_scanner_camera_section.dart';
+import 'package:gymbook/features/admin/admin_scanner_qrcode/presentation/widgets/checkin_success_sheet.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class AdminQrScannerBody extends StatefulWidget {
   final String? branchName;
@@ -23,6 +25,14 @@ class AdminQrScannerBody extends StatefulWidget {
 class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
   int? _selectedBranchId;
   bool _isProcessingScan = false;
+  bool _isSheetOpen = false;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -61,6 +71,7 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
 
         if (state.errorMessage != null &&
             state.errorMessage!.trim().isNotEmpty) {
+          _audioPlayer.play(AssetSource('failure.wav'));
           AdminScannerSnackbar.show(
             context,
             state.errorMessage!,
@@ -68,14 +79,30 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
           );
           context.read<AdminQrScannerCubit>().clearMessage();
         }
-        if (state.successMessage != null &&
-            state.successMessage!.trim().isNotEmpty) {
-          AdminScannerSnackbar.show(
+        if (state.scanResult != null) {
+          _isSheetOpen = true;
+          _audioPlayer.play(AssetSource('success.mp3'));
+          CheckInSuccessSheet.show(
             context,
-            state.successMessage!,
-            isError: false,
-          );
-          context.read<AdminQrScannerCubit>().clearMessage();
+            result: state.scanResult!,
+            onDismiss: () {
+              if (mounted) {
+                setState(() {
+                  _isSheetOpen = false;
+                  _isProcessingScan = false;
+                });
+              }
+            },
+          ).then((_) {
+            // Also reset when sheet is dismissed by swipe/back
+            if (mounted) {
+              setState(() {
+                _isSheetOpen = false;
+                _isProcessingScan = false;
+              });
+            }
+          });
+          context.read<AdminQrScannerCubit>().clearScanResult();
         }
       },
       builder: (context, state) {
@@ -115,7 +142,7 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
                           borderRadius: BorderRadius.circular(16.r),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
+                              color: Colors.black.withValues(alpha: 0.04),
                               blurRadius: 15.r,
                               offset: const Offset(0, 4),
                             ),
@@ -168,7 +195,8 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
                           onDetect: (capture) {
                             if (state.isSubmitting ||
                                 _selectedBranchId == null ||
-                                _isProcessingScan) {
+                                _isProcessingScan ||
+                                _isSheetOpen) {
                               return;
                             }
                             final value = capture.barcodes.first.rawValue;

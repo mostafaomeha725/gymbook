@@ -35,7 +35,9 @@ class NotificationsError extends NotificationsState {
 }
 
 class NotificationsTokenUpdating extends NotificationsState {}
+
 class NotificationsTokenUpdated extends NotificationsState {}
+
 class NotificationsTokenUpdateError extends NotificationsState {
   final String message;
   const NotificationsTokenUpdateError(this.message);
@@ -44,13 +46,16 @@ class NotificationsTokenUpdateError extends NotificationsState {
 }
 
 class NotificationsStatusLoading extends NotificationsState {}
+
 class NotificationsStatusLoaded extends NotificationsState {
   final bool isEnabled;
   const NotificationsStatusLoaded(this.isEnabled);
   @override
   List<Object?> get props => [isEnabled];
 }
+
 class NotificationsToggling extends NotificationsState {}
+
 class NotificationsToggled extends NotificationsState {
   final bool isEnabled;
   const NotificationsToggled(this.isEnabled);

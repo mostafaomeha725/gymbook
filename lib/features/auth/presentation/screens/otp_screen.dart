@@ -5,11 +5,16 @@ import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/features/auth/presentation/cubits/resend_confirmation_email_cubit/resend_confirmation_email_cubit_factory.dart';
 import 'package:gymbook/features/auth/presentation/cubits/validate_reset_password_code_cubit/validate_reset_password_code_cubit.dart';
 import 'package:gymbook/features/auth/presentation/cubits/confirm_email_cubit/confirm_email_cubit.dart';
+import 'package:gymbook/features/auth/presentation/cubits/forget_password_cubit/forget_password_cubit.dart';
 import 'package:gymbook/features/auth/presentation/widgets/otp_screen_body.dart';
 export 'package:gymbook/core/enums/app_enums.dart' show OtpSource, OtpPurpose;
 
 class OtpScreenArgs {
-  const OtpScreenArgs({required this.source, this.email, required this.purpose});
+  const OtpScreenArgs({
+    required this.source,
+    this.email,
+    required this.purpose,
+  });
 
   final OtpSource source;
   final String? email;
@@ -37,6 +42,7 @@ class OtpScreen extends StatelessWidget {
         BlocProvider(create: (_) => sl<ValidateResetPasswordCodeCubit>()),
         BlocProvider(create: (_) => sl<ConfirmEmailCubit>()),
         BlocProvider(create: (_) => buildResendConfirmationEmailCubit()),
+        BlocProvider(create: (_) => sl<ForgetPasswordCubit>()),
       ],
       child: Scaffold(
         body: OtpScreenBody(

@@ -16,11 +16,7 @@ class BranchImageModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type,
-      'url': url,
-    };
+    return {'id': id, 'type': type, 'url': url};
   }
 }
 

@@ -61,7 +61,7 @@ class PaymentCubit extends Cubit<PaymentState> {
                     if (status.status == 1) {
                       // successed
                       try {
-                        // Clear cache so that SubscriptionsScreen forces a network refresh 
+                        // Clear cache so that SubscriptionsScreen forces a network refresh
                         // the next time it's opened.
                         Hive.box<String>(HiveBoxes.cacheBox).clear();
                       } catch (_) {}

@@ -21,7 +21,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
         final Map<String, dynamic> jsonMap = jsonDecode(cachedProfileString);
         return Right(ProfileModel.fromJson(jsonMap));
       } catch (e) {
-        return const Left(CacheFailure(message: "Failed to parse profile cache"));
+        return const Left(
+          CacheFailure(message: "Failed to parse profile cache"),
+        );
       }
     }
     return const Left(CacheFailure(message: "No cached profile found"));
@@ -53,7 +55,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<Either<Failure, ProfileModel>> updateProfile({
     required String firstName,
     required String lastName,
-    required String phoneNumber,
+    required String? phoneNumber,
   }) async {
     try {
       final result = await remoteDataSource.updateProfile(

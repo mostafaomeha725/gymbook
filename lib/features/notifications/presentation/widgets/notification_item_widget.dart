@@ -19,41 +19,58 @@ class NotificationItemWidget extends StatelessWidget {
   List<TextSpan> _parseMessageBold(String text, bool isRead) {
     final textColor = isRead ? Colors.grey.shade600 : Colors.grey.shade800;
     final spans = <TextSpan>[];
-    
+
     // Simple parsing to make words in single quotes bold
     final regex = RegExp(r"'(.*?)'");
     int lastMatchEnd = 0;
-    
+
     for (var match in regex.allMatches(text)) {
       if (match.start > lastMatchEnd) {
-        spans.add(TextSpan(
-          text: text.substring(lastMatchEnd, match.start),
-          style: font12w400.copyWith(color: textColor, height: 1.4),
-        ));
+        spans.add(
+          TextSpan(
+            text: text.substring(lastMatchEnd, match.start),
+            style: font12w400.copyWith(color: textColor, height: 1.4),
+          ),
+        );
       }
-      spans.add(TextSpan(
-        text: match.group(1), // without quotes
-        style: font12w700.copyWith(color: textColor, height: 1.4),
-      ));
+      spans.add(
+        TextSpan(
+          text: match.group(1), // without quotes
+          style: font12w700.copyWith(color: textColor, height: 1.4),
+        ),
+      );
       lastMatchEnd = match.end;
     }
-    
+
     if (lastMatchEnd < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(lastMatchEnd),
-        style: font12w400.copyWith(color: textColor, height: 1.4),
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(lastMatchEnd),
+          style: font12w400.copyWith(color: textColor, height: 1.4),
+        ),
+      );
     }
-    
-    return spans.isEmpty ? [TextSpan(text: text, style: font12w400.copyWith(color: textColor, height: 1.4))] : spans;
+
+    return spans.isEmpty
+        ? [
+            TextSpan(
+              text: text,
+              style: font12w400.copyWith(color: textColor, height: 1.4),
+            ),
+          ]
+        : spans;
   }
 
   @override
   Widget build(BuildContext context) {
-    final style = NotificationStyle.getStyleForType(notification.notificationType);
-    
+    final style = NotificationStyle.getStyleForType(
+      notification.notificationType,
+    );
+
     // Facebook style backgrounds
-    final bgColor = notification.isRead ? Colors.white : const Color(0xFFE7F3FF);
+    final bgColor = notification.isRead
+        ? Colors.white
+        : const Color(0xFFE7F3FF);
 
     return InkWell(
       onTap: onTap,
@@ -77,11 +94,7 @@ class NotificationItemWidget extends StatelessWidget {
                       color: style.color.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      style.icon,
-                      color: style.color,
-                      size: 28.w,
-                    ),
+                    child: Icon(style.icon, color: style.color, size: 28.w),
                   ),
                   Positioned(
                     bottom: 0,
@@ -94,11 +107,7 @@ class NotificationItemWidget extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 2),
                       ),
-                      child: Icon(
-                        style.icon,
-                        color: Colors.white,
-                        size: 10.w,
-                      ),
+                      child: Icon(style.icon, color: Colors.white, size: 10.w),
                     ),
                   ),
                 ],
@@ -114,7 +123,9 @@ class NotificationItemWidget extends StatelessWidget {
                   AppText(
                     notification.title,
                     style: font14w700.copyWith(
-                      color: notification.isRead ? Colors.grey.shade800 : Colors.black,
+                      color: notification.isRead
+                          ? Colors.grey.shade800
+                          : Colors.black,
                       height: 1.4,
                     ),
                   ),
@@ -122,7 +133,10 @@ class NotificationItemWidget extends StatelessWidget {
                   // Subtitle (Message)
                   RichText(
                     text: TextSpan(
-                      children: _parseMessageBold(notification.message, notification.isRead),
+                      children: _parseMessageBold(
+                        notification.message,
+                        notification.isRead,
+                      ),
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -130,7 +144,9 @@ class NotificationItemWidget extends StatelessWidget {
                   AppText(
                     timeago.format(notification.createdAt, locale: 'en_short'),
                     style: font12w500.copyWith(
-                      color: notification.isRead ? Colors.grey.shade600 : Colors.blue.shade700,
+                      color: notification.isRead
+                          ? Colors.grey.shade600
+                          : Colors.blue.shade700,
                     ),
                   ),
                 ],

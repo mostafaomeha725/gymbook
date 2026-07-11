@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
+import 'dart:async';
 import 'package:gymbook/core/widgets/custom_search.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/notification_icon.dart';
@@ -12,12 +13,14 @@ class AppbarAdminHomeWidget extends StatefulWidget {
   final String userName;
   final String location;
   final ValueChanged<String>? onSearchChanged;
+  final VoidCallback? onAddBranchClosed;
 
   const AppbarAdminHomeWidget({
     super.key,
     required this.userName,
     required this.location,
     this.onSearchChanged,
+    this.onAddBranchClosed,
   });
 
   @override
@@ -26,9 +29,11 @@ class AppbarAdminHomeWidget extends StatefulWidget {
 
 class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
   final TextEditingController searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     searchController.dispose();
     super.dispose();
   }
@@ -87,12 +92,31 @@ class _AppbarAdminHomeWidgetState extends State<AppbarAdminHomeWidget> {
             CustomSearch(
               controller: searchController,
               hintText: "Search branches...",
-              onChanged: widget.onSearchChanged,
+              onChanged: (value) {
+                final trimValue = value.trim();
+                if (trimValue.isNotEmpty && trimValue.length < 3) return;
+
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                _debounce = Timer(const Duration(milliseconds: 400), () {
+                  if (widget.onSearchChanged != null) {
+                    widget.onSearchChanged!(value);
+                  }
+                });
+              },
+              onSubmitted: (value) {
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                if (widget.onSearchChanged != null) {
+                  widget.onSearchChanged!(value);
+                }
+              },
             ),
             SizedBox(height: 16.h),
             BouncingSocialButton(
-              onTap: () {
-                GoRouter.of(context).push(Routes.addBranchOneScreen);
+              onTap: () async {
+                await GoRouter.of(context).push(Routes.addBranchOneScreen);
+                if (widget.onAddBranchClosed != null) {
+                  widget.onAddBranchClosed!();
+                }
               },
               text: 'Add New Branch',
               icon: Icons.add,

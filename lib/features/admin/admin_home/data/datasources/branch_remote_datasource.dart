@@ -88,7 +88,7 @@ abstract class BranchRemoteDataSource {
   Future<BranchReviewsModel> getBranchReviews({
     required int branchId,
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     double? rating,
   });
 }
@@ -341,14 +341,11 @@ class BranchRemoteDataSourceImpl implements BranchRemoteDataSource {
   Future<BranchReviewsModel> getBranchReviews({
     required int branchId,
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 5,
     double? rating,
   }) async {
     try {
-      final queryParams = {
-        'pageNumber': pageNumber,
-        'pageSize': pageSize,
-      };
+      final queryParams = {'pageNumber': pageNumber, 'pageSize': pageSize};
       if (rating != null) {
         queryParams['rating'] = rating.toInt();
       }

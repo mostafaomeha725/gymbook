@@ -5,10 +5,14 @@ class AdminQrScannerState {
   final String? errorMessage;
   final String? successMessage;
 
+  /// Populated after a successful scan
+  final CheckInResultModel? scanResult;
+
   const AdminQrScannerState({
     this.isSubmitting = false,
     this.errorMessage,
     this.successMessage,
+    this.scanResult,
   });
 
   factory AdminQrScannerState.initial() => const AdminQrScannerState();
@@ -17,7 +21,9 @@ class AdminQrScannerState {
     bool? isSubmitting,
     String? errorMessage,
     String? successMessage,
+    CheckInResultModel? scanResult,
     bool clearMessages = false,
+    bool clearScanResult = false,
   }) {
     return AdminQrScannerState(
       isSubmitting: isSubmitting ?? this.isSubmitting,
@@ -25,6 +31,7 @@ class AdminQrScannerState {
       successMessage: clearMessages
           ? null
           : (successMessage ?? this.successMessage),
+      scanResult: clearScanResult ? null : (scanResult ?? this.scanResult),
     );
   }
 }

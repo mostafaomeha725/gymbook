@@ -8,7 +8,8 @@ class LabeledAuthField extends StatefulWidget {
   final String label;
   final String hintText;
   final TextEditingController controller;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
+  final Widget? prefixWidget;
   final TextInputType keyboardType;
   final bool isPassword;
   final bool hasBottomSpacing;
@@ -18,7 +19,8 @@ class LabeledAuthField extends StatefulWidget {
     required this.label,
     required this.hintText,
     required this.controller,
-    required this.prefixIcon,
+    this.prefixIcon,
+    this.prefixWidget,
     this.keyboardType = TextInputType.text,
     this.isPassword = false,
     this.hasBottomSpacing = true,
@@ -53,10 +55,14 @@ class _LabeledAuthFieldState extends State<LabeledAuthField> {
           maxLines: 1,
           keyboardType: widget.keyboardType,
           obsecureText: _obscureText,
-          prefixIcon: Padding(
-            padding: EdgeInsets.only(left: 8.w),
-            child: Icon(widget.prefixIcon, size: 22.sp),
-          ),
+          prefixIcon:
+              widget.prefixWidget ??
+              (widget.prefixIcon != null
+                  ? Padding(
+                      padding: EdgeInsets.only(left: 8.w),
+                      child: Icon(widget.prefixIcon, size: 16.sp),
+                    )
+                  : null),
           radius: 22.r,
           suffixIcon: widget.isPassword
               ? IconButton(

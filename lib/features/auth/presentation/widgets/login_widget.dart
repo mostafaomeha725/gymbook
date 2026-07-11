@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gymbook/core/enums/app_enums.dart';
 import 'package:gymbook/core/constants/app_assets.dart';
 import 'package:gymbook/core/routes/route_paths.dart';
 import 'package:gymbook/core/theme/styles.dart';
@@ -10,6 +11,8 @@ import 'package:gymbook/core/widgets/app_form_field.dart';
 import 'package:gymbook/core/widgets/bouncing_social_button.dart';
 import 'package:gymbook/core/widgets/custom_button.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
+import 'package:gymbook/core/cache/preferences_storage.dart';
+import 'package:gymbook/core/di/services_locator.dart';
 import 'package:gymbook/features/auth/presentation/screens/otp_screen.dart';
 import 'package:gymbook/features/auth/presentation/cubits/login_cubit/login_cubit.dart';
 import 'package:gymbook/features/auth/presentation/utils/auth_validator.dart';
@@ -43,10 +46,15 @@ class _LoginWidgetState extends State<LoginWidget> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           hideLoading();
-          GoRouter.of(context).pushReplacement(
-            Routes.mainNavigationScreen,
-            extra: state.loginResult.user.isAdmin,
-          );
+          final user = state.loginResult.user;
+
+          if (user.role == AppUserRole.customer) {
+            sl<PreferencesStorage>().saveNeedsLocationPrompt(true);
+          }
+
+          GoRouter.of(
+            context,
+          ).pushReplacement(Routes.mainNavigationScreen, extra: user.isAdmin);
         } else if (state is LoginEmailNotVerified) {
           hideLoading();
           GoRouter.of(context).push(
@@ -96,8 +104,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               onChanged: (value) => setState(() => selectedUserType = value),
             ),
             SizedBox(height: 24.h),
-            const DividerWidget(),
-            SizedBox(height: 16.h),
+
             AppText(
               'Email',
               style: font14w500.copyWith(color: const Color(0xff364153)),

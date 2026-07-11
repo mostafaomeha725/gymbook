@@ -25,7 +25,6 @@ class EmployeeNameFields extends StatelessWidget {
               hintText: 'First Name',
               prefixIcon: const Icon(Icons.person_outline, size: 20),
               validator: (val) {
-                if (val == null || val.isEmpty) return 'Required';
                 return null;
               },
             ),
@@ -40,7 +39,6 @@ class EmployeeNameFields extends StatelessWidget {
               hintText: 'Last Name',
               prefixIcon: const Icon(Icons.person_outline, size: 20),
               validator: (val) {
-                if (val == null || val.isEmpty) return 'Required';
                 return null;
               },
             ),
