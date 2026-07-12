@@ -5,6 +5,7 @@ import 'package:gymbook/features/customer/customer_subscriptions/data/models/cus
 abstract class CustomerSubscriptionsRepository {
   Stream<Either<Failure, List<CustomerSubscriptionModel>>> getMySubscriptions({
     int pageNumber = 1,
-    int pageSize = 50,
+    int pageSize = 5,
+    int? status,
   });
 }

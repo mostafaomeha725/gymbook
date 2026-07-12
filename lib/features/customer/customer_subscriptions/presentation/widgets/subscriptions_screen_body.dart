@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab;
+import 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab, SubscriptionTabExtension;
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
@@ -42,6 +42,9 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
                 setState(() {
                   selectedTab = tab;
                 });
+                context
+                    .read<CustomerSubscriptionsCubit>()
+                    .loadSubscriptions(status: tab.backendStatus);
               },
             ),
           ),
@@ -66,7 +69,7 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
                               onPressed: () {
                                 context
                                     .read<CustomerSubscriptionsCubit>()
-                                    .loadSubscriptions();
+                                    .loadSubscriptions(status: selectedTab.backendStatus);
                               },
                               child: const Text('Retry'),
                             ),

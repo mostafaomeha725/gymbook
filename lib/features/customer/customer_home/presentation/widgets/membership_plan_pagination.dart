@@ -21,29 +21,32 @@ class MembershipPlanPagination extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          AppText(
-            'Plan $currentPage of $totalCount',
-            style: font14w400.copyWith(color: const Color(0xff64748B)),
-          ),
-          Row(
-            children: [
-              PaginationNavButton(
-                icon: Icons.chevron_left_rounded,
-                enabled: currentPage > 1,
-                onTap: () => onPageChanged(currentPage - 1),
-              ),
-              SizedBox(width: 8.w),
-              PaginationNavButton(
-                icon: Icons.chevron_right_rounded,
-                enabled: currentPage < totalPages,
-                onTap: () => onPageChanged(currentPage + 1),
-              ),
-            ],
-          ),
-        ],
+      child: Container(
+        color: Colors.red,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            AppText(
+              'Page $currentPage of $totalPages',
+              style: font14w400.copyWith(color: const Color(0xff64748B)),
+            ),
+            Row(
+              children: [
+                PaginationNavButton(
+                  icon: Icons.chevron_left_rounded,
+                  enabled: currentPage > 1,
+                  onTap: () => onPageChanged(currentPage - 1),
+                ),
+                SizedBox(width: 8.w),
+                PaginationNavButton(
+                  icon: Icons.chevron_right_rounded,
+                  enabled: currentPage < totalPages,
+                  onTap: () => onPageChanged(currentPage + 1),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -70,9 +73,7 @@ class PaginationNavButton extends StatelessWidget {
         height: 36.w,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: enabled
-              ? const Color(0xff0EA5E9)
-              : const Color(0xffE2E8F0),
+          color: enabled ? const Color(0xff0EA5E9) : const Color(0xffE2E8F0),
         ),
         child: Icon(
           icon,

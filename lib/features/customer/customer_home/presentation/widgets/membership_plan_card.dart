@@ -64,6 +64,7 @@ class MembershipPlanCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
           children: [
             AppText(
               package.name,
@@ -106,7 +107,9 @@ class MembershipPlanCard extends StatelessWidget {
             AppButton(
               text: 'Subscribe',
               onPressed: () {
-                print('🚀 ATTEMPTING TO SUBSCRIBE TO PACKAGE: ${package.id} FOR BRANCH: $branchId');
+                print(
+                  '🚀 ATTEMPTING TO SUBSCRIBE TO PACKAGE: ${package.id} FOR BRANCH: $branchId',
+                );
                 context.read<PaymentCubit>().processPayment(
                   branchId: branchId,
                   packageId: package.id,

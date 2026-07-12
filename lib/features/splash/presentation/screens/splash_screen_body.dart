@@ -90,7 +90,23 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
         opacity: _fadeAnimation,
         child: ScaleTransition(
           scale: _scaleAnimation,
-          child: AppAsset(assetName: Assets.logo, width: 260.w),
+          child: Container(
+            width: 180.w,
+            height: 180.h,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: const AppAsset(assetName: Assets.logo, fit: BoxFit.cover),
+          ),
         ),
       ),
     );

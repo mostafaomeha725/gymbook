@@ -17,9 +17,11 @@ class CustomerSubscriptionsRepositoryImpl
   @override
   Stream<Either<Failure, List<CustomerSubscriptionModel>>> getMySubscriptions({
     int pageNumber = 1,
-    int pageSize = 50,
+    int pageSize = 5,
+    int? status,
   }) async* {
-    final String cacheKey = 'customer_subscriptions_${pageNumber}_$pageSize';
+    final String cacheKey =
+        'customer_subscriptions_${pageNumber}_${pageSize}_$status';
     bool emittedCache = false;
     bool needsBackgroundRefresh = true;
 
@@ -52,6 +54,7 @@ class CustomerSubscriptionsRepositoryImpl
         final remoteModels = await remoteDataSource.getMySubscriptions(
           pageNumber: pageNumber,
           pageSize: pageSize,
+          status: status,
         );
         final remoteJsonString = jsonEncode(
           remoteModels.map((e) => e.toJson()).toList(),

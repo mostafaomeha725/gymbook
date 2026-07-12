@@ -30,75 +30,78 @@ class AdminManageSubscriptionsScreenBody extends StatelessWidget {
           hideLoading();
         }
       },
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const AppbarSubscriptionWidget(text: 'Manage Subscriptions'),
-            SizedBox(height: 24.h),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.h),
+            child: const AppbarSubscriptionWidget(text: 'Manage Subscriptions'),
+          ),
+          SizedBox(height: 24.h),
 
-            BranchButtom(
-              text: 'Add Subscription',
-              icon: Icons.add,
-              onTap: () async {
-                final added = await GoRouter.of(context).push<bool>(
-                  Routes.adminAddSubscriptionScreen,
-                  extra: branchId,
-                );
-                if (added == true && context.mounted) {
-                  context.read<BranchSubscriptionsListCubit>().refresh();
-                }
-              },
-            ),
+          BranchButtom(
+            text: 'Add Subscription',
+            icon: Icons.add,
+            onTap: () async {
+              final added = await GoRouter.of(
+                context,
+              ).push<bool>(Routes.adminAddSubscriptionScreen, extra: branchId);
+              if (added == true && context.mounted) {
+                context.read<BranchSubscriptionsListCubit>().refresh();
+              }
+            },
+          ),
 
-            SizedBox(height: 24.h),
+          SizedBox(height: 24.h),
 
-            const SubscriptionsTabsWidget(),
+          const SubscriptionsTabsWidget(),
 
-            SizedBox(height: 16.h),
+          SizedBox(height: 16.h),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 22.w),
-              child: const SubscriptionsSearchWidget(),
-            ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 22.w),
+            child: const SubscriptionsSearchWidget(),
+          ),
 
-            SizedBox(height: 16.h),
+          SizedBox(height: 16.h),
 
-            BlocBuilder<
-              BranchSubscriptionsListCubit,
-              BranchSubscriptionsListState
-            >(
-              builder: (ctx, state) {
-                if (state is BranchSubscriptionsListLoading) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40.h),
-                    child: const Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    ),
-                  );
-                }
+          Expanded(
+            child:
+                BlocBuilder<
+                  BranchSubscriptionsListCubit,
+                  BranchSubscriptionsListState
+                >(
+                  builder: (ctx, state) {
+                    if (state is BranchSubscriptionsListLoading) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40.h),
+                        child: const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
+                      );
+                    }
 
-                if (state is BranchSubscriptionsListFailure) {
-                  return SubscriptionsErrorWidget(message: state.message);
-                }
+                    if (state is BranchSubscriptionsListFailure) {
+                      return SubscriptionsErrorWidget(message: state.message);
+                    }
 
-                if (state is BranchSubscriptionsListSuccess) {
-                  if (state.response.data.isEmpty) {
-                    final hasSearch =
-                        ctx.read<BranchSubscriptionsListCubit>().searchText !=
-                        null;
-                    return SubscriptionsEmptyWidget(hasSearch: hasSearch);
-                  }
+                    if (state is BranchSubscriptionsListSuccess) {
+                      if (state.response.data.isEmpty) {
+                        final hasSearch =
+                            ctx
+                                .read<BranchSubscriptionsListCubit>()
+                                .searchText !=
+                            null;
+                        return SubscriptionsEmptyWidget(hasSearch: hasSearch);
+                      }
 
-                  return SubscriptionsListWidget(response: state.response);
-                }
+                      return SubscriptionsListWidget(response: state.response);
+                    }
 
-                return const SizedBox.shrink();
-              },
-            ),
-
-            SizedBox(height: 40.h),
-          ],
-        ),
+                    return const SizedBox.shrink();
+                  },
+                ),
+          ),
+        ],
       ),
     );
   }

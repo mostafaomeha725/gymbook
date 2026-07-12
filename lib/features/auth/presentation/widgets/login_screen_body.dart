@@ -20,7 +20,7 @@ class LoginScreenBody extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               GymbookCard(
-                title: 'GymBook',
+                title: 'Prime Fit',
                 subtitle: 'Welcome back!',
                 height: 220.h,
                 height1: 40.h,

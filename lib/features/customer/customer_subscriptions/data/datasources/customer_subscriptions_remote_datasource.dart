@@ -7,6 +7,7 @@ abstract class CustomerSubscriptionsRemoteDataSource {
   Future<List<CustomerSubscriptionModel>> getMySubscriptions({
     int pageNumber = 1,
     int pageSize = 5,
+    int? status,
   });
 }
 
@@ -20,10 +21,20 @@ class CustomerSubscriptionsRemoteDataSourceImpl
   Future<List<CustomerSubscriptionModel>> getMySubscriptions({
     int pageNumber = 1,
     int pageSize = 5,
+    int? status,
   }) async {
+    final Map<String, dynamic> queryParameters = {
+      'PageNumber': pageNumber,
+      'PageSize': pageSize,
+    };
+    
+    if (status != null) {
+      queryParameters['status'] = status;
+    }
+
     final response = await networkService.getData(
       endPoint: EndPoints.getMySubscriptions,
-      queryParameters: {'PageNumber': pageNumber, 'PageSize': pageSize},
+      queryParameters: queryParameters,
     );
 
     return response.fold((failure) => throw ServerException(failure.message), (

@@ -8,6 +8,25 @@ enum GymType { menOnly, womenOnly, mixed }
 
 enum SubscriptionTab { all, active, expired, frozen, cancelled, scheduled }
 
+extension SubscriptionTabExtension on SubscriptionTab {
+  int? get backendStatus {
+    switch (this) {
+      case SubscriptionTab.scheduled:
+        return 0;
+      case SubscriptionTab.active:
+        return 1;
+      case SubscriptionTab.frozen:
+        return 2;
+      case SubscriptionTab.expired:
+        return 3;
+      case SubscriptionTab.cancelled:
+        return 4;
+      case SubscriptionTab.all:
+        return null;
+    }
+  }
+}
+
 enum RequestState { init, loading, success, error }
 
 enum PreferencesKeys {

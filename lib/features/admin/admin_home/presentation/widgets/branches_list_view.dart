@@ -14,9 +14,6 @@ class BranchesListView extends StatelessWidget {
 
   const BranchesListView({super.key, required this.branches});
 
-  static const String _placeholderImage =
-      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop';
-
   @override
   Widget build(BuildContext context) {
     if (branches.isEmpty) {
@@ -42,7 +39,7 @@ class BranchesListView extends StatelessWidget {
         return Padding(
           padding: EdgeInsets.only(bottom: 12.h),
           child: BranchCard(
-            imageUrl: branch.logo ?? _placeholderImage,
+            imageUrl: branch.logo,
             branchName: branch.name ?? 'Branch #${branch.id}',
             location: branch.displayLocation,
             tags: [branch.branchTypeName, branch.branchStatusName],

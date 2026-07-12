@@ -10,11 +10,13 @@ class GetCustomerSubscriptionsUseCase {
 
   Stream<Either<Failure, List<CustomerSubscriptionModel>>> call({
     int pageNumber = 1,
-    int pageSize = 50,
+    int pageSize = 5,
+    int? status,
   }) {
     return repository.getMySubscriptions(
       pageNumber: pageNumber,
       pageSize: pageSize,
+      status: status,
     );
   }
 }

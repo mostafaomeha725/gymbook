@@ -18,30 +18,9 @@ class SubscriptionListView extends StatelessWidget {
     required this.subscriptions,
   });
 
-  bool _matchesTab(int status) {
-    switch (selectedTab) {
-      case SubscriptionTab.all:
-        return true;
-      case SubscriptionTab.scheduled:
-        return status == 0;
-      case SubscriptionTab.active:
-        return status == 1;
-      case SubscriptionTab.frozen:
-        return status == 2;
-      case SubscriptionTab.expired:
-        return status == 3;
-      case SubscriptionTab.cancelled:
-        return status == 4;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final currentList = subscriptions.where((item) {
-      return _matchesTab(item.status);
-    }).toList();
-
-    if (currentList.isEmpty) {
+    if (subscriptions.isEmpty) {
       return const Center(
         child: AppText(
           "No subscriptions found",
@@ -52,11 +31,11 @@ class SubscriptionListView extends StatelessWidget {
 
     return ListView.separated(
       padding: EdgeInsets.zero,
-      itemCount: currentList.length,
+      itemCount: subscriptions.length,
       separatorBuilder: (_, __) => 16.verticalSpace,
       itemBuilder: (_, index) {
-        final item = currentList[index];
-        final isLast = index == currentList.length - 1;
+        final item = subscriptions[index];
+        final isLast = index == subscriptions.length - 1;
         final status = item.status;
 
         final totalDuration = item.totalDurationInDays;

@@ -18,33 +18,36 @@ class SubscriptionsListWidget extends StatelessWidget {
     final cubit = context.read<BranchSubscriptionsListCubit>();
     final items = response.data;
 
-    return Column(
-      children: [
-        ...items.map(
-          (sub) => AdminSubscriptionCard(
-            onTap: () async {
-              final changed = await GoRouter.of(context).push<bool>(
-                Routes.adminSubscriptionDetailsScreen,
-                extra: sub.subscriptionId,
-              );
-              if (changed == true && context.mounted) {
-                cubit.refresh();
-              }
-            },
-            name: sub.fullName,
-            status: sub.status.displayName,
-            totalDays: sub.totalDurationInDays,
-            remainingDays: sub.remainingDurationInDays,
-          ),
-        ),
-        SizedBox(height: 24.h),
-        if (response.totalPages > 1)
-          GymPaginationWidget(
+    return ListView.separated(
+      padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 8.h)
+          .copyWith(bottom: 100.h),
+      itemCount: response.totalPages > 1 ? items.length + 1 : items.length,
+      separatorBuilder: (_, __) => SizedBox(height: 12.h),
+      itemBuilder: (context, index) {
+        if (index == items.length) {
+          return GymPaginationWidget(
             totalPages: response.totalPages,
             currentPage: response.currentPage,
             onPageChanged: cubit.changePage,
-          ),
-      ],
+          );
+        }
+        final sub = items[index];
+        return AdminSubscriptionCard(
+          onTap: () async {
+            final changed = await GoRouter.of(context).push<bool>(
+              Routes.adminSubscriptionDetailsScreen,
+              extra: sub.subscriptionId,
+            );
+            if (changed == true && context.mounted) {
+              cubit.refresh();
+            }
+          },
+          name: sub.fullName,
+          status: sub.status.displayName,
+          totalDays: sub.totalDurationInDays,
+          remainingDays: sub.remainingDurationInDays,
+        );
+      },
     );
   }
 }

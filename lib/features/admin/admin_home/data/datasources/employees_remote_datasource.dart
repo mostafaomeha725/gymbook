@@ -43,7 +43,7 @@ class EmployeesRemoteDataSourceImpl implements EmployeesRemoteDataSource {
   ) async {
     final response = await networkService.getData(
       endPoint: EndPoints.getBranchEmployees(branchId),
-      queryParameters: {'PageNumber': pageNumber, 'PageSize': 10},
+      queryParameters: {'PageNumber': pageNumber, 'PageSize': 5},
     );
 
     return response.fold(

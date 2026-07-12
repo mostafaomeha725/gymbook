@@ -6,7 +6,7 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/public_branch_packages_cubit/public_branch_packages_cubit.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/public_branch_packages_cubit/public_branch_packages_state.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/membership_plan_card.dart';
-import 'package:gymbook/features/customer/customer_home/presentation/widgets/membership_plan_pagination.dart';
+import 'package:gymbook/features/customer/customer_home/presentation/widgets/membership_plan_side_arrow_button.dart';
 
 class MembershipPlansSection extends StatelessWidget {
   final int branchId;
@@ -54,8 +54,47 @@ class MembershipPlansSection extends StatelessWidget {
 
         final packages = response.data;
 
+        final List<Widget> listItems = [];
+
+        if (response.totalPages > 1 && response.currentPage > 1) {
+          listItems.add(
+            Center(
+              child: MembershipPlanSideArrowButton(
+                icon: Icons.chevron_left_rounded,
+                onTap: () => context
+                    .read<PublicBranchPackagesCubit>()
+                    .changePage(response.currentPage - 1),
+              ),
+            ),
+          );
+        }
+
+        for (final package in packages) {
+          listItems.add(
+            MembershipPlanCard(
+              package: package,
+              branchId: branchId,
+            ),
+          );
+        }
+
+        if (response.totalPages > 1 &&
+            response.currentPage < response.totalPages) {
+          listItems.add(
+            Center(
+              child: MembershipPlanSideArrowButton(
+                icon: Icons.chevron_right_rounded,
+                onTap: () => context
+                    .read<PublicBranchPackagesCubit>()
+                    .changePage(response.currentPage + 1),
+              ),
+            ),
+          );
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               height: 275.h,
@@ -64,26 +103,17 @@ class MembershipPlansSection extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 itemBuilder: (context, index) {
-                  return MembershipPlanCard(
-                    package: packages[index],
-                    branchId: branchId,
-                  );
+                  return listItems[index];
                 },
                 separatorBuilder: (_, __) => SizedBox(width: 16.w),
-                itemCount: packages.length,
+                itemCount: listItems.length,
               ),
             ),
-            if (response.totalPages > 1)
-              MembershipPlanPagination(
-                currentPage: response.currentPage,
-                totalPages: response.totalPages,
-                totalCount: response.totalCount,
-                onPageChanged: (page) =>
-                    context.read<PublicBranchPackagesCubit>().changePage(page),
-              ),
           ],
         );
       },
     );
   }
 }
+
+

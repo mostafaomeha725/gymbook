@@ -13,7 +13,8 @@ class CustomerSubscriptionsCubit extends Cubit<CustomerSubscriptionsState> {
 
   Future<void> loadSubscriptions({
     int pageNumber = 1,
-    int pageSize = 5,
+    int pageSize = 5, // Usually want more items or backend defaults
+    int? status,
   }) async {
     await _subscription?.cancel();
 
@@ -25,6 +26,7 @@ class CustomerSubscriptionsCubit extends Cubit<CustomerSubscriptionsState> {
         getCustomerSubscriptionsUseCase(
           pageNumber: pageNumber,
           pageSize: pageSize,
+          status: status,
         ).listen((result) {
           result.fold(
             (failure) {

@@ -6,7 +6,7 @@ import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/tag_bage.dart';
 
 class BranchCard extends StatelessWidget {
-  final String imageUrl;
+  final String? imageUrl;
   final String branchName;
   final String location;
   final List<String> tags;
@@ -49,10 +49,36 @@ class BranchCard extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 height: 130.h,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [AppImage(imageUrl: imageUrl, fit: BoxFit.cover)],
-                ),
+                child: (imageUrl != null && imageUrl!.trim().isNotEmpty)
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          AppImage(imageUrl: imageUrl!, fit: BoxFit.cover),
+                        ],
+                      )
+                    : Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xff0EA5E9), Color(0xff0284C7)],
+                          ),
+                        ),
+                        child: Center(
+                          child: Container(
+                            padding: EdgeInsets.all(12.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.storefront_outlined,
+                              size: 32.sp,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
               ),
               Padding(
                 padding: EdgeInsets.all(16.w),
@@ -111,24 +137,8 @@ class BranchCard extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         // Subscriptions count
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            AppText(
-                              subscriptions.toString(),
-                              style: font18w700.copyWith(
-                                color: const Color(0xFF00BCD4),
-                              ),
-                            ),
-                            AppText(
-                              'Subscriptions',
-                              style: font12w500.copyWith(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ],
