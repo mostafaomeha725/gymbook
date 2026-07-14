@@ -11,11 +11,13 @@ import 'package:gymbook/features/customer/customer_subscriptions/presentation/wi
 class SubscriptionListView extends StatelessWidget {
   final SubscriptionTab selectedTab;
   final List<CustomerSubscriptionModel> subscriptions;
+  final Widget? paginationWidget;
 
   const SubscriptionListView({
     super.key,
     required this.selectedTab,
     required this.subscriptions,
+    this.paginationWidget,
   });
 
   @override
@@ -31,11 +33,19 @@ class SubscriptionListView extends StatelessWidget {
 
     return ListView.separated(
       padding: EdgeInsets.zero,
-      itemCount: subscriptions.length,
+      itemCount: subscriptions.length + (paginationWidget != null ? 1 : 0),
       separatorBuilder: (_, __) => 16.verticalSpace,
       itemBuilder: (_, index) {
+        if (paginationWidget != null && index == subscriptions.length) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: 152.h, top: 16.h),
+            child: paginationWidget!,
+          );
+        }
+
         final item = subscriptions[index];
         final isLast = index == subscriptions.length - 1;
+        final hasPagination = paginationWidget != null;
         final status = item.status;
 
         final totalDuration = item.totalDurationInDays;
@@ -43,7 +53,7 @@ class SubscriptionListView extends StatelessWidget {
         final isExpired = status == 3;
 
         return Padding(
-          padding: EdgeInsets.only(bottom: isLast ? 152.h : 0),
+          padding: EdgeInsets.only(bottom: (isLast && !hasPagination) ? 152.h : 0),
           child: MySubscriptionCard(
             image: item.branchLogoUrl,
             title: item.branchName,

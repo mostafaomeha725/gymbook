@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/data/models/customer_subscriptions_page_model.dart';
 import 'package:hive/hive.dart';
 import 'package:gymbook/core/cache/hive_boxes.dart';
 import 'package:gymbook/core/error/exceptions.dart';
 import 'package:gymbook/core/error/failure.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/data/datasources/customer_subscriptions_remote_datasource.dart';
-import 'package:gymbook/features/customer/customer_subscriptions/data/models/customer_subscription_model.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/domain/repositories/customer_subscriptions_repository.dart';
 
 class CustomerSubscriptionsRepositoryImpl
@@ -15,7 +15,7 @@ class CustomerSubscriptionsRepositoryImpl
   CustomerSubscriptionsRepositoryImpl(this.remoteDataSource);
 
   @override
-  Stream<Either<Failure, List<CustomerSubscriptionModel>>> getMySubscriptions({
+  Stream<Either<Failure, CustomerSubscriptionsPageModel>> getMySubscriptions({
     int pageNumber = 1,
     int pageSize = 5,
     int? status,
@@ -30,15 +30,14 @@ class CustomerSubscriptionsRepositoryImpl
     if (cachedJson != null && cachedJson.isNotEmpty) {
       try {
         final Map<String, dynamic> wrapper = jsonDecode(cachedJson);
-        final List<dynamic>? dataList = wrapper['data'];
+        final dynamic dataField = wrapper['data'];
 
-        if (dataList != null) {
-          final list = dataList
-              .whereType<Map<String, dynamic>>()
-              .map((e) => CustomerSubscriptionModel.fromJson(e))
-              .toList();
+        if (dataField != null) {
+          final pageModel = CustomerSubscriptionsPageModel.fromJson(
+            dataField as Map<String, dynamic>,
+          );
           emittedCache = true;
-          yield Right(list);
+          yield Right(pageModel);
 
           // Always refresh in the background (Silent refresh)
           needsBackgroundRefresh = true;
@@ -51,14 +50,12 @@ class CustomerSubscriptionsRepositoryImpl
     // 2. Fetch from Network
     if (needsBackgroundRefresh) {
       try {
-        final remoteModels = await remoteDataSource.getMySubscriptions(
+        final remoteModel = await remoteDataSource.getMySubscriptions(
           pageNumber: pageNumber,
           pageSize: pageSize,
           status: status,
         );
-        final remoteJsonString = jsonEncode(
-          remoteModels.map((e) => e.toJson()).toList(),
-        );
+        final remoteJsonString = jsonEncode(remoteModel.toJson());
 
         // Retrieve current cache to compare
         bool shouldUpdateCacheAndEmit = true;
@@ -81,12 +78,12 @@ class CustomerSubscriptionsRepositoryImpl
         if (shouldUpdateCacheAndEmit) {
           final newCacheWrapper = {
             'timestamp': DateTime.now().millisecondsSinceEpoch,
-            'data': remoteModels.map((e) => e.toJson()).toList(),
+            'data': remoteModel.toJson(),
           };
           await Hive.box<String>(
             HiveBoxes.cacheBox,
           ).put(cacheKey, jsonEncode(newCacheWrapper));
-          yield Right(remoteModels);
+          yield Right(remoteModel);
         }
       } catch (e) {
         // 3. Handle Errors

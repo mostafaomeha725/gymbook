@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:gymbook/features/customer/customer_subscriptions/data/models/customer_subscription_model.dart';
+import 'package:gymbook/features/customer/customer_subscriptions/data/models/customer_subscriptions_page_model.dart';
 
 abstract class CustomerSubscriptionsState extends Equatable {
   const CustomerSubscriptionsState();
@@ -13,12 +13,12 @@ class CustomerSubscriptionsInitial extends CustomerSubscriptionsState {}
 class CustomerSubscriptionsLoading extends CustomerSubscriptionsState {}
 
 class CustomerSubscriptionsLoaded extends CustomerSubscriptionsState {
-  final List<CustomerSubscriptionModel> subscriptions;
+  final CustomerSubscriptionsPageModel pageModel;
 
-  const CustomerSubscriptionsLoaded(this.subscriptions);
+  const CustomerSubscriptionsLoaded(this.pageModel);
 
   @override
-  List<Object> get props => [subscriptions];
+  List<Object> get props => [pageModel];
 }
 
 class CustomerSubscriptionsError extends CustomerSubscriptionsState {

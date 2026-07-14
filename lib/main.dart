@@ -55,7 +55,7 @@ class GymbookApp extends StatelessWidget {
       useInheritedMediaQuery: true,
       builder: (context, child) {
         return MaterialApp.router(
-          title: 'Gymbook',
+          title: 'Prime Fit',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             scaffoldBackgroundColor: AppLightColors.defaultBackground,

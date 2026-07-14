@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gymbook/core/enums/app_enums.dart' show SubscriptionTab, SubscriptionTabExtension;
+import 'package:gymbook/core/enums/app_enums.dart'
+    show SubscriptionTab, SubscriptionTabExtension;
 import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/core/widgets/custom_nav_bar.dart';
@@ -9,6 +10,7 @@ import 'package:gymbook/features/customer/customer_subscriptions/presentation/cu
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/cubits/customer_subscriptions_cubit/customer_subscriptions_state.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscription_list_view.dart';
 import 'package:gymbook/features/customer/customer_subscriptions/presentation/widgets/subscription_tabs.dart';
+import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
 class SubscriptionsScreenBody extends StatefulWidget {
   const SubscriptionsScreenBody({super.key});
@@ -42,9 +44,9 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
                 setState(() {
                   selectedTab = tab;
                 });
-                context
-                    .read<CustomerSubscriptionsCubit>()
-                    .loadSubscriptions(status: tab.backendStatus);
+                context.read<CustomerSubscriptionsCubit>().loadSubscriptions(
+                  status: tab.backendStatus,
+                );
               },
             ),
           ),
@@ -69,7 +71,9 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
                               onPressed: () {
                                 context
                                     .read<CustomerSubscriptionsCubit>()
-                                    .loadSubscriptions(status: selectedTab.backendStatus);
+                                    .loadSubscriptions(
+                                      status: selectedTab.backendStatus,
+                                    );
                               },
                               child: const Text('Retry'),
                             ),
@@ -81,7 +85,21 @@ class _SubscriptionsScreenBodyState extends State<SubscriptionsScreenBody> {
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
                         child: SubscriptionListView(
                           selectedTab: selectedTab,
-                          subscriptions: state.subscriptions,
+                          subscriptions: state.pageModel.data,
+                          paginationWidget: state.pageModel.totalPages > 1
+                              ? GymPaginationWidget(
+                                  totalPages: state.pageModel.totalPages,
+                                  currentPage: state.pageModel.currentPage,
+                                  onPageChanged: (page) {
+                                    context
+                                        .read<CustomerSubscriptionsCubit>()
+                                        .loadSubscriptions(
+                                          status: selectedTab.backendStatus,
+                                          pageNumber: page,
+                                        );
+                                  },
+                                )
+                              : null,
                         ),
                       );
                     }

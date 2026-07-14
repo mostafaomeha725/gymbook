@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gymbook/core/widgets/custom_text.dart';
-import 'package:gymbook/core/theme/styles.dart';
+
 import 'segmented_tab_item.dart';
 
 class CustomSegmentedTabs extends StatelessWidget {
@@ -24,11 +23,11 @@ class CustomSegmentedTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedTab = tabs[selectedIndex];
+    // final selectedTab = tabs[selectedIndex];
 
-    final title = titleBuilder != null
-        ? titleBuilder!(selectedTab)
-        : "$titlePrefix ($selectedTab)";
+    // final title = titleBuilder != null
+    //     ? titleBuilder!(selectedTab)
+    //     : "$titlePrefix ($selectedTab)";
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 22.w),
@@ -52,12 +51,12 @@ class CustomSegmentedTabs extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: 28.h),
+          // SizedBox(height: 28.h),
 
-          AppText(
-            title,
-            style: font20w700.copyWith(color: const Color(0xff2C3E50)),
-          ),
+          // AppText(
+          //   title,
+          //   style: font20w700.copyWith(color: const Color(0xff2C3E50)),
+          // ),
         ],
       ),
     );
