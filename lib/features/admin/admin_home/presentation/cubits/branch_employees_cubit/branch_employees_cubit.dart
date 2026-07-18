@@ -10,37 +10,99 @@ class BranchEmployeesCubit extends Cubit<BranchEmployeesState> {
   final UpdateEmployeeUseCase updateEmployeeUseCase;
   BranchEmployeesResponse? currentResponse;
   StreamSubscription? _subscription;
+  bool _isFetchingMore = false;
+  bool get isFetchingMore => _isFetchingMore;
+  List<EmployeeModel> _accumulatedItems = [];
+  List<EmployeeModel> get items => _accumulatedItems;
+  int _currentPage = 1;
+  late int _currentBranchId;
 
   BranchEmployeesCubit({
     required this.getBranchEmployeesUseCase,
     required this.updateEmployeeUseCase,
   }) : super(BranchEmployeesInitial());
 
-  Future<void> getBranchEmployees(int branchId, {int pageNumber = 1}) async {
+  Future<void> getBranchEmployees(
+    int branchId, {
+    bool isRefresh = false,
+  }) async {
+    _currentBranchId = branchId;
+    if (isRefresh || _currentPage == 1) {
+      _accumulatedItems.clear();
+      _currentPage = 1;
+    }
+
     if (state is! BranchEmployeesLoaded) {
-      if (pageNumber == 1) {
-        emit(const BranchEmployeesLoading());
-      } else {
-        emit(const BranchEmployeesLoading(isPaginationLoading: true));
-      }
+      emit(const BranchEmployeesLoading());
     }
 
     _subscription?.cancel();
-    _subscription = getBranchEmployeesUseCase(branchId, pageNumber).listen((
+    _subscription = getBranchEmployeesUseCase(branchId, _currentPage).listen((
       result,
     ) {
       result.fold(
         (failure) {
-          if (state is! BranchEmployeesLoaded) {
-            emit(BranchEmployeesError(failure.message));
-          }
+          if (isClosed) return;
+          emit(BranchEmployeesError(failure.message));
         },
         (response) {
+          if (isClosed) return;
           currentResponse = response;
-          emit(BranchEmployeesLoaded(response));
+          if (_currentPage == 1) {
+            _accumulatedItems = List.from(response.data);
+          } else {
+            _accumulatedItems.addAll(response.data);
+          }
+
+          emit(
+            BranchEmployeesLoaded(
+              response: response,
+              items: List.from(_accumulatedItems),
+              isFetchingMore: false,
+              hasReachedMax: _currentPage >= response.totalPages || response.data.isEmpty,
+            ),
+          );
         },
       );
     });
+  }
+
+  Future<void> loadMore() async {
+    if (_isFetchingMore) return;
+    if (state is! BranchEmployeesLoaded) return;
+
+    final currentState = state as BranchEmployeesLoaded;
+    if (currentState.hasReachedMax) return;
+
+    _isFetchingMore = true;
+    _currentPage++;
+    emit(currentState.copyWith(isFetchingMore: true));
+
+    _subscription?.cancel();
+    _subscription = getBranchEmployeesUseCase(_currentBranchId, _currentPage)
+        .listen((result) {
+          _isFetchingMore = false;
+          result.fold(
+            (failure) {
+              if (isClosed) return;
+              _currentPage--;
+              emit(currentState.copyWith(isFetchingMore: false));
+            },
+            (response) {
+              currentResponse = response;
+              _accumulatedItems.addAll(response.data);
+
+              emit(
+                BranchEmployeesLoaded(
+                  response: response,
+                  items: List.from(_accumulatedItems),
+                  isFetchingMore: false,
+                  hasReachedMax: _currentPage >= response.totalPages || response.data.isEmpty,
+                ),
+              );
+            },
+          );
+        });
   }
 
   Future<void> toggleEmployeeStatus({
@@ -67,7 +129,14 @@ class BranchEmployeesCubit extends Cubit<BranchEmployeesState> {
       (failure) {
         // Restore list state on failure
         if (currentResponse != null) {
-          emit(BranchEmployeesLoaded(currentResponse!));
+          emit(
+            BranchEmployeesLoaded(
+              response: currentResponse!,
+              items: List.from(_accumulatedItems),
+              isFetchingMore: false,
+              hasReachedMax: _currentPage >= currentResponse!.totalPages || currentResponse!.data.isEmpty,
+            ),
+          );
         }
         emit(
           EmployeeStatusToggleError(
@@ -95,7 +164,19 @@ class BranchEmployeesCubit extends Cubit<BranchEmployeesState> {
             hasPreviousPage: currentResponse!.hasPreviousPage,
             hasNextPage: currentResponse!.hasNextPage,
           );
-          emit(BranchEmployeesLoaded(currentResponse!));
+
+          final updatedAccumulated = _accumulatedItems.map((e) {
+            if (e.id == employeeId) return updatedEmployee;
+            return e;
+          }).toList();
+          _accumulatedItems = updatedAccumulated;
+
+          emit(
+            (state as BranchEmployeesLoaded).copyWith(
+              response: currentResponse!,
+              items: List.from(_accumulatedItems),
+            ),
+          );
         }
         emit(
           EmployeeStatusToggleSuccess(

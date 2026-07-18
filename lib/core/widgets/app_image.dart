@@ -14,8 +14,8 @@ class AppImage extends StatefulWidget {
     this.width,
     this.height,
     this.fit,
-    this.onImageLoaded,
     this.showprogressIndicator = true,
+    this.useMemCache = true,
   });
 
   final String imageUrl;
@@ -23,20 +23,28 @@ class AppImage extends StatefulWidget {
   final double? height;
   final BorderRadius? borderRadius;
   final BoxFit? fit;
-  final VoidCallback? onImageLoaded;
   final bool showprogressIndicator;
+  final bool useMemCache;
 
   @override
   State<AppImage> createState() => _AppImageState();
 }
 
 class _AppImageState extends State<AppImage> {
-  bool _isImageLoaded = false;
+  @override
+  void initState() {
+    super.initState();
+    // Force cache size increase safely here so it works even on Hot Reload
+    PaintingBinding.instance.imageCache.maximumSize = 1000;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 150 * 1024 * 1024; // 150 MB
+  }
 
-  void _callOnImageLoadedOnce() {
-    if (!_isImageLoaded) {
-      _isImageLoaded = true;
-      widget.onImageLoaded?.call();
+  String _getCacheKey(String url) {
+    try {
+      final uri = Uri.parse(url);
+      return '${uri.scheme}://${uri.host}${uri.path}';
+    } catch (e) {
+      return url;
     }
   }
 
@@ -48,18 +56,23 @@ class _AppImageState extends State<AppImage> {
         fit: widget.fit ?? BoxFit.fill,
         width: widget.width,
         height: widget.height,
+        // Compress image in RAM to save memory and keep 50+ images in LRU Cache
+        memCacheWidth: widget.useMemCache
+            ? (widget.width != null && widget.width!.isFinite ? (widget.width! * 2).toInt() : 800)
+            : null,
         imageUrl: widget.imageUrl,
-        imageBuilder: (context, imageProvider) {
-          _callOnImageLoadedOnce();
-          return Image(image: imageProvider, fit: widget.fit ?? BoxFit.fill);
-        },
-        progressIndicatorBuilder: (context, url, downloadProgress) {
-          return widget.showprogressIndicator
-              ? SpinKitFadingCircle(
-                  color: context.colorScheme.primary,
-                  size: 30.h,
-                )
-              : const SizedBox();
+        cacheKey: _getCacheKey(widget.imageUrl),
+        // Eliminate visual flashing when loading from cache (instant pop-in)
+        fadeInDuration: Duration.zero,
+        fadeOutDuration: Duration.zero,
+        placeholder: (context, url) {
+          if (!widget.showprogressIndicator) return const SizedBox();
+          return Center(
+            child: SpinKitFadingCircle(
+              color: context.colorScheme.primary,
+              size: 30.h,
+            ),
+          );
         },
         errorWidget: (context, url, error) {
           return Container(

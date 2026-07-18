@@ -94,7 +94,10 @@ class AdminManageSubscriptionsScreenBody extends StatelessWidget {
                         return SubscriptionsEmptyWidget(hasSearch: hasSearch);
                       }
 
-                      return SubscriptionsListWidget(response: state.response);
+                      return SubscriptionsListWidget(
+                        items: state.items,
+                        isFetchingMore: state.isFetchingMore,
+                      );
                     }
 
                     return const SizedBox.shrink();

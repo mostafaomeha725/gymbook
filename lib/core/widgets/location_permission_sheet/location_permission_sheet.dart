@@ -46,6 +46,8 @@ class _LocationPermissionSheetState extends State<LocationPermissionSheet>
   late Animation<double> _fadeAnim;
 
   bool _isLoading = false;
+  bool _isResolving = false;
+  bool _hasPopped = false;
 
   @override
   void initState() {
@@ -88,7 +90,7 @@ class _LocationPermissionSheetState extends State<LocationPermissionSheet>
         }
       } else if (permission == LocationPermission.denied) {
         // Service was just enabled, now automatically ask for permission
-        if (mounted && !_isLoading) {
+        if (mounted && !_isLoading && !_hasPopped) {
           _requestLocation();
         }
       }
@@ -96,6 +98,7 @@ class _LocationPermissionSheetState extends State<LocationPermissionSheet>
   }
 
   Future<void> _requestLocation() async {
+    if (_hasPopped) return;
     setState(() => _isLoading = true);
 
     try {
@@ -128,6 +131,8 @@ class _LocationPermissionSheetState extends State<LocationPermissionSheet>
   }
 
   Future<void> _resolveAndSaveLocation() async {
+    if (_isResolving || _hasPopped) return;
+    _isResolving = true;
     try {
       Position? position;
       try {
@@ -142,7 +147,8 @@ class _LocationPermissionSheetState extends State<LocationPermissionSheet>
       }
 
       if (position == null) {
-        if (mounted) {
+        if (mounted && !_hasPopped) {
+          _hasPopped = true;
           Navigator.of(context).pop();
         }
         return;
@@ -193,18 +199,28 @@ class _LocationPermissionSheetState extends State<LocationPermissionSheet>
         selectedLocationId: location.id,
       );
 
-      if (mounted) {
+      if (mounted && !_hasPopped) {
+        _hasPopped = true;
         Navigator.of(context).pop();
         widget.onLocationApplied?.call(location);
       }
     } catch (_) {
-      if (mounted) {
+      if (mounted && !_hasPopped) {
+        _hasPopped = true;
         Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        _isResolving = false;
       }
     }
   }
 
-  void _skipLocation() => Navigator.of(context).pop();
+  void _skipLocation() {
+    if (_hasPopped) return;
+    _hasPopped = true;
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {

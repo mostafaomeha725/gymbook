@@ -22,46 +22,48 @@ class EntryQrcodeGymScreenBody extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        return SizedBox(
-          height:
-              MediaQuery.of(context).size.height -
-              MediaQuery.of(context).padding.top -
-              MediaQuery.of(context).padding.bottom,
+        return SingleChildScrollView(
           child: Column(
             children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    GymbookCard(
-                      title: 'Your QR Code',
-                      subtitle: 'Show this code at the entrance',
-                      height: 250.h,
-                      height1: 20.h,
-                      showAppBar: true,
-                      appbarText: 'Entry QR Code',
-                    ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  GymbookCard(
+                    title: 'Your QR Code',
+                    subtitle: 'Show this code at the entrance',
+                    height: 250.h,
+                    height1: 20.h,
+                    showAppBar: true,
+                    appbarText: 'Entry QR Code',
+                  ),
 
-                    Positioned(
+                  Padding(
+                    padding: EdgeInsets.only(
                       top: 190.h,
                       left: 40.w,
                       right: 40.w,
-                      child: QrcodeScanner(
-                        userId: state.userId,
-                        code: state.code,
-                        qrData: state.qrPayload,
-                        secondsRemaining: state.secondsRemaining,
-                        isLoading: state.isLoading,
-                        onRefreshTap: () {
-                          context.read<EntryQrcodeCubit>().refreshNow();
-                        },
-                      ),
                     ),
-                  ],
-                ),
+                    child: QrcodeScanner(
+                      userId: state.userId,
+                      code: state.code,
+                      qrData: state.qrPayload,
+                      secondsRemaining: state.secondsRemaining,
+                      isLoading: state.isLoading,
+                      onRefreshTap: () {
+                        context.read<EntryQrcodeCubit>().refreshNow();
+                      },
+                    ),
+                  ),
+                ],
               ),
+              SizedBox(height: 32.h),
 
               Padding(
-                padding: EdgeInsets.only(bottom: 28.h, right: 56.w, left: 56.w),
+                padding: EdgeInsets.only(
+                  bottom: 100.h,
+                  right: 56.w,
+                  left: 56.w,
+                ),
                 child: const BrightnessHintCard(),
               ),
             ],

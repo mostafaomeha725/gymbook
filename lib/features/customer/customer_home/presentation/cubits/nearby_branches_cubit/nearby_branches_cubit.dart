@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:gymbook/features/customer/customer_home/domain/entities/nearby_branch_entity.dart';
 import 'package:gymbook/features/customer/customer_home/domain/entities/nearby_branches_page_entity.dart';
 import 'package:gymbook/features/customer/customer_home/domain/usecases/get_nearby_branches_usecase.dart';
 
@@ -19,6 +20,9 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
   double? _latitude;
   double? _longitude;
 
+  bool _isFetchingMore = false;
+  List<NearbyBranchEntity> _accumulatedBranches = [];
+
   StreamSubscription? _subscription;
 
   int get currentPage => _currentPage;
@@ -33,6 +37,7 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
       _latitude = latitude;
       _longitude = longitude;
       _currentPage = 1;
+      _accumulatedBranches.clear();
       emit(NearbyBranchesLoading());
     }
     await loadNearby();
@@ -43,9 +48,54 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
       _latitude = null;
       _longitude = null;
       _currentPage = 1;
+      _accumulatedBranches.clear();
       emit(NearbyBranchesLoading());
     }
     await loadNearby();
+  }
+
+  Future<void> loadMore() async {
+    if (_isFetchingMore) return;
+    if (state is! NearbyBranchesSuccess) return;
+
+    final currentState = state as NearbyBranchesSuccess;
+    if (currentState.hasReachedMax) return;
+
+    _isFetchingMore = true;
+    _currentPage++;
+    emit(currentState.copyWith(isFetchingMore: true));
+
+    _subscription?.cancel();
+
+    _subscription =
+        getNearbyBranchesUseCase(
+          latitude: _latitude,
+          longitude: _longitude,
+          radiusInMeters: _radiusInMeters,
+          pageNumber: _currentPage,
+          pageSize: _pageSize,
+          search: _currentSearch,
+        ).listen((result) {
+          _isFetchingMore = false;
+          result.fold(
+            (failure) {
+              if (isClosed) return;
+              _currentPage--;
+              emit(currentState.copyWith(isFetchingMore: false));
+            },
+            (response) {
+              _accumulatedBranches.addAll(response.data);
+              emit(
+                NearbyBranchesSuccess(
+                  response: response,
+                  branches: List.from(_accumulatedBranches),
+                  isFetchingMore: false,
+                  hasReachedMax: _currentPage >= response.totalPages || response.data.isEmpty,
+                ),
+              );
+            },
+          );
+        });
   }
 
   Future<void> loadNearby({
@@ -61,16 +111,19 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
       }
       _currentPage = 1;
       _currentSearch = null;
+      _accumulatedBranches.clear();
     } else {
       if (pageNumber != null && pageNumber > 0 && pageNumber != _currentPage) {
         _currentPage = pageNumber;
         filtersChanged = true;
+        _accumulatedBranches.clear();
       }
       if (search != null) {
         final newSearch = search.trim().isEmpty ? null : search.trim();
         if (_currentSearch != newSearch) {
           _currentSearch = newSearch;
           _currentPage = 1;
+          _accumulatedBranches.clear();
           filtersChanged = true;
         }
       }
@@ -93,12 +146,26 @@ class NearbyBranchesCubit extends Cubit<NearbyBranchesState> {
         ).listen((result) {
           result.fold(
             (failure) {
+              if (isClosed) return;
               if (state is! NearbyBranchesSuccess) {
                 emit(NearbyBranchesFailure(failure.message));
               }
             },
             (response) {
-              emit(NearbyBranchesSuccess(response));
+              if (isClosed) return;
+              if (_currentPage == 1) {
+                _accumulatedBranches = List.from(response.data);
+              } else {
+                _accumulatedBranches.addAll(response.data);
+              }
+              emit(
+                NearbyBranchesSuccess(
+                  response: response,
+                  branches: List.from(_accumulatedBranches),
+                  isFetchingMore: false,
+                  hasReachedMax: _currentPage >= response.totalPages || response.data.isEmpty,
+                ),
+              );
             },
           );
         });

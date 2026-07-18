@@ -217,7 +217,7 @@ class _AdminQrScannerBodyState extends State<AdminQrScannerBody> {
                           },
                         ),
                       ),
-                      SizedBox(height: 104.h),
+                      SizedBox(height: 132.h),
                     ],
                   ),
                 ),

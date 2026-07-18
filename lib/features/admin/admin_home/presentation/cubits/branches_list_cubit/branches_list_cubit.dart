@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:gymbook/features/admin/admin_home/domain/entities/branch_list_entity.dart';
+import 'package:gymbook/features/admin/admin_home/domain/entities/branch_entity.dart';
 import 'package:gymbook/features/admin/admin_home/domain/usecases/get_branches_usecase.dart';
-
-part 'branches_list_state.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/branches_list_cubit/branches_list_state.dart';
 
 class BranchesListCubit extends Cubit<BranchesListState> {
   BranchesListCubit(this.getBranchesUseCase) : super(BranchesListInitial());
@@ -13,6 +12,9 @@ class BranchesListCubit extends Cubit<BranchesListState> {
   int _currentPage = 1;
   static const int _pageSize = 5;
   String? _currentSearch;
+
+  bool _isFetchingMore = false;
+  List<BranchEntity> _accumulatedItems = [];
 
   StreamSubscription? _branchesSubscription;
 
@@ -56,11 +58,71 @@ class BranchesListCubit extends Cubit<BranchesListState> {
           pageSize: _pageSize,
           search: _currentSearch,
         ).listen((result) {
-          result.fold((failure) {
-            if (state is! BranchesListSuccess) {
-              emit(BranchesListFailure(failure.message));
-            }
-          }, (entity) => emit(BranchesListSuccess(entity)));
+          result.fold(
+            (failure) {
+              if (isClosed) return;
+              if (state is! BranchesListSuccess) {
+                emit(BranchesListFailure(failure.message));
+              }
+            },
+            (entity) {
+              if (isClosed) return;
+              if (_currentPage == 1) {
+                _accumulatedItems = List.from(entity.data);
+              } else {
+                _accumulatedItems.addAll(entity.data);
+              }
+              emit(
+                BranchesListSuccess(
+                  response: entity,
+                  items: List.from(_accumulatedItems),
+                  isFetchingMore: false,
+                  hasReachedMax: _currentPage >= entity.totalPages || entity.data.isEmpty,
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  Future<void> loadMore() async {
+    if (_isFetchingMore) return;
+    if (state is! BranchesListSuccess) return;
+
+    final currentState = state as BranchesListSuccess;
+    if (currentState.hasReachedMax) return;
+
+    _isFetchingMore = true;
+    _currentPage++;
+    emit(currentState.copyWith(isFetchingMore: true));
+
+    _branchesSubscription?.cancel();
+    _branchesSubscription =
+        getBranchesUseCase(
+          pageNumber: _currentPage,
+          pageSize: _pageSize,
+          search: _currentSearch,
+        ).listen((result) {
+          _isFetchingMore = false;
+          result.fold(
+            (failure) {
+              if (isClosed) return;
+              _currentPage--;
+              emit(currentState.copyWith(isFetchingMore: false));
+            },
+            (entity) {
+              if (isClosed) return;
+              _accumulatedItems.addAll(entity.data);
+              emit(
+                BranchesListSuccess(
+                  response: entity,
+                  items: List.from(_accumulatedItems),
+                  isFetchingMore: false,
+                  hasReachedMax: _currentPage >= entity.totalPages || entity.data.isEmpty,
+                ),
+              );
+            },
+          );
         });
   }
 

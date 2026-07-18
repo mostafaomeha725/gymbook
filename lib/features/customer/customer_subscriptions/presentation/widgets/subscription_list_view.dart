@@ -12,12 +12,16 @@ class SubscriptionListView extends StatelessWidget {
   final SubscriptionTab selectedTab;
   final List<CustomerSubscriptionModel> subscriptions;
   final Widget? paginationWidget;
+  final ScrollController? scrollController;
+  final ScrollPhysics? physics;
 
   const SubscriptionListView({
     super.key,
     required this.selectedTab,
     required this.subscriptions,
     this.paginationWidget,
+    this.scrollController,
+    this.physics,
   });
 
   @override
@@ -32,6 +36,8 @@ class SubscriptionListView extends StatelessWidget {
     }
 
     return ListView.separated(
+      controller: scrollController,
+      physics: physics,
       padding: EdgeInsets.zero,
       itemCount: subscriptions.length + (paginationWidget != null ? 1 : 0),
       separatorBuilder: (_, __) => 16.verticalSpace,
@@ -53,7 +59,9 @@ class SubscriptionListView extends StatelessWidget {
         final isExpired = status == 3;
 
         return Padding(
-          padding: EdgeInsets.only(bottom: (isLast && !hasPagination) ? 152.h : 0),
+          padding: EdgeInsets.only(
+            bottom: (isLast && !hasPagination) ? 152.h : 0,
+          ),
           child: MySubscriptionCard(
             image: item.branchLogoUrl,
             title: item.branchName,

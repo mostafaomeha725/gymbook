@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/widgets/app_image.dart';
 
 class ExistingBranchImageItem {
   final int id;
@@ -43,18 +44,11 @@ class GymPhotosGrid extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
-                child: Image.network(
-                  image.url,
+                child: AppImage(
+                  imageUrl: image.url,
                   width: double.infinity,
                   height: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return Container(
-                      color: const Color(0xffF3F4F6),
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.broken_image_outlined),
-                    );
-                  },
                 ),
               ),
               if (onRemoveExisting != null)

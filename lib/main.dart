@@ -38,6 +38,10 @@ Future<void> main() async {
 
   configureEasyLoading();
 
+  // Optimizing Image Cache to hold 50+ images smoothly (150 MB limit)
+  PaintingBinding.instance.imageCache.maximumSize = 1000;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 150 * 1024 * 1024;
+
   runApp(const GymbookApp());
 }
 

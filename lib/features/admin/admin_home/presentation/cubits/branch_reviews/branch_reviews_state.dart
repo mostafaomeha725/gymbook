@@ -16,6 +16,9 @@ class BranchReviewsLoaded extends BranchReviewsState {
   final bool canReview;
   final ReviewEntity? myReview;
 
+  final bool isFetchingMore;
+  final bool hasReachedMax;
+
   BranchReviewsLoaded({
     required this.reviews,
     required this.selectedRating,
@@ -25,7 +28,35 @@ class BranchReviewsLoaded extends BranchReviewsState {
     required this.totalCount,
     required this.canReview,
     this.myReview,
+    this.isFetchingMore = false,
+    this.hasReachedMax = false,
   });
+
+  BranchReviewsLoaded copyWith({
+    List<ReviewEntity>? reviews,
+    String? selectedRating,
+    int? currentPage,
+    int? totalPages,
+    double? averageRating,
+    int? totalCount,
+    bool? canReview,
+    ReviewEntity? myReview,
+    bool? isFetchingMore,
+    bool? hasReachedMax,
+  }) {
+    return BranchReviewsLoaded(
+      reviews: reviews ?? this.reviews,
+      selectedRating: selectedRating ?? this.selectedRating,
+      currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
+      averageRating: averageRating ?? this.averageRating,
+      totalCount: totalCount ?? this.totalCount,
+      canReview: canReview ?? this.canReview,
+      myReview: myReview ?? this.myReview,
+      isFetchingMore: isFetchingMore ?? this.isFetchingMore,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+    );
+  }
 }
 
 class BranchReviewsError extends BranchReviewsState {

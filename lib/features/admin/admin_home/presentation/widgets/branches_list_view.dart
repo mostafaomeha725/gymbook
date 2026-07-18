@@ -11,51 +11,63 @@ import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_ca
 
 class BranchesListView extends StatelessWidget {
   final List<BranchEntity> branches;
+  final bool isFetchingMore;
 
-  const BranchesListView({super.key, required this.branches});
+  const BranchesListView({
+    super.key,
+    required this.branches,
+    this.isFetchingMore = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (branches.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: 60.h),
-        child: AppText(
-          'No branches found.\nTap + to add your first branch.',
-          alignment: AlignmentDirectional.center,
-          textAlign: TextAlign.center,
-          style: font18w500,
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 60.h),
+          child: AppText(
+            'No branches found.\nTap + to add your first branch.',
+            alignment: AlignmentDirectional.center,
+            textAlign: TextAlign.center,
+            style: font18w500,
+          ),
         ),
       );
     }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+    return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 12.w),
-      itemCount: branches.length,
-      itemBuilder: (context, index) {
-        final branch = branches[index];
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          if (index == branches.length) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: const Center(child: CircularProgressIndicator()),
+            );
+          }
 
-        return Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
-          child: BranchCard(
-            imageUrl: branch.logo,
-            branchName: branch.name ?? 'Branch #${branch.id}',
-            location: branch.displayLocation,
-            tags: [branch.branchTypeName, branch.branchStatusName],
-            subscriptions: branch.subscriptionsCount,
-            onTap: () async {
-              await GoRouter.of(
-                context,
-              ).push(Routes.adminBranchScreen, extra: branch);
+          final branch = branches[index];
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: BranchCard(
+              imageUrl: branch.logo,
+              branchName: branch.name ?? 'Branch #${branch.id}',
+              location: branch.displayLocation,
+              tags: [branch.branchTypeName, branch.branchStatusName],
+              subscriptions: branch.subscriptionsCount,
+              onTap: () async {
+                await GoRouter.of(
+                  context,
+                ).push(Routes.adminBranchScreen, extra: branch);
 
-              if (context.mounted) {
-                context.read<BranchesListCubit>().loadBranches(refresh: true);
-              }
-            },
-          ),
-        );
-      },
+                if (context.mounted) {
+                  context.read<BranchesListCubit>().loadBranches(refresh: true);
+                }
+              },
+            ),
+          );
+        }, childCount: branches.length + (isFetchingMore ? 1 : 0)),
+      ),
     );
   }
 }

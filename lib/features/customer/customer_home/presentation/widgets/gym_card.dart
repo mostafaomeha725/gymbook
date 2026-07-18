@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gymbook/core/theme/styles.dart';
+import 'package:gymbook/core/widgets/app_image.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/tag_bage.dart';
 
@@ -31,7 +32,7 @@ class GymCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: 16.h, left: 16.w, right: 16.w),
+        margin: EdgeInsets.only(bottom: 16.h, right: 22.w, left: 22.w),
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -50,17 +51,12 @@ class GymCard extends StatelessWidget {
             // صورة الجيم
             ClipRRect(
               borderRadius: BorderRadius.circular(16.r),
-              child: Image.network(
-                imageUrl,
+              child: AppImage(
+                imageUrl: imageUrl,
                 width: 90.w,
                 height: 90.w,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 90.w,
-                  height: 90.w,
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.image_not_supported),
-                ),
+                borderRadius: BorderRadius.circular(16.r),
               ),
             ),
             SizedBox(width: 16.w),

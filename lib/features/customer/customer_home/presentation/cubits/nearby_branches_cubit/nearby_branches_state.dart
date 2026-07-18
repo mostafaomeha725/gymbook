@@ -8,7 +8,30 @@ final class NearbyBranchesLoading extends NearbyBranchesState {}
 
 final class NearbyBranchesSuccess extends NearbyBranchesState {
   final NearbyBranchesPageEntity response;
-  NearbyBranchesSuccess(this.response);
+  final List<NearbyBranchEntity> branches;
+  final bool isFetchingMore;
+  final bool hasReachedMax;
+
+  NearbyBranchesSuccess({
+    required this.response,
+    required this.branches,
+    this.isFetchingMore = false,
+    this.hasReachedMax = false,
+  });
+
+  NearbyBranchesSuccess copyWith({
+    NearbyBranchesPageEntity? response,
+    List<NearbyBranchEntity>? branches,
+    bool? isFetchingMore,
+    bool? hasReachedMax,
+  }) {
+    return NearbyBranchesSuccess(
+      response: response ?? this.response,
+      branches: branches ?? this.branches,
+      isFetchingMore: isFetchingMore ?? this.isFetchingMore,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+    );
+  }
 }
 
 final class NearbyBranchesFailure extends NearbyBranchesState {

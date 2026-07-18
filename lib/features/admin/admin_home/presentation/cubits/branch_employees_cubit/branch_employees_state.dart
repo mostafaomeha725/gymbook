@@ -21,11 +21,33 @@ class BranchEmployeesLoading extends BranchEmployeesState {
 
 class BranchEmployeesLoaded extends BranchEmployeesState {
   final BranchEmployeesResponse response;
+  final List<EmployeeModel> items;
+  final bool isFetchingMore;
+  final bool hasReachedMax;
 
-  const BranchEmployeesLoaded(this.response);
+  const BranchEmployeesLoaded({
+    required this.response,
+    required this.items,
+    this.isFetchingMore = false,
+    this.hasReachedMax = false,
+  });
+
+  BranchEmployeesLoaded copyWith({
+    BranchEmployeesResponse? response,
+    List<EmployeeModel>? items,
+    bool? isFetchingMore,
+    bool? hasReachedMax,
+  }) {
+    return BranchEmployeesLoaded(
+      response: response ?? this.response,
+      items: items ?? this.items,
+      isFetchingMore: isFetchingMore ?? this.isFetchingMore,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+    );
+  }
 
   @override
-  List<Object> get props => [response];
+  List<Object> get props => [response, items, isFetchingMore, hasReachedMax];
 }
 
 class BranchEmployeesError extends BranchEmployeesState {

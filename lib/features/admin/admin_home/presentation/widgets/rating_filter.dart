@@ -54,15 +54,7 @@ class RatingFilter extends StatelessWidget {
                     border: isSelected
                         ? null
                         : Border.all(color: Colors.grey.shade200),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFF0EA5E9).withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : null,
+                    boxShadow: null,
                   ),
                   child: Row(
                     children: [

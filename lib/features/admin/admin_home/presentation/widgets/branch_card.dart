@@ -28,7 +28,7 @@ class BranchCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.r),
@@ -88,12 +88,16 @@ class BranchCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        AppText(
-                          branchName,
-                          style: font18w700.copyWith(
-                            color: const Color(0xFF333333),
+                        Expanded(
+                          child: AppText(
+                            branchName,
+                            style: font18w700.copyWith(
+                              color: const Color(0xFF333333),
+                            ),
+                            maxLines: 1,
                           ),
                         ),
+                        SizedBox(width: 8.w),
                         Icon(
                           Icons.arrow_forward_ios,
                           size: 16.sp,

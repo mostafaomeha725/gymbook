@@ -29,6 +29,9 @@ class BranchSubscriptionsListCubit extends Cubit<BranchSubscriptionsListState> {
   int currentPage = 1;
   String? searchText;
 
+  bool _isFetchingMore = false;
+  List<SubscriptionItemEntity> _accumulatedItems = [];
+
   int? get activeStatus => _tabStatuses[selectedTab];
 
   void init(int id) {
@@ -40,6 +43,7 @@ class BranchSubscriptionsListCubit extends Cubit<BranchSubscriptionsListState> {
     if (selectedTab == index) return;
     selectedTab = index;
     currentPage = 1;
+    _accumulatedItems.clear();
     _load();
   }
 
@@ -51,6 +55,7 @@ class BranchSubscriptionsListCubit extends Cubit<BranchSubscriptionsListState> {
     _debounce = Timer(const Duration(milliseconds: 400), () {
       searchText = trimValue.isEmpty ? null : trimValue;
       currentPage = 1;
+      _accumulatedItems.clear();
       _load();
     });
   }
@@ -60,17 +65,13 @@ class BranchSubscriptionsListCubit extends Cubit<BranchSubscriptionsListState> {
     final trimValue = query.trim();
     searchText = trimValue.isEmpty ? null : trimValue;
     currentPage = 1;
-    _load();
-  }
-
-  void changePage(int page) {
-    if (currentPage == page) return;
-    currentPage = page;
+    _accumulatedItems.clear();
     _load();
   }
 
   void refresh() {
     currentPage = 1;
+    _accumulatedItems.clear();
     _load(isRefresh: true);
   }
 
@@ -88,11 +89,73 @@ class BranchSubscriptionsListCubit extends Cubit<BranchSubscriptionsListState> {
           search: searchText,
           status: activeStatus,
         ).listen((result) {
-          result.fold((failure) {
-            if (state is! BranchSubscriptionsListSuccess) {
-              emit(BranchSubscriptionsListFailure(failure.message));
-            }
-          }, (entity) => emit(BranchSubscriptionsListSuccess(entity)));
+          result.fold(
+            (failure) {
+              if (isClosed) return;
+              if (state is! BranchSubscriptionsListSuccess) {
+                emit(BranchSubscriptionsListFailure(failure.message));
+              }
+            },
+            (entity) {
+              if (isClosed) return;
+              if (currentPage == 1) {
+                _accumulatedItems = List.from(entity.data);
+              } else {
+                _accumulatedItems.addAll(entity.data);
+              }
+              emit(
+                BranchSubscriptionsListSuccess(
+                  response: entity,
+                  items: List.from(_accumulatedItems),
+                  isFetchingMore: false,
+                  hasReachedMax: currentPage >= entity.totalPages || entity.data.isEmpty,
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  Future<void> loadMore() async {
+    if (_isFetchingMore) return;
+    if (state is! BranchSubscriptionsListSuccess) return;
+
+    final currentState = state as BranchSubscriptionsListSuccess;
+    if (currentState.hasReachedMax) return;
+
+    _isFetchingMore = true;
+    currentPage++;
+    emit(currentState.copyWith(isFetchingMore: true));
+
+    _subscription?.cancel();
+    _subscription =
+        getBranchSubscriptionsUseCase(
+          branchId: branchId,
+          pageNumber: currentPage,
+          pageSize: _pageSize,
+          search: searchText,
+          status: activeStatus,
+        ).listen((result) {
+          _isFetchingMore = false;
+          result.fold(
+            (failure) {
+              if (isClosed) return;
+              currentPage--;
+              emit(currentState.copyWith(isFetchingMore: false));
+            },
+            (entity) {
+              if (isClosed) return;
+              _accumulatedItems.addAll(entity.data);
+              emit(
+                BranchSubscriptionsListSuccess(
+                  response: entity,
+                  items: List.from(_accumulatedItems),
+                  isFetchingMore: false,
+                  hasReachedMax: currentPage >= entity.totalPages || entity.data.isEmpty,
+                ),
+              );
+            },
+          );
         });
   }
 

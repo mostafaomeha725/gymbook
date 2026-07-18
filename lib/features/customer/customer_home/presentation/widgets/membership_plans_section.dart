@@ -96,17 +96,20 @@ class MembershipPlansSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              height: 275.h,
-              child: ListView.separated(
-                key: ValueKey(response.currentPage),
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                itemBuilder: (context, index) {
-                  return listItems[index];
-                },
-                separatorBuilder: (_, __) => SizedBox(width: 16.w),
-                itemCount: listItems.length,
+            SingleChildScrollView(
+              key: ValueKey(response.currentPage),
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (int i = 0; i < listItems.length; i++) ...[
+                      listItems[i],
+                      if (i < listItems.length - 1) SizedBox(width: 16.w),
+                    ],
+                  ],
+                ),
               ),
             ),
           ],

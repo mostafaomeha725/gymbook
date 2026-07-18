@@ -73,7 +73,7 @@ class MembershipPlanCard extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
             AppText(
-              '${package.price.toStringAsFixed(package.price % 1 == 0 ? 0 : 2)} EGP',
+              '${package.price.toInt()} EGP',
               style: font32w700.copyWith(color: Colors.white),
             ),
             SizedBox(height: 4.h),
@@ -103,6 +103,7 @@ class MembershipPlanCard extends StatelessWidget {
                 ],
               ),
             ),
+            SizedBox(height: 16.h),
             const Spacer(),
             AppButton(
               text: 'Subscribe',

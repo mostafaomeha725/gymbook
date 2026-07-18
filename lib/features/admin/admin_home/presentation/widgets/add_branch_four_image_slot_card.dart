@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gymbook/core/widgets/app_image.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_images_cubit/branch_images_cubit.dart';
 
 class AddBranchFourImageSlotCard extends StatelessWidget {
@@ -34,14 +35,9 @@ class AddBranchFourImageSlotCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14.r),
                 child: () {
                   if (item?.url.trim().isNotEmpty ?? false) {
-                    return Image.network(
-                      item!.url,
+                    return AppImage(
+                      imageUrl: item!.url,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) {
-                        return const Center(
-                          child: Icon(Icons.broken_image_outlined),
-                        );
-                      },
                     );
                   }
 

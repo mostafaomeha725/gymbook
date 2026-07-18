@@ -11,7 +11,30 @@ final class BranchSubscriptionsListLoading
 final class BranchSubscriptionsListSuccess
     extends BranchSubscriptionsListState {
   final SubscriptionsListEntity response;
-  BranchSubscriptionsListSuccess(this.response);
+  final List<SubscriptionItemEntity> items;
+  final bool isFetchingMore;
+  final bool hasReachedMax;
+
+  BranchSubscriptionsListSuccess({
+    required this.response,
+    required this.items,
+    this.isFetchingMore = false,
+    this.hasReachedMax = false,
+  });
+
+  BranchSubscriptionsListSuccess copyWith({
+    SubscriptionsListEntity? response,
+    List<SubscriptionItemEntity>? items,
+    bool? isFetchingMore,
+    bool? hasReachedMax,
+  }) {
+    return BranchSubscriptionsListSuccess(
+      response: response ?? this.response,
+      items: items ?? this.items,
+      isFetchingMore: isFetchingMore ?? this.isFetchingMore,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+    );
+  }
 }
 
 final class BranchSubscriptionsListFailure

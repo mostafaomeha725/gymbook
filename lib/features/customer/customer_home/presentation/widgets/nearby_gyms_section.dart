@@ -7,7 +7,6 @@ import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/customer/customer_home/domain/entities/nearby_branch_entity.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/cubits/nearby_branches_cubit/nearby_branches_cubit.dart';
 import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_card.dart';
-import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
 class NearbyGymsSection extends StatelessWidget {
   final bool showOnlyOpenGyms;
@@ -50,47 +49,53 @@ class NearbyGymsSection extends StatelessWidget {
       child: BlocBuilder<NearbyBranchesCubit, NearbyBranchesState>(
         builder: (context, state) {
           if (state is NearbyBranchesLoading) {
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 60.h),
-              child: const Center(child: CircularProgressIndicator()),
+            return SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 60.h),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
             );
           }
 
           if (state is NearbyBranchesFailure) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
-              child: Column(
-                children: [
-                  AppText(
-                    state.message,
-                    style: font14w500.copyWith(color: const Color(0xff4A5565)),
-                    alignment: AlignmentDirectional.center,
-                  ),
-                  SizedBox(height: 12.h),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<NearbyBranchesCubit>().loadNearby();
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
+            return SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+                child: Column(
+                  children: [
+                    AppText(
+                      state.message,
+                      style: font14w500.copyWith(
+                        color: const Color(0xff4A5565),
+                      ),
+                      alignment: AlignmentDirectional.center,
+                    ),
+                    SizedBox(height: 12.h),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<NearbyBranchesCubit>().loadNearby();
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
               ),
             );
           }
 
           if (state is! NearbyBranchesSuccess) {
-            return const SizedBox.shrink();
+            return const SliverToBoxAdapter(child: SizedBox.shrink());
           }
 
           final response = state.response;
           final gyms = showOnlyOpenGyms
-              ? response.data.where((gym) => gym.isOpenNow).toList()
-              : response.data;
+              ? state.branches.where((gym) => gym.isOpenNow).toList()
+              : state.branches;
 
-          return Column(
-            children: [
+          return SliverList(
+            delegate: SliverChildListDelegate([
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 22.w),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -118,18 +123,12 @@ class NearbyGymsSection extends StatelessWidget {
                 )
               else
                 ...gyms.map(_buildGymCard),
-              if (response.totalPages > 1)
-                GymPaginationWidget(
-                  totalPages: response.totalPages,
-                  currentPage: response.currentPage,
-                  onPageChanged: (page) {
-                    showLoading();
-                    context.read<NearbyBranchesCubit>().loadNearby(
-                      pageNumber: page,
-                    );
-                  },
+              if (state.isFetchingMore)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24.h),
+                  child: const Center(child: CircularProgressIndicator()),
                 ),
-            ],
+            ]),
           );
         },
       ),

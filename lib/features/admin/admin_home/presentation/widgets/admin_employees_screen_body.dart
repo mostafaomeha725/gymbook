@@ -12,12 +12,40 @@ import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_bu
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/employee_card.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_employees_cubit/branch_employees_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_employees_cubit/branch_employees_state.dart';
-import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
-class AdminEmployeesScreenBody extends StatelessWidget {
+class AdminEmployeesScreenBody extends StatefulWidget {
   final int branchId;
 
   const AdminEmployeesScreenBody({super.key, required this.branchId});
+
+  @override
+  State<AdminEmployeesScreenBody> createState() =>
+      _AdminEmployeesScreenBodyState();
+}
+
+class _AdminEmployeesScreenBodyState extends State<AdminEmployeesScreenBody> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!mounted || !_scrollController.hasClients) return;
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.8) {
+      context.read<BranchEmployeesCubit>().loadMore();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +76,13 @@ class AdminEmployeesScreenBody extends StatelessWidget {
               await GoRouter.of(context).push(
                 Routes.addEditEmployeeScreen,
                 extra: AddEditEmployeeScreenArgs(
-                  branchId: branchId,
+                  branchId: widget.branchId,
                   isEditMode: false,
                 ),
               );
               if (context.mounted) {
                 context.read<BranchEmployeesCubit>().getBranchEmployees(
-                  branchId,
+                  widget.branchId,
                 );
               }
             },
@@ -71,9 +99,12 @@ class AdminEmployeesScreenBody extends StatelessWidget {
                 }
 
                 final cubit = context.read<BranchEmployeesCubit>();
-                final response = cubit.currentResponse;
 
-                if (response == null || response.data.isEmpty) {
+                final items = cubit.items;
+                final isFetchingMore = cubit.isFetchingMore;
+
+                // Show empty state if no items
+                if (items.isEmpty && state is! BranchEmployeesLoading) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 48.h),
                     child: Column(
@@ -106,73 +137,82 @@ class AdminEmployeesScreenBody extends StatelessWidget {
 
                 final isToggling = state is EmployeeStatusToggling;
 
-                return ListView.separated(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 22.w,
-                  ).copyWith(bottom: 100.h),
-                  itemCount: response.totalPages > 1
-                      ? response.data.length + 1
-                      : response.data.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) {
-                    if (index == response.data.length) {
-                      return GymPaginationWidget(
-                        totalPages: response.totalPages,
-                        currentPage: response.currentPage,
-                        onPageChanged: (page) {
-                          showLoading();
-                          cubit.getBranchEmployees(branchId, pageNumber: page);
-                        },
-                      );
-                    }
-                    final employee = response.data[index];
-                    final isThisToggling =
-                        isToggling &&
-                        (state is EmployeeStatusToggling &&
-                            state.employeeId == employee.id);
-                    return IgnorePointer(
-                      ignoring: isThisToggling,
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 200),
-                        opacity: isThisToggling ? 0.6 : 1.0,
-                        child: EmployeeCard(
-                          name: '${employee.firstName} ${employee.lastName}'
-                              .trim(),
-                          role: employee.roleName,
-                          phone: employee.phone,
-                          initials: employee.firstName.isNotEmpty
-                              ? employee.firstName.substring(0, 1).toUpperCase()
-                              : 'E',
-                          status: employee.isActive,
-                          onEdit: () async {
-                            await GoRouter.of(context).push(
-                              Routes.addEditEmployeeScreen,
-                              extra: AddEditEmployeeScreenArgs(
-                                branchId: branchId,
-                                isEditMode: true,
-                                employee: employee,
-                              ),
-                            );
-                            if (context.mounted) {
-                              context
-                                  .read<BranchEmployeesCubit>()
-                                  .getBranchEmployees(branchId);
-                            }
-                          },
-                          onToggleStatus: (newStatus) {
-                            context
-                                .read<BranchEmployeesCubit>()
-                                .toggleEmployeeStatus(
-                                  branchId: branchId,
-                                  employeeId: employee.id,
-                                  employee: employee,
-                                  newStatus: newStatus,
-                                );
-                          },
-                        ),
-                      ),
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await cubit.getBranchEmployees(
+                      widget.branchId,
+                      isRefresh: true,
                     );
                   },
+                  child: ListView.separated(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 22.w,
+                    ).copyWith(bottom: 100.h),
+                    itemCount: items.length + (isFetchingMore ? 1 : 0),
+                    separatorBuilder: (context, index) =>
+                        SizedBox(height: 12.h),
+                    itemBuilder: (context, index) {
+                      if (index == items.length) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      final employee = items[index];
+                      final isThisToggling =
+                          isToggling &&
+                          (state is EmployeeStatusToggling &&
+                              state.employeeId == employee.id);
+                      return IgnorePointer(
+                        ignoring: isThisToggling,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 200),
+                          opacity: isThisToggling ? 0.6 : 1.0,
+                          child: EmployeeCard(
+                            name: '${employee.firstName} ${employee.lastName}'
+                                .trim(),
+                            role: employee.roleName,
+                            phone: employee.phone,
+                            initials: employee.firstName.isNotEmpty
+                                ? employee.firstName
+                                      .substring(0, 1)
+                                      .toUpperCase()
+                                : 'E',
+                            status: employee.isActive,
+                            onEdit: () async {
+                              await GoRouter.of(context).push(
+                                Routes.addEditEmployeeScreen,
+                                extra: AddEditEmployeeScreenArgs(
+                                  branchId: widget.branchId,
+                                  isEditMode: true,
+                                  employee: employee,
+                                ),
+                              );
+                              if (context.mounted) {
+                                context
+                                    .read<BranchEmployeesCubit>()
+                                    .getBranchEmployees(widget.branchId);
+                              }
+                            },
+                            onToggleStatus: (newStatus) {
+                              context
+                                  .read<BranchEmployeesCubit>()
+                                  .toggleEmployeeStatus(
+                                    branchId: widget.branchId,
+                                    employeeId: employee.id,
+                                    employee: employee,
+                                    newStatus: newStatus,
+                                  );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),

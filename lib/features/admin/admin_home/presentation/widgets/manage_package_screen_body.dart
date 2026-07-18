@@ -8,16 +8,45 @@ import 'package:gymbook/core/widgets/appbar_subscription_widget.dart';
 import 'package:gymbook/core/widgets/custom_text.dart';
 import 'package:gymbook/features/admin/admin_home/data/models/package_model.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_cubit.dart';
+import 'package:gymbook/features/admin/admin_home/presentation/cubits/branch_packages_list_cubit/branch_packages_list_state.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/cubits/create_package_cubit/create_package_cubit.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/branch_buttom.dart';
 import 'package:gymbook/core/utils/easy_loading.dart';
 import 'package:gymbook/features/admin/admin_home/presentation/widgets/package_card.dart';
-import 'package:gymbook/features/customer/customer_home/presentation/widgets/gym_pagination_widget.dart';
 
-class ManagePackageScreenBody extends StatelessWidget {
+class ManagePackageScreenBody extends StatefulWidget {
   final int branchId;
 
   const ManagePackageScreenBody({super.key, required this.branchId});
+
+  @override
+  State<ManagePackageScreenBody> createState() =>
+      _ManagePackageScreenBodyState();
+}
+
+class _ManagePackageScreenBodyState extends State<ManagePackageScreenBody> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!mounted || !_scrollController.hasClients) return;
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.8) {
+      context.read<BranchPackagesListCubit>().loadMore();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   String _formatPrice(double value) {
     final hasFraction = value % 1 != 0;
@@ -33,7 +62,7 @@ class ManagePackageScreenBody extends StatelessWidget {
     ).push<bool>(Routes.addNewPackageScreen, extra: args);
     if (saved == true && context.mounted) {
       context.read<BranchPackagesListCubit>().loadPackages(
-        branchId: branchId,
+        branchId: widget.branchId,
         refresh: true,
       );
     }
@@ -47,7 +76,7 @@ class ManagePackageScreenBody extends StatelessWidget {
             state is PackageStatusUpdated ||
             state is PackageDeleted) {
           context.read<BranchPackagesListCubit>().loadPackages(
-            branchId: branchId,
+            branchId: widget.branchId,
             refresh: true,
           );
         }
@@ -79,19 +108,21 @@ class ManagePackageScreenBody extends StatelessWidget {
                   icon: Icons.add,
                   onTap: () => _navigateAndRefresh(
                     context,
-                    PackageScreenArgs(branchId: branchId),
+                    PackageScreenArgs(branchId: widget.branchId),
                   ),
                 ),
-                SizedBox(height: 24.h),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () => context
                         .read<BranchPackagesListCubit>()
-                        .loadPackages(branchId: branchId, refresh: true),
+                        .loadPackages(branchId: widget.branchId, refresh: true),
                     child: ListView(
+                      controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.only(bottom: 100.h),
                       children: [
+                        SizedBox(height: 16.h),
+
                         AppText(
                           success != null
                               ? 'All Packages (${success.totalCount})'
@@ -125,7 +156,7 @@ class ManagePackageScreenBody extends StatelessWidget {
                                   onPressed: () => context
                                       .read<BranchPackagesListCubit>()
                                       .loadPackages(
-                                        branchId: branchId,
+                                        branchId: widget.branchId,
                                         refresh: true,
                                       ),
                                   child: const Text('Try Again'),
@@ -133,8 +164,8 @@ class ManagePackageScreenBody extends StatelessWidget {
                               ],
                             ),
                           )
-                        else if (success != null)
-                          if (success.data.isEmpty)
+                        else if (state is BranchPackagesListSuccess)
+                          if (state.items.isEmpty)
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 40.h),
                               child: Column(
@@ -164,12 +195,12 @@ class ManagePackageScreenBody extends StatelessWidget {
                               ),
                             )
                           else
-                            ...success.data.map(
+                            ...state.items.map(
                               (pkg) => PackageCard(
                                 onEdit: () => _navigateAndRefresh(
                                   context,
                                   PackageScreenArgs(
-                                    branchId: branchId,
+                                    branchId: widget.branchId,
                                     packageItem: pkg,
                                   ),
                                 ),
@@ -177,7 +208,7 @@ class ManagePackageScreenBody extends StatelessWidget {
                                   context
                                       .read<CreatePackageCubit>()
                                       .togglePackageStatus(
-                                        branchId: branchId,
+                                        branchId: widget.branchId,
                                         packageId: pkg.id,
                                         isActive: newValue,
                                       );
@@ -186,7 +217,7 @@ class ManagePackageScreenBody extends StatelessWidget {
                                   context
                                       .read<CreatePackageCubit>()
                                       .deletePackage(
-                                        branchId: branchId,
+                                        branchId: widget.branchId,
                                         packageId: pkg.id,
                                       );
                                 },
@@ -201,19 +232,13 @@ class ManagePackageScreenBody extends StatelessWidget {
                               ),
                             ),
                         SizedBox(height: 20.h),
-                        if (success != null && success.totalPages > 1)
-                          GymPaginationWidget(
-                            totalPages: success.totalPages,
-                            currentPage: success.currentPage,
-                            onPageChanged: (page) {
-                              showLoading();
-                              context
-                                  .read<BranchPackagesListCubit>()
-                                  .loadPackages(
-                                    branchId: branchId,
-                                    pageNumber: page,
-                                  );
-                            },
+                        if (state is BranchPackagesListSuccess &&
+                            state.isFetchingMore)
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                           ),
                       ],
                     ),

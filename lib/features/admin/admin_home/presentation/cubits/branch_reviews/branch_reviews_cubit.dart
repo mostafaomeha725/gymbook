@@ -10,6 +10,7 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
   BranchReviewsCubit(this._getBranchReviewsUseCase)
     : super(BranchReviewsInitial());
 
+  bool _isFetchingMore = false;
   List<ReviewEntity> _allReviews = [];
   String _selectedRating = 'All';
   int _currentPage = 1;
@@ -20,11 +21,15 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
   ReviewEntity? _myReview;
   late int _currentBranchId;
 
-  Future<void> loadReviews(int branchId, {bool isLoadMore = false}) async {
+  Future<void> loadReviews(int branchId, {bool isRefresh = false}) async {
     _currentBranchId = branchId;
-    if (!isLoadMore) {
-      emit(BranchReviewsLoading());
+    if (isRefresh || _currentPage == 1) {
+      _allReviews.clear();
       _currentPage = 1;
+    }
+
+    if (state is! BranchReviewsLoaded) {
+      emit(BranchReviewsLoading());
     }
 
     double? ratingFilter;
@@ -41,11 +46,13 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
 
     result.fold(
       (failure) {
+        if (isClosed) return;
         emit(BranchReviewsError(failure.message));
       },
       (entity) {
-        if (!isLoadMore) {
-          _allReviews = entity.data;
+        if (isClosed) return;
+        if (_currentPage == 1) {
+          _allReviews = List.from(entity.data);
         } else {
           _allReviews.addAll(entity.data);
         }
@@ -67,25 +74,69 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
           _averageRating = 0.0;
         }
 
-        _emitLoaded();
+        _emitLoaded(isLastPage: entity.data.isEmpty);
       },
     );
   }
 
   void filterByRating(String rating) {
     _selectedRating = rating;
-    loadReviews(_currentBranchId, isLoadMore: false);
+    _currentPage = 1;
+    loadReviews(_currentBranchId);
   }
 
-  void changePage(int page) {
-    _currentPage = page;
-    loadReviews(
-      _currentBranchId,
-      isLoadMore: false,
-    ); // According to UI, might need full reload on page change, not append
+  Future<void> loadMore() async {
+    if (_isFetchingMore) return;
+    if (state is! BranchReviewsLoaded) return;
+
+    final currentState = state as BranchReviewsLoaded;
+    if (currentState.hasReachedMax) return;
+
+    _isFetchingMore = true;
+    _currentPage++;
+    emit(currentState.copyWith(isFetchingMore: true));
+
+    double? ratingFilter;
+    if (_selectedRating != 'All') {
+      ratingFilter = double.tryParse(_selectedRating);
+    }
+
+    final result = await _getBranchReviewsUseCase(
+      branchId: _currentBranchId,
+      pageNumber: _currentPage,
+      pageSize: 5,
+      rating: ratingFilter,
+    );
+
+    _isFetchingMore = false;
+    result.fold(
+      (failure) {
+        if (isClosed) return;
+        _currentPage--;
+        emit(currentState.copyWith(isFetchingMore: false));
+      },
+      (entity) {
+        if (isClosed) return;
+        _allReviews.addAll(entity.data);
+        _totalPages = entity.totalPages;
+        _canReview = entity.canReview;
+        _myReview = entity.myReview;
+        _totalCount = entity.totalCount;
+
+        final allItems = [if (_myReview != null) _myReview!, ..._allReviews];
+        if (allItems.isNotEmpty) {
+          _averageRating =
+              allItems.map((e) => e.rating).reduce((a, b) => a + b) /
+              allItems.length;
+        } else {
+          _averageRating = 0.0;
+        }
+        _emitLoaded(isLastPage: entity.data.isEmpty);
+      },
+    );
   }
 
-  void _emitLoaded() {
+  void _emitLoaded({bool isLastPage = false}) {
     emit(
       BranchReviewsLoaded(
         reviews: _allReviews,
@@ -96,6 +147,8 @@ class BranchReviewsCubit extends Cubit<BranchReviewsState> {
         totalCount: _totalCount,
         canReview: _canReview,
         myReview: _myReview,
+        isFetchingMore: false,
+        hasReachedMax: _currentPage >= _totalPages || isLastPage,
       ),
     );
   }
