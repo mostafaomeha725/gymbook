@@ -1,4 +1,4 @@
-# gymbook
+# PrimeFit
 
 A new Flutter project.
 
